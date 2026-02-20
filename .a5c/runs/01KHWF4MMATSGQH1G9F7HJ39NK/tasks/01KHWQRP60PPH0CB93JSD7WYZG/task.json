@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWQRP60PPH0CB93JSD7WYZG",
+  "taskId": "build-verify",
+  "invocationKey": "central-tauri-build:S000032:build-verify",
+  "stepId": "S000032",
+  "kind": "agent",
+  "title": "Build Verify: Terminal",
+  "labels": [
+    "agent",
+    "build",
+    "phase-6-terminal",
+    "verification"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWQRP60PPH0CB93JSD7WYZG/input.json",
+    "outputJsonPath": "tasks/01KHWQRP60PPH0CB93JSD7WYZG/result.json"
+  },
+  "inputs": {
+    "phase": {
+      "description": "xterm.js v5 setup with @xterm/xterm and addons: @xterm/addon-fit, @xterm/addon-web-links, @xterm/addon-webgl. portable-pty in Rust backend for real PTY. PTY spawn/resize/write via Tauri Channels API (NOT events). ResizeObserver → debounced fit → resize PTY. Terminal placed in right pane below file viewer in resizable split. One terminal per project (not per agent). IMPORTANT: call term.dispose() on unmount, don't call fit() before container is visible.",
+      "id": "phase-6-terminal",
+      "name": "Terminal",
+      "screenshotDescription": "Right pane split: file viewer on top, terminal on bottom showing a shell prompt. Terminal has dark theme matching app.",
+      "tasks": [
+        "xterm.js setup with fit, web-links, webgl addons",
+        "portable-pty in Rust backend",
+        "PTY spawn/resize/write via Tauri Channels",
+        "ResizeObserver → debounced fit → PTY resize",
+        "Terminal in right pane below file viewer, resizable split"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm tsc --noEmit"
+    },
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm tsc --noEmit"
+  }
+}

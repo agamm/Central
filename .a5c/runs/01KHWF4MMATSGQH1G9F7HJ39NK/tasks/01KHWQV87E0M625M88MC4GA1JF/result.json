@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWQV87E0M625M88MC4GA1JF",
+  "taskId": "screenshot-verify",
+  "invocationKey": "central-tauri-build:S000033:screenshot-verify",
+  "status": "ok",
+  "result": {
+    "description": "Right pane now split into two areas: file viewer empty state on top ('No project selected'), terminal empty state on bottom ('Select a project to open a terminal' with terminal icon). Both show correctly in dark theme. Terminal cannot be verified as running without Tauri backend, but the RightPane split and TerminalEmpty component render correctly.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-6-screenshot.png"
+  },
+  "startedAt": "2026-02-20T05:20:27.821Z",
+  "finishedAt": "2026-02-20T05:20:27.821Z",
+  "value": {
+    "description": "Right pane now split into two areas: file viewer empty state on top ('No project selected'), terminal empty state on bottom ('Select a project to open a terminal' with terminal icon). Both show correctly in dark theme. Terminal cannot be verified as running without Tauri backend, but the RightPane split and TerminalEmpty component render correctly.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-6-screenshot.png"
+  }
+}

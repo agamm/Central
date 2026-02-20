@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWQRP60PPH0CB93JSD7WYZG",
+  "taskId": "build-verify",
+  "invocationKey": "central-tauri-build:S000032:build-verify",
+  "status": "ok",
+  "result": {
+    "errors": [],
+    "output": "All 3 checks pass: tsc --noEmit (0 errors), cargo clippy (0 warnings), eslint (0 errors, 1 expected warning). Fixed 7 ESLint errors: void expressions, dynamic-delete replaced with Object.fromEntries filter.",
+    "success": true
+  },
+  "startedAt": "2026-02-20T05:19:57.115Z",
+  "finishedAt": "2026-02-20T05:19:57.115Z",
+  "value": {
+    "errors": [],
+    "output": "All 3 checks pass: tsc --noEmit (0 errors), cargo clippy (0 warnings), eslint (0 errors, 1 expected warning). Fixed 7 ESLint errors: void expressions, dynamic-delete replaced with Object.fromEntries filter.",
+    "success": true
+  }
+}

@@ -1,5 +1,6 @@
 pub mod agents;
 pub mod files;
+pub mod terminal;
 
 #[tauri::command]
 pub fn greet(name: &str) -> String {

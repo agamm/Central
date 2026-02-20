@@ -1,0 +1,20 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-20T05:11:20.290Z",
+  "data": {
+    "effectId": "01KHWQBAEGWYYH6PDSDT37PH75",
+    "invocationKey": "central-tauri-build:S000031:implement-phase",
+    "invocationHash": "96134cfe3a928338a3a7e3e27fceb97f6f70b6b74da8e34c95af20cc83206dc3",
+    "stepId": "S000031",
+    "taskId": "implement-phase",
+    "kind": "agent",
+    "label": "agent",
+    "taskDefRef": "tasks/01KHWQBAEGWYYH6PDSDT37PH75/task.json",
+    "labels": [
+      "agent",
+      "implementation",
+      "phase-6-terminal"
+    ]
+  },
+  "checksum": "72dde7b357c84f43e745bed9ae0d2d06cfe4717fcb6448ec030aad753536ba25"
+}

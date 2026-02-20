@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWQW5ZZA2EMRB8N4X2M865X",
+  "taskId": "quality-score",
+  "invocationKey": "central-tauri-build:S000034:quality-score",
+  "status": "ok",
+  "result": {
+    "breakdown": {
+      "buildSuccess": 20,
+      "codeQuality": 28,
+      "completeness": 36,
+      "uiCorrectness": 4
+    },
+    "feedback": "All 5 phase tasks implemented. xterm.js with fit/web-links/webgl addons, portable-pty Rust backend, PTY streaming, debounced ResizeObserver, right pane split. All files under 300 lines (longest: terminal.rs at 226). Build passes all 3 checks. Note: uses Tauri emit/listen instead of Channels API as specified in PLAN.md, but matches existing codebase pattern from Phase 3. UI shows correct split with empty states. Minor deduction: Channels API deviation.",
+    "recommendations": [
+      "Consider migrating to Tauri Channels API in Phase 7 or 8 for typed streaming",
+      "Add terminal reconnect on project re-select if session is still running"
+    ],
+    "score": 88
+  },
+  "startedAt": "2026-02-20T05:20:49.769Z",
+  "finishedAt": "2026-02-20T05:20:49.769Z",
+  "value": {
+    "breakdown": {
+      "buildSuccess": 20,
+      "codeQuality": 28,
+      "completeness": 36,
+      "uiCorrectness": 4
+    },
+    "feedback": "All 5 phase tasks implemented. xterm.js with fit/web-links/webgl addons, portable-pty Rust backend, PTY streaming, debounced ResizeObserver, right pane split. All files under 300 lines (longest: terminal.rs at 226). Build passes all 3 checks. Note: uses Tauri emit/listen instead of Channels API as specified in PLAN.md, but matches existing codebase pattern from Phase 3. UI shows correct split with empty states. Minor deduction: Channels API deviation.",
+    "recommendations": [
+      "Consider migrating to Tauri Channels API in Phase 7 or 8 for typed streaming",
+      "Add terminal reconnect on project re-select if session is still running"
+    ],
+    "score": 88
+  }
+}

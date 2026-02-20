@@ -32,6 +32,10 @@ pub fn run() {
             let handle = app.handle().clone();
             let sidecar_handle = sidecar::create_sidecar_handle(handle);
             app.manage(sidecar_handle);
+
+            let pty_handle = commands::terminal::create_pty_handle();
+            app.manage(pty_handle);
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -44,6 +48,10 @@ pub fn run() {
             commands::files::status::get_git_status,
             commands::files::status::get_file_content,
             commands::files::diff::get_diff,
+            commands::terminal::pty_spawn,
+            commands::terminal::pty_write,
+            commands::terminal::pty_resize,
+            commands::terminal::pty_kill,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Central");

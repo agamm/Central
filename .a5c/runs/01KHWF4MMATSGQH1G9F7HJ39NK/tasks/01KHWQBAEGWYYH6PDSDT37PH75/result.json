@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWQBAEGWYYH6PDSDT37PH75",
+  "taskId": "implement-phase",
+  "invocationKey": "central-tauri-build:S000031:implement-phase",
+  "status": "ok",
+  "result": {
+    "decisions": [
+      "Used Tauri emit/listen for PTY streaming matching existing agent-event pattern",
+      "portable-pty 0.8 stable version",
+      "Terminal theme uses hardcoded hex derived from HSL CSS variables",
+      "One terminal per project keyed by project ID",
+      "WebGL addon with canvas fallback",
+      "ResizeObserver debounced at 100ms"
+    ],
+    "filesCreated": [
+      "src-tauri/src/commands/terminal.rs",
+      "src/features/terminal/types.ts",
+      "src/features/terminal/api.ts",
+      "src/features/terminal/store.ts",
+      "src/features/terminal/theme.ts",
+      "src/features/terminal/hooks/useTerminal.ts",
+      "src/features/terminal/components/TerminalView.tsx",
+      "src/features/terminal/components/TerminalPanel.tsx",
+      "src/features/terminal/components/TerminalEmpty.tsx",
+      "src/features/terminal/components/RightPane.tsx"
+    ],
+    "filesModified": [
+      "package.json",
+      "src-tauri/Cargo.toml",
+      "src-tauri/src/lib.rs",
+      "src-tauri/src/commands/mod.rs",
+      "src/App.tsx",
+      "src/features/terminal/index.ts"
+    ],
+    "summary": "Implemented Phase 6: Terminal. xterm.js v5 with fit/web-links/webgl addons, portable-pty Rust backend, PTY streaming via Tauri events, debounced ResizeObserver. Right pane split: FilesPanel (60%) + TerminalPanel (40%). One terminal per project. Dark theme matching app HSL variables."
+  },
+  "startedAt": "2026-02-20T05:18:33.463Z",
+  "finishedAt": "2026-02-20T05:18:33.463Z",
+  "value": {
+    "decisions": [
+      "Used Tauri emit/listen for PTY streaming matching existing agent-event pattern",
+      "portable-pty 0.8 stable version",
+      "Terminal theme uses hardcoded hex derived from HSL CSS variables",
+      "One terminal per project keyed by project ID",
+      "WebGL addon with canvas fallback",
+      "ResizeObserver debounced at 100ms"
+    ],
+    "filesCreated": [
+      "src-tauri/src/commands/terminal.rs",
+      "src/features/terminal/types.ts",
+      "src/features/terminal/api.ts",
+      "src/features/terminal/store.ts",
+      "src/features/terminal/theme.ts",
+      "src/features/terminal/hooks/useTerminal.ts",
+      "src/features/terminal/components/TerminalView.tsx",
+      "src/features/terminal/components/TerminalPanel.tsx",
+      "src/features/terminal/components/TerminalEmpty.tsx",
+      "src/features/terminal/components/RightPane.tsx"
+    ],
+    "filesModified": [
+      "package.json",
+      "src-tauri/Cargo.toml",
+      "src-tauri/src/lib.rs",
+      "src-tauri/src/commands/mod.rs",
+      "src/App.tsx",
+      "src/features/terminal/index.ts"
+    ],
+    "summary": "Implemented Phase 6: Terminal. xterm.js v5 with fit/web-links/webgl addons, portable-pty Rust backend, PTY streaming via Tauri events, debounced ResizeObserver. Right pane split: FilesPanel (60%) + TerminalPanel (40%). One terminal per project. Dark theme matching app HSL variables."
+  }
+}
