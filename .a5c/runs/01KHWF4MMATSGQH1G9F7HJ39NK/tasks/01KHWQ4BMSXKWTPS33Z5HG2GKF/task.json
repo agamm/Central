@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWQ4BMSXKWTPS33Z5HG2GKF",
+  "taskId": "screenshot-verify",
+  "invocationKey": "central-tauri-build:S000027:screenshot-verify",
+  "stepId": "S000027",
+  "kind": "agent",
+  "title": "Screenshot Verify: File Viewer + Git",
+  "labels": [
+    "agent",
+    "phase-5-files",
+    "screenshot",
+    "verification"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWQ4BMSXKWTPS33Z5HG2GKF/input.json",
+    "outputJsonPath": "tasks/01KHWQ4BMSXKWTPS33Z5HG2GKF/result.json"
+  },
+  "inputs": {
+    "phase": {
+      "description": "Right pane file tree via git2-rs (Tauri commands: get_file_tree, get_git_status, get_file_content, get_diff). Changed files highlighted in tree (modified=yellow, added=green, deleted=red indicators). CodeMirror 6 viewer: read-only (EditorState.readOnly.of(true) + EditorView.editable.of(false)), dynamic language switching via Compartment. Diff view for changed files. Git status display (branch, ahead/behind). Theme CodeMirror to match dark palette via CSS variables. IMPORTANT: open new Repository instance per Tauri command handler (git2-rs !Send/!Sync). Call view.destroy() on unmount. Set explicit height + overflow on CodeMirror.",
+      "id": "phase-5-files",
+      "name": "File Viewer + Git",
+      "screenshotDescription": "Right pane showing file tree with git status indicators, a file selected showing syntax-highlighted code in CodeMirror viewer, branch info at top.",
+      "tasks": [
+        "Right pane file tree via git2-rs Tauri commands",
+        "Changed files highlighted in tree",
+        "CodeMirror 6 viewer: read-only, dynamic language via Compartment",
+        "Diff view for changed files",
+        "Git status, branch info display",
+        "Theme CodeMirror to match dark palette"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm tsc --noEmit"
+    },
+    "phaseIndex": 5,
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "screenshotDescription": "Right pane showing file tree with git status indicators, a file selected showing syntax-highlighted code in CodeMirror viewer, branch info at top."
+  }
+}

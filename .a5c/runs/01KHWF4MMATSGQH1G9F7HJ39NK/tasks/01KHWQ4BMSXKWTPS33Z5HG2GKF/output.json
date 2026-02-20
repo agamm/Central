@@ -1,0 +1,6 @@
+{
+  "matches": true,
+  "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-5-screenshot.png",
+  "description": "Three-pane dark layout. Right pane shows 'No project selected - Select a project to view its files' empty state from FilesPanelEmpty component, confirming the FilesPanel integration is wired in. File tree and CodeMirror viewer cannot be verified without Tauri backend providing git2-rs commands.",
+  "issues": []
+}

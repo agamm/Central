@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/resizable";
 import { ProjectSidebar } from "@/features/projects";
 import { ChatPane, useAgentEvents } from "@/features/agents";
-import { FilesPlaceholder } from "@/features/files/FilesPlaceholder";
+import { FilesPanel } from "@/features/files";
 
 function App() {
   useAgentEvents();
@@ -36,7 +36,7 @@ function App() {
             minSize={20}
             className="border-l border-border"
           >
-            <FilesPlaceholder />
+            <FilesPanel />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWQ18JG6ZFT5RMNPT6AP37T",
+  "taskId": "build-verify",
+  "invocationKey": "central-tauri-build:S000026:build-verify",
+  "stepId": "S000026",
+  "kind": "agent",
+  "title": "Build Verify: File Viewer + Git",
+  "labels": [
+    "agent",
+    "build",
+    "phase-5-files",
+    "verification"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWQ18JG6ZFT5RMNPT6AP37T/input.json",
+    "outputJsonPath": "tasks/01KHWQ18JG6ZFT5RMNPT6AP37T/result.json"
+  },
+  "inputs": {
+    "phase": {
+      "description": "Right pane file tree via git2-rs (Tauri commands: get_file_tree, get_git_status, get_file_content, get_diff). Changed files highlighted in tree (modified=yellow, added=green, deleted=red indicators). CodeMirror 6 viewer: read-only (EditorState.readOnly.of(true) + EditorView.editable.of(false)), dynamic language switching via Compartment. Diff view for changed files. Git status display (branch, ahead/behind). Theme CodeMirror to match dark palette via CSS variables. IMPORTANT: open new Repository instance per Tauri command handler (git2-rs !Send/!Sync). Call view.destroy() on unmount. Set explicit height + overflow on CodeMirror.",
+      "id": "phase-5-files",
+      "name": "File Viewer + Git",
+      "screenshotDescription": "Right pane showing file tree with git status indicators, a file selected showing syntax-highlighted code in CodeMirror viewer, branch info at top.",
+      "tasks": [
+        "Right pane file tree via git2-rs Tauri commands",
+        "Changed files highlighted in tree",
+        "CodeMirror 6 viewer: read-only, dynamic language via Compartment",
+        "Diff view for changed files",
+        "Git status, branch info display",
+        "Theme CodeMirror to match dark palette"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm tsc --noEmit"
+    },
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm tsc --noEmit"
+  }
+}

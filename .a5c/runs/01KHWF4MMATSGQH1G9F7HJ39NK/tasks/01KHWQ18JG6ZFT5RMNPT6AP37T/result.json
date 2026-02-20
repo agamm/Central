@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWQ18JG6ZFT5RMNPT6AP37T",
+  "taskId": "build-verify",
+  "invocationKey": "central-tauri-build:S000026:build-verify",
+  "status": "ok",
+  "result": {
+    "errors": [],
+    "output": "All 3 checks pass: tsc --noEmit (0 errors), cargo clippy (0 warnings), eslint (0 errors, 1 expected warning). Fixed 16 ESLint errors: conditional hook call in FilesPanel.tsx, void expressions in store.ts, unnecessary type assertions in FileTreeNode.tsx.",
+    "success": true
+  },
+  "startedAt": "2026-02-20T05:07:27.013Z",
+  "finishedAt": "2026-02-20T05:07:27.013Z",
+  "value": {
+    "errors": [],
+    "output": "All 3 checks pass: tsc --noEmit (0 errors), cargo clippy (0 warnings), eslint (0 errors, 1 expected warning). Fixed 16 ESLint errors: conditional hook call in FilesPanel.tsx, void expressions in store.ts, unnecessary type assertions in FileTreeNode.tsx.",
+    "success": true
+  }
+}

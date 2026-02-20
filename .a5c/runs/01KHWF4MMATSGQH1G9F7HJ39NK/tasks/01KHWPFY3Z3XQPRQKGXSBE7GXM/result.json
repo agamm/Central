@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWPFY3Z3XQPRQKGXSBE7GXM",
+  "taskId": "implement-phase",
+  "invocationKey": "central-tauri-build:S000025:implement-phase",
+  "status": "ok",
+  "result": {
+    "decisions": [
+      "Split Rust files into 6 sub-modules for 300-line guardrail",
+      "Custom CodeMirror theme matching HSL CSS variables",
+      "Lazy dynamic language imports",
+      "Compartment for language switching",
+      "New Repository instance per Tauri command handler"
+    ],
+    "filesCreated": [
+      "src-tauri/src/commands/files/mod.rs",
+      "src-tauri/src/commands/files/types.rs",
+      "src-tauri/src/commands/files/git_helpers.rs",
+      "src-tauri/src/commands/files/tree.rs",
+      "src-tauri/src/commands/files/status.rs",
+      "src-tauri/src/commands/files/diff.rs",
+      "src/features/files/types.ts",
+      "src/features/files/api.ts",
+      "src/features/files/store.ts",
+      "src/features/files/components/FileTree.tsx",
+      "src/features/files/components/FileTreeNode.tsx",
+      "src/features/files/components/FileViewer.tsx",
+      "src/features/files/components/DiffViewer.tsx",
+      "src/features/files/components/GitStatusBar.tsx",
+      "src/features/files/components/FilesPanel.tsx",
+      "src/features/files/components/FilesPanelEmpty.tsx",
+      "src/features/files/components/editorTheme.ts",
+      "src/features/files/components/languageSupport.ts"
+    ],
+    "filesModified": [
+      "src-tauri/src/commands/mod.rs",
+      "src-tauri/src/lib.rs",
+      "src/features/files/index.ts",
+      "src/App.tsx",
+      "package.json"
+    ],
+    "summary": "Implemented Phase 5: File Viewer + Git. Rust git2-rs commands split into 6 sub-modules (tree, status, diff, types, git_helpers). CodeMirror 6 read-only viewer with custom dark theme, Compartment-based dynamic language switching, lazy language imports. File tree with git status indicators. Diff viewer with line coloring. Git status bar. FilesPanel with resizable split."
+  },
+  "startedAt": "2026-02-20T05:05:45.953Z",
+  "finishedAt": "2026-02-20T05:05:45.953Z",
+  "value": {
+    "decisions": [
+      "Split Rust files into 6 sub-modules for 300-line guardrail",
+      "Custom CodeMirror theme matching HSL CSS variables",
+      "Lazy dynamic language imports",
+      "Compartment for language switching",
+      "New Repository instance per Tauri command handler"
+    ],
+    "filesCreated": [
+      "src-tauri/src/commands/files/mod.rs",
+      "src-tauri/src/commands/files/types.rs",
+      "src-tauri/src/commands/files/git_helpers.rs",
+      "src-tauri/src/commands/files/tree.rs",
+      "src-tauri/src/commands/files/status.rs",
+      "src-tauri/src/commands/files/diff.rs",
+      "src/features/files/types.ts",
+      "src/features/files/api.ts",
+      "src/features/files/store.ts",
+      "src/features/files/components/FileTree.tsx",
+      "src/features/files/components/FileTreeNode.tsx",
+      "src/features/files/components/FileViewer.tsx",
+      "src/features/files/components/DiffViewer.tsx",
+      "src/features/files/components/GitStatusBar.tsx",
+      "src/features/files/components/FilesPanel.tsx",
+      "src/features/files/components/FilesPanelEmpty.tsx",
+      "src/features/files/components/editorTheme.ts",
+      "src/features/files/components/languageSupport.ts"
+    ],
+    "filesModified": [
+      "src-tauri/src/commands/mod.rs",
+      "src-tauri/src/lib.rs",
+      "src/features/files/index.ts",
+      "src/App.tsx",
+      "package.json"
+    ],
+    "summary": "Implemented Phase 5: File Viewer + Git. Rust git2-rs commands split into 6 sub-modules (tree, status, diff, types, git_helpers). CodeMirror 6 read-only viewer with custom dark theme, Compartment-based dynamic language switching, lazy language imports. File tree with git status indicators. Diff viewer with line coloring. Git status bar. FilesPanel with resizable split."
+  }
+}

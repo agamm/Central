@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWQ5XYH97A668BXC2EQEJQ0",
+  "taskId": "__sdk.breakpoint",
+  "invocationKey": "central-tauri-build:S000029:__sdk.breakpoint",
+  "stepId": "S000029",
+  "kind": "breakpoint",
+  "title": "breakpoint",
+  "metadata": {
+    "label": "breakpoint",
+    "payload": {
+      "context": {
+        "files": [
+          {
+            "format": "image",
+            "label": "UI Screenshot",
+            "path": "artifacts/phase-5-files/screenshot.png"
+          },
+          {
+            "format": "markdown",
+            "label": "Phase Summary",
+            "path": "artifacts/phase-5-files/summary.md"
+          }
+        ]
+      },
+      "question": "Phase 5/8: \"File Viewer + Git\" complete. Quality: 90/100. Fix iterations: 0. Build: PASS. Review and approve to continue?",
+      "title": "Phase 5: File Viewer + Git Review"
+    },
+    "requestedAt": "2026-02-20T05:08:23.633Z"
+  },
+  "inputs": {
+    "label": "breakpoint",
+    "payload": {
+      "context": {
+        "files": [
+          {
+            "format": "image",
+            "label": "UI Screenshot",
+            "path": "artifacts/phase-5-files/screenshot.png"
+          },
+          {
+            "format": "markdown",
+            "label": "Phase Summary",
+            "path": "artifacts/phase-5-files/summary.md"
+          }
+        ]
+      },
+      "question": "Phase 5/8: \"File Viewer + Git\" complete. Quality: 90/100. Fix iterations: 0. Build: PASS. Review and approve to continue?",
+      "title": "Phase 5: File Viewer + Git Review"
+    },
+    "requestedAt": "2026-02-20T05:08:23.633Z"
+  }
+}

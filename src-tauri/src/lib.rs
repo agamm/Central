@@ -40,6 +40,10 @@ pub fn run() {
             commands::agents::send_agent_message,
             commands::agents::abort_agent_session,
             commands::agents::list_agent_sessions,
+            commands::files::tree::get_file_tree,
+            commands::files::status::get_git_status,
+            commands::files::status::get_file_content,
+            commands::files::diff::get_diff,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Central");

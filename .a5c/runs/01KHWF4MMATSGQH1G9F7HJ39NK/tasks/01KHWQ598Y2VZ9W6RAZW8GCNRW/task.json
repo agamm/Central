@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWQ598Y2VZ9W6RAZW8GCNRW",
+  "taskId": "quality-score",
+  "invocationKey": "central-tauri-build:S000028:quality-score",
+  "stepId": "S000028",
+  "kind": "agent",
+  "title": "Quality Score: File Viewer + Git",
+  "labels": [
+    "agent",
+    "phase-5-files",
+    "quality"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWQ598Y2VZ9W6RAZW8GCNRW/input.json",
+    "outputJsonPath": "tasks/01KHWQ598Y2VZ9W6RAZW8GCNRW/result.json"
+  },
+  "inputs": {
+    "buildResult": {
+      "errors": [],
+      "output": "All 3 checks pass: tsc --noEmit (0 errors), cargo clippy (0 warnings), eslint (0 errors, 1 expected warning). Fixed 16 ESLint errors: conditional hook call in FilesPanel.tsx, void expressions in store.ts, unnecessary type assertions in FileTreeNode.tsx.",
+      "success": true
+    },
+    "implementResult": {
+      "decisions": [
+        "Split Rust files into 6 sub-modules for 300-line guardrail",
+        "Custom CodeMirror theme matching HSL CSS variables",
+        "Lazy dynamic language imports",
+        "Compartment for language switching",
+        "New Repository instance per Tauri command handler"
+      ],
+      "filesCreated": [
+        "src-tauri/src/commands/files/mod.rs",
+        "src-tauri/src/commands/files/types.rs",
+        "src-tauri/src/commands/files/git_helpers.rs",
+        "src-tauri/src/commands/files/tree.rs",
+        "src-tauri/src/commands/files/status.rs",
+        "src-tauri/src/commands/files/diff.rs",
+        "src/features/files/types.ts",
+        "src/features/files/api.ts",
+        "src/features/files/store.ts",
+        "src/features/files/components/FileTree.tsx",
+        "src/features/files/components/FileTreeNode.tsx",
+        "src/features/files/components/FileViewer.tsx",
+        "src/features/files/components/DiffViewer.tsx",
+        "src/features/files/components/GitStatusBar.tsx",
+        "src/features/files/components/FilesPanel.tsx",
+        "src/features/files/components/FilesPanelEmpty.tsx",
+        "src/features/files/components/editorTheme.ts",
+        "src/features/files/components/languageSupport.ts"
+      ],
+      "filesModified": [
+        "src-tauri/src/commands/mod.rs",
+        "src-tauri/src/lib.rs",
+        "src/features/files/index.ts",
+        "src/App.tsx",
+        "package.json"
+      ],
+      "summary": "Implemented Phase 5: File Viewer + Git. Rust git2-rs commands split into 6 sub-modules (tree, status, diff, types, git_helpers). CodeMirror 6 read-only viewer with custom dark theme, Compartment-based dynamic language switching, lazy language imports. File tree with git status indicators. Diff viewer with line coloring. Git status bar. FilesPanel with resizable split."
+    },
+    "phase": {
+      "description": "Right pane file tree via git2-rs (Tauri commands: get_file_tree, get_git_status, get_file_content, get_diff). Changed files highlighted in tree (modified=yellow, added=green, deleted=red indicators). CodeMirror 6 viewer: read-only (EditorState.readOnly.of(true) + EditorView.editable.of(false)), dynamic language switching via Compartment. Diff view for changed files. Git status display (branch, ahead/behind). Theme CodeMirror to match dark palette via CSS variables. IMPORTANT: open new Repository instance per Tauri command handler (git2-rs !Send/!Sync). Call view.destroy() on unmount. Set explicit height + overflow on CodeMirror.",
+      "id": "phase-5-files",
+      "name": "File Viewer + Git",
+      "screenshotDescription": "Right pane showing file tree with git status indicators, a file selected showing syntax-highlighted code in CodeMirror viewer, branch info at top.",
+      "tasks": [
+        "Right pane file tree via git2-rs Tauri commands",
+        "Changed files highlighted in tree",
+        "CodeMirror 6 viewer: read-only, dynamic language via Compartment",
+        "Diff view for changed files",
+        "Git status, branch info display",
+        "Theme CodeMirror to match dark palette"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm tsc --noEmit"
+    },
+    "phaseIndex": 5,
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "screenshotResult": {
+      "description": "Three-pane dark layout. Right pane shows 'No project selected - Select a project to view its files' empty state from FilesPanelEmpty component, confirming the FilesPanel integration is wired in. File tree and CodeMirror viewer cannot be verified without Tauri backend providing git2-rs commands.",
+      "issues": [],
+      "matches": true,
+      "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-5-screenshot.png"
+    }
+  }
+}

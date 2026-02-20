@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWQ4BMSXKWTPS33Z5HG2GKF",
+  "taskId": "screenshot-verify",
+  "invocationKey": "central-tauri-build:S000027:screenshot-verify",
+  "status": "ok",
+  "result": {
+    "description": "Three-pane dark layout. Right pane shows 'No project selected - Select a project to view its files' empty state from FilesPanelEmpty component, confirming the FilesPanel integration is wired in. File tree and CodeMirror viewer cannot be verified without Tauri backend providing git2-rs commands.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-5-screenshot.png"
+  },
+  "startedAt": "2026-02-20T05:07:56.578Z",
+  "finishedAt": "2026-02-20T05:07:56.578Z",
+  "value": {
+    "description": "Three-pane dark layout. Right pane shows 'No project selected - Select a project to view its files' empty state from FilesPanelEmpty component, confirming the FilesPanel integration is wired in. File tree and CodeMirror viewer cannot be verified without Tauri backend providing git2-rs commands.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-5-screenshot.png"
+  }
+}

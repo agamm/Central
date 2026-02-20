@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWQ5XYH97A668BXC2EQEJQ0",
+  "taskId": "__sdk.breakpoint",
+  "invocationKey": "central-tauri-build:S000029:__sdk.breakpoint",
+  "status": "ok",
+  "result": {
+    "approved": true,
+    "feedback": "Approved. Clean implementation, no violations."
+  },
+  "startedAt": "2026-02-20T05:10:59.193Z",
+  "finishedAt": "2026-02-20T05:10:59.193Z",
+  "value": {
+    "approved": true,
+    "feedback": "Approved. Clean implementation, no violations."
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWPFY3Z3XQPRQKGXSBE7GXM",
+  "taskId": "implement-phase",
+  "invocationKey": "central-tauri-build:S000025:implement-phase",
+  "stepId": "S000025",
+  "kind": "agent",
+  "title": "Implement: File Viewer + Git (5/8)",
+  "labels": [
+    "agent",
+    "implementation",
+    "phase-5-files"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWPFY3Z3XQPRQKGXSBE7GXM/input.json",
+    "outputJsonPath": "tasks/01KHWPFY3Z3XQPRQKGXSBE7GXM/result.json"
+  },
+  "inputs": {
+    "claudeMdPath": "/Users/agam/dev/CentralTauri/CLAUDE.md",
+    "phase": {
+      "description": "Right pane file tree via git2-rs (Tauri commands: get_file_tree, get_git_status, get_file_content, get_diff). Changed files highlighted in tree (modified=yellow, added=green, deleted=red indicators). CodeMirror 6 viewer: read-only (EditorState.readOnly.of(true) + EditorView.editable.of(false)), dynamic language switching via Compartment. Diff view for changed files. Git status display (branch, ahead/behind). Theme CodeMirror to match dark palette via CSS variables. IMPORTANT: open new Repository instance per Tauri command handler (git2-rs !Send/!Sync). Call view.destroy() on unmount. Set explicit height + overflow on CodeMirror.",
+      "id": "phase-5-files",
+      "name": "File Viewer + Git",
+      "screenshotDescription": "Right pane showing file tree with git status indicators, a file selected showing syntax-highlighted code in CodeMirror viewer, branch info at top.",
+      "tasks": [
+        "Right pane file tree via git2-rs Tauri commands",
+        "Changed files highlighted in tree",
+        "CodeMirror 6 viewer: read-only, dynamic language via Compartment",
+        "Diff view for changed files",
+        "Git status, branch info display",
+        "Theme CodeMirror to match dark palette"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm tsc --noEmit"
+    },
+    "phaseIndex": 5,
+    "planPath": "/Users/agam/dev/CentralTauri/PLAN.md",
+    "previousPhases": [
+      {
+        "id": "phase-1-setup",
+        "name": "Project Setup",
+        "summary": "Scaffolded complete Tauri v2 + React 19 + TypeScript strict project. Configured Vite, ESLint flat config, Prettier, Tailwind v3 + shadcn/ui with dark theme HSL vars from PLAN.md, Zustand, neverthrow, lucide-react. Rust backend with git2-rs (vendored), tauri-plugin-sql (SQLite), dialog, notification, shell plugins. SQLite schema with all 4 tables (projects, agent_sessions, messages, app_settings) + indexes. Feature-based directory structure. All checks pass: tsc --noEmit, cargo build, cargo clippy, vitest (3/3), vite build."
+      },
+      {
+        "id": "phase-2-layout",
+        "name": "Core Layout + Projects",
+        "summary": "Implemented Phase 2: Core Layout + Projects. Three-pane resizable layout (left 20%, middle 50%, right 30%), project sidebar with full CRUD, folder picker via Tauri dialog, SQLite persistence via @tauri-apps/plugin-sql JS API, Zustand store with selectors, dark theme styling. 8 shadcn/ui components installed. All TypeScript and Rust compiles clean."
+      },
+      {
+        "id": "phase-3-agents",
+        "name": "Agent Orchestration",
+        "summary": "Implemented Phase 3: Agent Orchestration. Mock Node.js sidecar with JSON-lines protocol, Rust sidecar manager with Tauri events, agent CRUD commands, SQLite persistence, Zustand agent store, and full Chat UI (MessageBubble, ThinkingBlock, ToolCallBlock, PromptInput, MessageQueue). Event bridge connects backend to frontend."
+      },
+      {
+        "id": "phase-4-monitoring",
+        "name": "Agent Monitoring + Switching",
+        "summary": "Implemented Phase 4: Agent Monitoring + Switching. Added agent sessions nested under projects in sidebar with status badges (spinner/green/red/gray/amber dots). Click session switches active agent. Scroll positions preserved per-session. macOS notifications on completion/failure. Selective Zustand subscriptions for performance. Extracted sessionActions.ts and ChatEmptyState.tsx from ChatPane."
+      }
+    ],
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "totalPhases": 8
+  }
+}
