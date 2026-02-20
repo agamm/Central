@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWNC6KR8R7076XTFQA4GQWE",
+  "taskId": "git-commit",
+  "invocationKey": "central-tauri-build:S000018:git-commit",
+  "stepId": "S000018",
+  "kind": "agent",
+  "title": "Git Commit: Phase 3 - Agent Orchestration",
+  "labels": [
+    "agent",
+    "git",
+    "phase-3-agents"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWNC6KR8R7076XTFQA4GQWE/input.json",
+    "outputJsonPath": "tasks/01KHWNC6KR8R7076XTFQA4GQWE/result.json"
+  },
+  "inputs": {
+    "phase": {
+      "description": "Node.js sidecar setup with Claude Agent SDK (@anthropic-ai/claude-code). The sidecar is a compiled Node.js binary in bundle.externalBin that receives commands via stdin (JSON-lines) and streams responses via stdout. Rust sidecar manager: spawn, route messages, abort agents via AbortController. Use Tauri v2 Channels API (NOT events) for streaming agent output to frontend. Agent session CRUD in SQLite (AgentSession: id, project_id, status, prompt, model, sdk_session_id, created_at, ended_at). Zustand agent store: session state, status tracking. Chat pane: prompt input → launch agent → stream response. Chat UI: assistant message bubbles + collapsible tool calls + expandable thinking sections. Message queue: type while agent is running, queue is visible/editable/cancellable. Status enum: running → completed | failed | aborted | interrupted.",
+      "id": "phase-3-agents",
+      "name": "Agent Orchestration",
+      "screenshotDescription": "Chat pane with prompt input at bottom, a project selected in left pane. Middle pane shows chat area ready for input.",
+      "tasks": [
+        "Node.js sidecar setup with Claude Agent SDK",
+        "Rust sidecar manager: spawn, route messages, abort",
+        "Tauri Channels for streaming agent output to frontend",
+        "Agent session CRUD in SQLite",
+        "Zustand agent store: session state, status tracking",
+        "Chat pane: prompt input → launch agent → stream response",
+        "Chat UI: message bubbles + collapsible tool calls + expandable thinking",
+        "AbortController integration for cancellation",
+        "Message queue: type while agent running, queue visible/editable/cancellable"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml 2>&1 | tail -20 && pnpm tsc --noEmit"
+    },
+    "phaseIndex": 3,
+    "projectPath": "/Users/agam/dev/CentralTauri"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWM3270X4K2BPEJK1PFSW31",
+  "taskId": "screenshot-verify",
+  "invocationKey": "central-tauri-build:S000015:screenshot-verify",
+  "status": "ok",
+  "result": {
+    "description": "Three-pane dark layout. Middle pane shows chat area with 'Select a project' empty state and prompt input bar at bottom with 'Send a message to start an agent...' placeholder and send button. Left pane: project sidebar. Right pane: files placeholder.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-3-screenshot.png"
+  },
+  "startedAt": "2026-02-20T04:15:30.566Z",
+  "finishedAt": "2026-02-20T04:15:30.566Z",
+  "value": {
+    "description": "Three-pane dark layout. Middle pane shows chat area with 'Select a project' empty state and prompt input bar at bottom with 'Send a message to start an agent...' placeholder and send button. Left pane: project sidebar. Right pane: files placeholder.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-3-screenshot.png"
+  }
+}

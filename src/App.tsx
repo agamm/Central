@@ -5,10 +5,12 @@ import {
   ResizableHandle,
 } from "@/components/ui/resizable";
 import { ProjectSidebar } from "@/features/projects";
-import { ChatPlaceholder } from "@/features/agents/ChatPlaceholder";
+import { ChatPane, useAgentEvents } from "@/features/agents";
 import { FilesPlaceholder } from "@/features/files/FilesPlaceholder";
 
 function App() {
+  useAgentEvents();
+
   return (
     <TooltipProvider delayDuration={300}>
       <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
@@ -24,7 +26,7 @@ function App() {
           <ResizableHandle />
 
           <ResizablePanel defaultSize={50} minSize={25}>
-            <ChatPlaceholder />
+            <ChatPane />
           </ResizablePanel>
 
           <ResizableHandle />

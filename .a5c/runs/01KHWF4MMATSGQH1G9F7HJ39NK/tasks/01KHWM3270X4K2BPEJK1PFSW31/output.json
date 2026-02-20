@@ -1,0 +1,6 @@
+{
+  "matches": true,
+  "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-3-screenshot.png",
+  "description": "Three-pane dark layout. Middle pane shows chat area with 'Select a project' empty state and prompt input bar at bottom with 'Send a message to start an agent...' placeholder and send button. Left pane: project sidebar. Right pane: files placeholder.",
+  "issues": []
+}

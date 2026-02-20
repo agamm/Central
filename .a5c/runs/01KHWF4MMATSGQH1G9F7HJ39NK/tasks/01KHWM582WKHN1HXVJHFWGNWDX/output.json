@@ -1,0 +1,18 @@
+{
+  "score": 81,
+  "breakdown": {
+    "completeness": 33,
+    "codeQuality": 25,
+    "buildSuccess": 18,
+    "uiCorrectness": 5
+  },
+  "feedback": "All 9 core tasks complete. Mock sidecar, Rust manager, event bridge, SQLite persistence, Zustand store, full chat UI with thinking/tool call blocks and message queue. Key gaps: uses emit() instead of Channels API, handleSubmit exceeds 50-line limit, no tests, no session restore on startup.",
+  "recommendations": [
+    "Decompose ChatPane.handleSubmit (108 lines) into smaller functions",
+    "Replace emit() with Tauri v2 Channels API for typed streaming",
+    "Add session restore on mount from SQLite",
+    "Write agent lifecycle tests (start, complete, abort, queue drain)",
+    "Fix sidecar path resolution for production",
+    "Remove dynamic import in useAgentEvents.ts"
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWKG2DFTA1MJ68JA3QHJFHD",
+  "taskId": "implement-phase",
+  "invocationKey": "central-tauri-build:S000013:implement-phase",
+  "stepId": "S000013",
+  "kind": "agent",
+  "title": "Implement: Agent Orchestration (3/8)",
+  "labels": [
+    "agent",
+    "implementation",
+    "phase-3-agents"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWKG2DFTA1MJ68JA3QHJFHD/input.json",
+    "outputJsonPath": "tasks/01KHWKG2DFTA1MJ68JA3QHJFHD/result.json"
+  },
+  "inputs": {
+    "claudeMdPath": "/Users/agam/dev/CentralTauri/CLAUDE.md",
+    "phase": {
+      "description": "Node.js sidecar setup with Claude Agent SDK (@anthropic-ai/claude-code). The sidecar is a compiled Node.js binary in bundle.externalBin that receives commands via stdin (JSON-lines) and streams responses via stdout. Rust sidecar manager: spawn, route messages, abort agents via AbortController. Use Tauri v2 Channels API (NOT events) for streaming agent output to frontend. Agent session CRUD in SQLite (AgentSession: id, project_id, status, prompt, model, sdk_session_id, created_at, ended_at). Zustand agent store: session state, status tracking. Chat pane: prompt input → launch agent → stream response. Chat UI: assistant message bubbles + collapsible tool calls + expandable thinking sections. Message queue: type while agent is running, queue is visible/editable/cancellable. Status enum: running → completed | failed | aborted | interrupted.",
+      "id": "phase-3-agents",
+      "name": "Agent Orchestration",
+      "screenshotDescription": "Chat pane with prompt input at bottom, a project selected in left pane. Middle pane shows chat area ready for input.",
+      "tasks": [
+        "Node.js sidecar setup with Claude Agent SDK",
+        "Rust sidecar manager: spawn, route messages, abort",
+        "Tauri Channels for streaming agent output to frontend",
+        "Agent session CRUD in SQLite",
+        "Zustand agent store: session state, status tracking",
+        "Chat pane: prompt input → launch agent → stream response",
+        "Chat UI: message bubbles + collapsible tool calls + expandable thinking",
+        "AbortController integration for cancellation",
+        "Message queue: type while agent running, queue visible/editable/cancellable"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml 2>&1 | tail -20 && pnpm tsc --noEmit"
+    },
+    "phaseIndex": 3,
+    "planPath": "/Users/agam/dev/CentralTauri/PLAN.md",
+    "previousPhases": [
+      {
+        "id": "phase-1-setup",
+        "name": "Project Setup",
+        "summary": "Scaffolded complete Tauri v2 + React 19 + TypeScript strict project. Configured Vite, ESLint flat config, Prettier, Tailwind v3 + shadcn/ui with dark theme HSL vars from PLAN.md, Zustand, neverthrow, lucide-react. Rust backend with git2-rs (vendored), tauri-plugin-sql (SQLite), dialog, notification, shell plugins. SQLite schema with all 4 tables (projects, agent_sessions, messages, app_settings) + indexes. Feature-based directory structure. All checks pass: tsc --noEmit, cargo build, cargo clippy, vitest (3/3), vite build."
+      },
+      {
+        "id": "phase-2-layout",
+        "name": "Core Layout + Projects",
+        "summary": "Implemented Phase 2: Core Layout + Projects. Three-pane resizable layout (left 20%, middle 50%, right 30%), project sidebar with full CRUD, folder picker via Tauri dialog, SQLite persistence via @tauri-apps/plugin-sql JS API, Zustand store with selectors, dark theme styling. 8 shadcn/ui components installed. All TypeScript and Rust compiles clean."
+      }
+    ],
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "totalPhases": 8
+  }
+}
