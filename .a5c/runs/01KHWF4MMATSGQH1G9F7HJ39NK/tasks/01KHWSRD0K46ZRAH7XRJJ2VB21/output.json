@@ -1,0 +1,6 @@
+{
+  "matches": true,
+  "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-8-screenshot.png",
+  "description": "App renders stably with all three panes. Phase 8 only added test files — no UI changes. The app still shows the three-pane layout: projects sidebar (empty state), chat pane (empty state with prompt input), and right pane (file viewer + terminal empty states). All elements render correctly, confirming test additions did not break the UI.",
+  "issues": []
+}

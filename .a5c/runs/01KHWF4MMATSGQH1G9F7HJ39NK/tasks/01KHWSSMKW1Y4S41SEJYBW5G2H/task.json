@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWSSMKW1Y4S41SEJYBW5G2H",
+  "taskId": "quality-score",
+  "invocationKey": "central-tauri-build:S000046:quality-score",
+  "stepId": "S000046",
+  "kind": "agent",
+  "title": "Quality Score: Testing",
+  "labels": [
+    "agent",
+    "phase-8-testing",
+    "quality"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWSSMKW1Y4S41SEJYBW5G2H/input.json",
+    "outputJsonPath": "tasks/01KHWSSMKW1Y4S41SEJYBW5G2H/result.json"
+  },
+  "inputs": {
+    "buildResult": {
+      "errors": [],
+      "output": "All checks pass: tsc --noEmit (0 errors), cargo clippy (0 warnings), eslint (0 errors, 1 expected warning), cargo test (62 passed), pnpm vitest run (94 passed across 8 files). Total: 156 tests.",
+      "success": true
+    },
+    "implementResult": {
+      "decisions": [
+        "Co-located test files (*.test.ts) and #[cfg(test)] mod tests in Rust",
+        "Shared test-helpers.ts with factory functions to reduce boilerplate",
+        "Rust git tests create real temp repositories for authentic integration",
+        "Tested 5-concurrent-agent scenarios for parallelism isolation"
+      ],
+      "filesCreated": [
+        "src/features/agents/store.test.ts",
+        "src/features/agents/api.test.ts",
+        "src/features/agents/sessionActions.test.ts",
+        "src/features/projects/store.test.ts",
+        "src/features/files/store.test.ts",
+        "src/features/terminal/store.test.ts",
+        "src/hooks/useBootstrap.test.ts",
+        "src/shared/test-helpers.ts"
+      ],
+      "filesModified": [
+        "src/test-setup.ts",
+        "src-tauri/src/sidecar/types.rs",
+        "src-tauri/src/commands/files/git_helpers.rs",
+        "src-tauri/src/commands/files/tree.rs",
+        "src-tauri/src/commands/files/diff.rs",
+        "src-tauri/src/commands/files/status.rs",
+        "src-tauri/src/commands/mod.rs"
+      ],
+      "summary": "Phase 8 Testing: 156 total tests (94 vitest + 62 Rust). All pass. Covers agent store (28 tests), agent API (14), session actions (5), project store (12), files store (11), terminal store (15), bootstrap (6), constants (3). Rust: sidecar protocol (16), git_helpers (12), tree (16), diff (6), status (4), greet (2). Parallelism with 5 concurrent agents tested."
+    },
+    "phase": {
+      "description": "Rust unit tests: git2-rs wrappers (status, diff, log), sidecar manager (spawn/kill), PTY management. TypeScript unit tests (vitest): Zustand store logic (agent store, project store), neverthrow error handling patterns, message queue operations, session restore logic. Integration tests: agent lifecycle (spawn → stream → complete/fail/abort), parallelism (multiple agents, switching), crash recovery (persist → restore). UI tests: critical interactions only — agent launch, switching, status updates. No tests for: pure UI layout, styling, static components.",
+      "id": "phase-8-testing",
+      "name": "Testing",
+      "screenshotDescription": "Terminal output showing all tests passing (Rust + vitest), or the app running stably with test results visible.",
+      "tasks": [
+        "Rust unit tests: git2-rs wrappers, sidecar manager, PTY management",
+        "TS vitest: agent store logic, message queue, session restore",
+        "Integration: agent lifecycle end-to-end",
+        "Integration: parallelism (multiple agents, switching)",
+        "Integration: crash recovery (persist → restore)",
+        "UI tests: agent launch, switching, status updates"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm vitest run"
+    },
+    "phaseIndex": 8,
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "screenshotResult": {
+      "description": "App renders stably with all three panes. Phase 8 only added test files — no UI changes. The app still shows the three-pane layout: projects sidebar (empty state), chat pane (empty state with prompt input), and right pane (file viewer + terminal empty states). All elements render correctly, confirming test additions did not break the UI.",
+      "issues": [],
+      "matches": true,
+      "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-8-screenshot.png"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "success": true,
+  "errors": [],
+  "output": "All checks pass: tsc --noEmit (0 errors), cargo clippy (0 warnings), eslint (0 errors, 1 expected warning), cargo test (62 passed), pnpm vitest run (94 passed across 8 files). Total: 156 tests."
+}

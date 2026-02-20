@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWSRD0K46ZRAH7XRJJ2VB21",
+  "taskId": "screenshot-verify",
+  "invocationKey": "central-tauri-build:S000045:screenshot-verify",
+  "status": "ok",
+  "result": {
+    "description": "App renders stably with all three panes. Phase 8 only added test files — no UI changes. The app still shows the three-pane layout: projects sidebar (empty state), chat pane (empty state with prompt input), and right pane (file viewer + terminal empty states). All elements render correctly, confirming test additions did not break the UI.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-8-screenshot.png"
+  },
+  "startedAt": "2026-02-20T05:54:01.659Z",
+  "finishedAt": "2026-02-20T05:54:01.659Z",
+  "value": {
+    "description": "App renders stably with all three panes. Phase 8 only added test files — no UI changes. The app still shows the three-pane layout: projects sidebar (empty state), chat pane (empty state with prompt input), and right pane (file viewer + terminal empty states). All elements render correctly, confirming test additions did not break the UI.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-8-screenshot.png"
+  }
+}

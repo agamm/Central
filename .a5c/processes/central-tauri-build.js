@@ -1,7 +1,7 @@
 /**
  * @process central-tauri-build
  * @description Full build process for CentralTauri — macOS desktop app for orchestrating parallel Claude Code agents.
- * Tauri v2 + React 19 + TypeScript strict + Zustand + shadcn/ui. 8 quality-gated phases with screenshot verification.
+ * Tauri v2 + React 19 + TypeScript strict + Zustand + shadcn/ui. 9 quality-gated phases with screenshot verification.
  * @inputs { projectPath: string, planPath: string, claudeMdPath: string }
  * @outputs { success: boolean, phasesCompleted: number, artifacts: array }
  */
@@ -141,6 +141,51 @@ export async function process(inputs, ctx) {
         'Integration: parallelism (multiple agents, switching)',
         'Integration: crash recovery (persist → restore)',
         'UI tests: agent launch, switching, status updates'
+      ]
+    },
+    {
+      id: 'phase-9-design-polish',
+      name: 'Design Polish — Native macOS Feel',
+      description: `Make the app look and feel like a native macOS IDE (reference: Cursor/Conductor workspace UI) rather than a default shadcn/ui web app. Key changes:
+
+REFERENCE IMAGE ANALYSIS (Conductor workspace):
+- Background: Very dark (#0d0d0d to #111111 range), darker than current shadcn default
+- Borders: Ultra-subtle, barely visible — ~5-8% opacity white or very dark gray (e.g., hsl(0 0% 15%)), NOT the current 17% lightness blue-gray
+- Selected items: Subtle background shift (slightly lighter surface), no harsh outlines or bright highlights
+- Text hierarchy: Primary text ~85% white, secondary ~50% white, tertiary ~35% white — all muted, no pure white anywhere
+- Panels: Differentiated by very slight background shade (1-2% difference), not by borders
+- Inputs: Dark background with very subtle border, muted placeholder text, slightly rounded
+- Tab bars: Plain text tabs, minimal — no shadcn Tab styling. Active tab slightly lighter, inactive very muted
+- Buttons: Ghost-style by default, very subtle hover states
+- Empty states: Simple centered text, no heavy illustrations or boxes
+- Scrollbars: Thin, dark, auto-hide
+- Overall: Zero shadows, completely flat, feels like part of the OS not a web page
+
+SPECIFIC TASKS:
+1. Update globals.css HSL variables: darken background to ~hsl(0 0% 5%), surface to hsl(0 0% 7%), reduce border contrast to ~hsl(0 0% 12-15%), desaturate everything (move from blue-tinted to neutral dark)
+2. Update ResizableHandle to be 1px hairline, nearly invisible
+3. Refine sidebar: items should have subtle rounded hover states, selected state is slightly lighter bg not bold/bright
+4. Chat input area: dark bg, subtle border, rounded corners, placeholder text very muted
+5. Terminal tab bar: plain text, minimal, no shadcn Tab component overhead
+6. Message bubbles: remove any boxy card styling, use subtle bg difference only
+7. File tree: tighten spacing, ensure git status dots are small and refined
+8. Status badges: smaller, more refined, match native macOS aesthetic
+9. Custom thin scrollbar CSS (webkit-scrollbar) for all scrollable areas
+10. Ensure all hover/focus states are subtle and not flashy
+11. Remove any remaining default shadcn visual artifacts (large border-radius, heavy shadows, etc.)
+12. Add subtle CSS transitions (150ms) for hover/active states to feel polished`,
+      verifyCommand: 'cd /Users/agam/dev/CentralTauri && pnpm tsc --noEmit && pnpm eslint src/',
+      screenshotDescription: 'App with refined native-macOS-feeling dark theme: ultra-subtle borders, muted color hierarchy, no shadcn visual artifacts, feels like Cursor/Conductor not a web app.',
+      tasks: [
+        'Update globals.css: darker bg, desaturated palette, ultra-subtle borders',
+        'Refine ResizableHandle to 1px hairline',
+        'Refine sidebar: subtle hover/selected states, tighter spacing',
+        'Refine chat input and message bubbles',
+        'Refine terminal tab bar to plain minimal style',
+        'Custom thin scrollbars (webkit)',
+        'Subtle CSS transitions for all interactive states',
+        'Ensure file tree, status badges, empty states match native feel',
+        'Screenshot comparison with reference image to verify'
       ]
     }
   ];

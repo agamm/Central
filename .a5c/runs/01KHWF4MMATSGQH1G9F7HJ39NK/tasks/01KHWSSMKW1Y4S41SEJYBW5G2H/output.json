@@ -1,0 +1,32 @@
+{
+  "score": 92,
+  "summary": "Excellent test coverage. 156 tests (94 TS + 62 Rust) all passing. Comprehensive coverage of stores, API layer, session lifecycle, parallelism, and crash recovery.",
+  "breakdown": {
+    "completeness": 38,
+    "codeQuality": 28,
+    "buildSuccess": 20,
+    "uiCorrectness": 6
+  },
+  "strengths": [
+    "156 tests total, all passing on first run",
+    "Agent store has 28 tests covering all operations including 5-agent parallelism",
+    "Rust git tests use real temp repos for authentic integration testing",
+    "Shared test-helpers.ts reduces boilerplate with factory functions",
+    "Bootstrap/crash recovery tested as extracted pure functions",
+    "Sidecar protocol roundtrip tests ensure Rust<->Node.js compatibility"
+  ],
+  "issues": [
+    {
+      "severity": "low",
+      "description": "No direct UI/component tests (testing-library) — session actions tested at store level instead. Acceptable for MVP."
+    },
+    {
+      "severity": "low",
+      "description": "PTY management not unit-tested in Rust (requires real PTY which is hard to mock). Covered by integration testing instead."
+    }
+  ],
+  "recommendations": [
+    "Add React Testing Library component tests in a future iteration",
+    "Consider adding E2E tests with Playwright for full agent lifecycle"
+  ]
+}

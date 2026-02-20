@@ -1,0 +1,20 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-20T14:12:13.406Z",
+  "data": {
+    "effectId": "01KHXP9PYHRJY1HZJP7N4P0Z16",
+    "invocationKey": "central-tauri-build:S000048:git-commit",
+    "invocationHash": "622e92698337efd586383fef3c73c3ef00837c3fee3fe8c4cf21853c9bcf9931",
+    "stepId": "S000048",
+    "taskId": "git-commit",
+    "kind": "agent",
+    "label": "agent",
+    "taskDefRef": "tasks/01KHXP9PYHRJY1HZJP7N4P0Z16/task.json",
+    "labels": [
+      "agent",
+      "git",
+      "phase-8-testing"
+    ]
+  },
+  "checksum": "49b3da436a3564e6f2a08de6691c4eecec926e4d27391282ed4019af4f208f32"
+}

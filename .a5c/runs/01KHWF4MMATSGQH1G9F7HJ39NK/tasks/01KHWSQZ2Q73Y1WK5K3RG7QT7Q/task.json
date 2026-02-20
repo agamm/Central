@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWSQZ2Q73Y1WK5K3RG7QT7Q",
+  "taskId": "build-verify",
+  "invocationKey": "central-tauri-build:S000044:build-verify",
+  "stepId": "S000044",
+  "kind": "agent",
+  "title": "Build Verify: Testing",
+  "labels": [
+    "agent",
+    "build",
+    "phase-8-testing",
+    "verification"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWSQZ2Q73Y1WK5K3RG7QT7Q/input.json",
+    "outputJsonPath": "tasks/01KHWSQZ2Q73Y1WK5K3RG7QT7Q/result.json"
+  },
+  "inputs": {
+    "phase": {
+      "description": "Rust unit tests: git2-rs wrappers (status, diff, log), sidecar manager (spawn/kill), PTY management. TypeScript unit tests (vitest): Zustand store logic (agent store, project store), neverthrow error handling patterns, message queue operations, session restore logic. Integration tests: agent lifecycle (spawn → stream → complete/fail/abort), parallelism (multiple agents, switching), crash recovery (persist → restore). UI tests: critical interactions only — agent launch, switching, status updates. No tests for: pure UI layout, styling, static components.",
+      "id": "phase-8-testing",
+      "name": "Testing",
+      "screenshotDescription": "Terminal output showing all tests passing (Rust + vitest), or the app running stably with test results visible.",
+      "tasks": [
+        "Rust unit tests: git2-rs wrappers, sidecar manager, PTY management",
+        "TS vitest: agent store logic, message queue, session restore",
+        "Integration: agent lifecycle end-to-end",
+        "Integration: parallelism (multiple agents, switching)",
+        "Integration: crash recovery (persist → restore)",
+        "UI tests: agent launch, switching, status updates"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm vitest run"
+    },
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm vitest run"
+  }
+}

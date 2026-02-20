@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWST9968K8HFQ9GC6SC9A3A",
+  "taskId": "__sdk.breakpoint",
+  "invocationKey": "central-tauri-build:S000047:__sdk.breakpoint",
+  "stepId": "S000047",
+  "kind": "breakpoint",
+  "title": "breakpoint",
+  "metadata": {
+    "label": "breakpoint",
+    "payload": {
+      "context": {
+        "files": [
+          {
+            "format": "image",
+            "label": "UI Screenshot",
+            "path": "artifacts/phase-8-testing/screenshot.png"
+          },
+          {
+            "format": "markdown",
+            "label": "Phase Summary",
+            "path": "artifacts/phase-8-testing/summary.md"
+          }
+        ]
+      },
+      "question": "Phase 8/9: \"Testing\" complete. Quality: 92/100. Fix iterations: 0. Build: PASS. Review and approve to continue?",
+      "title": "Phase 8: Testing Review"
+    },
+    "requestedAt": "2026-02-20T05:54:27.750Z"
+  },
+  "inputs": {
+    "label": "breakpoint",
+    "payload": {
+      "context": {
+        "files": [
+          {
+            "format": "image",
+            "label": "UI Screenshot",
+            "path": "artifacts/phase-8-testing/screenshot.png"
+          },
+          {
+            "format": "markdown",
+            "label": "Phase Summary",
+            "path": "artifacts/phase-8-testing/summary.md"
+          }
+        ]
+      },
+      "question": "Phase 8/9: \"Testing\" complete. Quality: 92/100. Fix iterations: 0. Build: PASS. Review and approve to continue?",
+      "title": "Phase 8: Testing Review"
+    },
+    "requestedAt": "2026-02-20T05:54:27.750Z"
+  }
+}

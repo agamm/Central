@@ -118,3 +118,116 @@ fn append_diff_line(
         new_lineno: line.new_lineno(),
     });
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn find_or_create_file_diff_creates_new() {
+        let mut result: Vec<FileDiff> = vec![];
+        let fd = find_or_create_file_diff(&mut result, "src/main.rs");
+
+        assert_eq!(fd.path, "src/main.rs");
+        assert!(fd.hunks.is_empty());
+        assert_eq!(result.len(), 1);
+    }
+
+    #[test]
+    fn find_or_create_file_diff_returns_existing() {
+        let mut result = vec![FileDiff {
+            path: "src/main.rs".to_string(),
+            hunks: vec![DiffHunk {
+                header: "@@ -1 +1 @@".to_string(),
+                lines: vec![],
+            }],
+        }];
+
+        let fd = find_or_create_file_diff(&mut result, "src/main.rs");
+
+        assert_eq!(fd.hunks.len(), 1);
+        assert_eq!(result.len(), 1);
+    }
+
+    #[test]
+    fn find_or_create_tracks_multiple_files() {
+        let mut result: Vec<FileDiff> = vec![];
+
+        find_or_create_file_diff(&mut result, "a.rs");
+        find_or_create_file_diff(&mut result, "b.rs");
+        find_or_create_file_diff(&mut result, "a.rs");
+
+        assert_eq!(result.len(), 2);
+    }
+
+    #[test]
+    fn get_diff_fails_for_non_repo() {
+        let temp = std::env::temp_dir().join(format!(
+            "central_diff_test_{}",
+            uuid::Uuid::new_v4()
+        ));
+        std::fs::create_dir_all(&temp).unwrap();
+
+        let result = get_diff(temp.to_string_lossy().to_string(), None);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("Not a git repository"));
+
+        std::fs::remove_dir_all(&temp).unwrap();
+    }
+
+    #[test]
+    fn get_diff_returns_empty_for_clean_repo() {
+        let temp = std::env::temp_dir().join(format!(
+            "central_diff_clean_{}",
+            uuid::Uuid::new_v4()
+        ));
+        std::fs::create_dir_all(&temp).unwrap();
+        let repo = Repository::init(&temp).unwrap();
+
+        // Create initial commit
+        let sig = git2::Signature::now("test", "test@test.com").unwrap();
+        let tree_id = repo.index().unwrap().write_tree().unwrap();
+        let tree = repo.find_tree(tree_id).unwrap();
+        repo.commit(Some("HEAD"), &sig, &sig, "init", &tree, &[])
+            .unwrap();
+
+        let result = get_diff(temp.to_string_lossy().to_string(), None);
+        assert!(result.is_ok());
+        assert!(result.unwrap().is_empty());
+
+        std::fs::remove_dir_all(&temp).unwrap();
+    }
+
+    #[test]
+    fn get_diff_detects_new_file() {
+        let temp = std::env::temp_dir().join(format!(
+            "central_diff_new_{}",
+            uuid::Uuid::new_v4()
+        ));
+        std::fs::create_dir_all(&temp).unwrap();
+        let repo = Repository::init(&temp).unwrap();
+
+        // Create initial commit
+        let sig = git2::Signature::now("test", "test@test.com").unwrap();
+        let tree_id = repo.index().unwrap().write_tree().unwrap();
+        let tree = repo.find_tree(tree_id).unwrap();
+        repo.commit(Some("HEAD"), &sig, &sig, "init", &tree, &[])
+            .unwrap();
+
+        // Add a new file (staged via index)
+        std::fs::write(temp.join("new.txt"), "hello\n").unwrap();
+        let mut index = repo.index().unwrap();
+        index
+            .add_path(std::path::Path::new("new.txt"))
+            .unwrap();
+        index.write().unwrap();
+
+        let result = get_diff(temp.to_string_lossy().to_string(), None);
+        assert!(result.is_ok());
+        let diffs = result.unwrap();
+        assert!(!diffs.is_empty());
+        assert_eq!(diffs[0].path, "new.txt");
+
+        std::fs::remove_dir_all(&temp).unwrap();
+    }
+}
