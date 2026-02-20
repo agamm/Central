@@ -10,6 +10,11 @@ import { PromptInput } from "./PromptInput";
 import { ChatEmptyState } from "./ChatEmptyState";
 import type { ChatMessage } from "../types";
 
+/**
+ * Performance: Each selector pulls only the data it needs. The messages
+ * derivation (messagesBySession.get) only triggers re-render when the
+ * active session's messages change — not when other agents' messages update.
+ */
 function ChatPane() {
   const selectedProjectId = useProjectStore((s) => s.selectedProjectId);
   const projects = useProjectStore((s) => s.projects);

@@ -1,0 +1,30 @@
+{
+  "score": 90,
+  "summary": "Phase 7 passes all quality gates. Session restore, timeout, error boundaries, and orphan cleanup are well-structured. All checks passed on first try.",
+  "guardrailChecks": {
+    "maxFileLines": { "pass": true, "details": "All files under 300 lines (max: useBootstrap.ts at 103)" },
+    "maxFunctionLines": { "pass": true, "details": "All functions under 50 lines. Largest: restoreSessions ~20 lines" },
+    "dependencyDirection": { "pass": true, "details": "hooks → features → core. No circular imports." },
+    "noAnyType": { "pass": true, "details": "No 'any' types found" },
+    "noInlineSecrets": { "pass": true, "details": "No secrets found" },
+    "noConsoleLog": { "pass": true, "details": "No committed console.log" },
+    "resultTypes": { "pass": true, "details": "neverthrow Result types used consistently in api calls and bootstrap" },
+    "cleanupListeners": { "pass": true, "details": "useBootstrap uses cancelled flag, useAgentTimeout clears interval, cleanup_on_exit handles sidecar and PTY" },
+    "zustandSelectors": { "pass": true, "details": "All Zustand usage via selectors or getState()" },
+    "errorBoundaryException": { "pass": true, "details": "Class-based ErrorBoundary properly documented as the one exception to no-classes rule" }
+  },
+  "strengths": [
+    "All 3 build checks passed on first attempt — zero errors",
+    "Proper cancellation pattern in useBootstrap (cancelled flag)",
+    "Clean separation: findTimedOutSessionIds is pure, abortTimedOutSession handles side effects",
+    "cleanup_on_exit handles both sidecar and PTY shutdown",
+    "Error boundary fallback UI is polished with retry button",
+    "No new dependencies added"
+  ],
+  "issues": [
+    {
+      "severity": "low",
+      "description": "useAgentTimeout checks session.createdAt for timeout, but a session that sends follow-ups should probably track last activity time. Acceptable for MVP."
+    }
+  ]
+}

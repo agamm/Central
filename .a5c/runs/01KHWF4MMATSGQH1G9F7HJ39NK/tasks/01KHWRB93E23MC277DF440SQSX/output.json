@@ -1,0 +1,5 @@
+{
+  "success": true,
+  "errors": [],
+  "output": "All 3 checks pass: tsc --noEmit (0 errors), cargo clippy (0 warnings), eslint (0 errors, 1 expected warning). No fixes needed."
+}

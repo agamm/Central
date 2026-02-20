@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWRB93E23MC277DF440SQSX",
+  "taskId": "build-verify",
+  "invocationKey": "central-tauri-build:S000038:build-verify",
+  "stepId": "S000038",
+  "kind": "agent",
+  "title": "Build Verify: Crash Recovery + Polish",
+  "labels": [
+    "agent",
+    "build",
+    "phase-7-polish",
+    "verification"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWRB93E23MC277DF440SQSX/input.json",
+    "outputJsonPath": "tasks/01KHWRB93E23MC277DF440SQSX/result.json"
+  },
+  "inputs": {
+    "phase": {
+      "description": "Persist all session state to SQLite on every message (append-only messages with full detail: content + thinking + tool_calls + usage). On restart: restore sessions from SQLite, mark previously-running sessions as interrupted. Orphan sidecar process cleanup on app quit (register cleanup handler, track all child PIDs, force-kill on shutdown). Agent timeout handling (configurable timeout, AbortController). React error boundaries for all major panes. Loading/empty states for all panes. Performance audit considerations for 5 concurrent agents.",
+      "id": "phase-7-polish",
+      "name": "Crash Recovery + Polish",
+      "screenshotDescription": "App showing multiple agents in various states (one running, one completed, one failed), demonstrating robust state handling and polished UI.",
+      "tasks": [
+        "Persist all session state to SQLite on every message",
+        "On restart: restore sessions, mark running→interrupted",
+        "Orphan process cleanup on app quit",
+        "Agent timeout handling",
+        "Error boundaries for React",
+        "Loading/empty states for all panes",
+        "Performance audit with 5 concurrent agents"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm tsc --noEmit && pnpm eslint src/"
+    },
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm tsc --noEmit && pnpm eslint src/"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWRB93E23MC277DF440SQSX",
+  "taskId": "build-verify",
+  "invocationKey": "central-tauri-build:S000038:build-verify",
+  "status": "ok",
+  "result": {
+    "errors": [],
+    "output": "All 3 checks pass: tsc --noEmit (0 errors), cargo clippy (0 warnings), eslint (0 errors, 1 expected warning). No fixes needed.",
+    "success": true
+  },
+  "startedAt": "2026-02-20T05:29:02.988Z",
+  "finishedAt": "2026-02-20T05:29:02.988Z",
+  "value": {
+    "errors": [],
+    "output": "All 3 checks pass: tsc --noEmit (0 errors), cargo clippy (0 warnings), eslint (0 errors, 1 expected warning). No fixes needed.",
+    "success": true
+  }
+}

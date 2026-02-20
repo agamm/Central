@@ -185,10 +185,46 @@ async function getMessages(
   }
 }
 
+/** Fetch all sessions across all projects, ordered by most recent first */
+async function getAllSessions(): Promise<Result<AgentSession[], string>> {
+  try {
+    const db = getDb();
+    const rows = await db.select<SessionRow[]>(
+      `SELECT id, project_id, status, prompt, model, sdk_session_id, created_at, ended_at
+       FROM agent_sessions
+       ORDER BY created_at DESC`,
+    );
+
+    return ok(rows.map(rowToSession));
+  } catch (e) {
+    return err(`Failed to get all sessions: ${String(e)}`);
+  }
+}
+
+/** Mark all "running" sessions as "interrupted" after a crash/restart */
+async function markInterruptedSessions(): Promise<Result<number, string>> {
+  try {
+    const db = getDb();
+    const now = new Date().toISOString();
+
+    const result = await db.execute(
+      `UPDATE agent_sessions SET status = 'interrupted', ended_at = $1
+       WHERE status = 'running'`,
+      [now],
+    );
+
+    return ok(result.rowsAffected);
+  } catch (e) {
+    return err(`Failed to mark interrupted sessions: ${String(e)}`);
+  }
+}
+
 export {
   createSession,
   updateSessionStatus,
   listSessions,
   addMessage,
   getMessages,
+  getAllSessions,
+  markInterruptedSessions,
 };

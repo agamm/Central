@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWRBXCKMKKK2G4WW7E2FV90",
+  "taskId": "screenshot-verify",
+  "invocationKey": "central-tauri-build:S000039:screenshot-verify",
+  "status": "ok",
+  "result": {
+    "description": "App renders with all three panes showing empty states. Bootstrap completed (no loading screen). Left pane: projects sidebar. Center: chat empty state. Right: file viewer + terminal empty states. Error boundaries invisible when no errors (correct).",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-7-screenshot.png"
+  },
+  "startedAt": "2026-02-20T05:29:32.896Z",
+  "finishedAt": "2026-02-20T05:29:32.896Z",
+  "value": {
+    "description": "App renders with all three panes showing empty states. Bootstrap completed (no loading screen). Left pane: projects sidebar. Center: chat empty state. Right: file viewer + terminal empty states. Error boundaries invisible when no errors (correct).",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-7-screenshot.png"
+  }
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -83,7 +83,13 @@ function ProjectSidebar() {
 
       <Separator />
 
-      <ProjectList onAddProject={() => void handleOpenFolderPicker()} />
+      {loading ? (
+        <div className="flex flex-1 items-center justify-center">
+          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        </div>
+      ) : (
+        <ProjectList onAddProject={() => void handleOpenFolderPicker()} />
+      )}
 
       {pending && (
         <AddProjectDialog

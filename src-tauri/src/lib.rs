@@ -15,6 +15,21 @@ fn create_migrations() -> Vec<Migration> {
     ]
 }
 
+/// Clean up all child processes to prevent orphans on app quit
+fn cleanup_on_exit(app_handle: &tauri::AppHandle) {
+    // Shut down the sidecar (kills the Node.js process + all agent sessions)
+    if let Some(sidecar) = app_handle.try_state::<sidecar::SidecarHandle>() {
+        if let Ok(mut manager) = sidecar.lock() {
+            manager.shutdown();
+        }
+    }
+
+    // Kill all PTY sessions
+    if let Some(pty) = app_handle.try_state::<commands::terminal::PtyHandle>() {
+        commands::terminal::shutdown_all_ptys(&pty);
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let migrations = create_migrations();
@@ -37,6 +52,12 @@ pub fn run() {
             app.manage(pty_handle);
 
             Ok(())
+        })
+        .on_window_event(|window, event| {
+            // Clean up when the last window is destroyed
+            if let tauri::WindowEvent::Destroyed = event {
+                cleanup_on_exit(window.app_handle());
+            }
         })
         .invoke_handler(tauri::generate_handler![
             commands::greet,

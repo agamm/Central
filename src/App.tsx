@@ -7,9 +7,19 @@ import {
 import { ProjectSidebar } from "@/features/projects";
 import { ChatPane, useAgentEvents } from "@/features/agents";
 import { RightPane } from "@/features/terminal/components/RightPane";
+import { PaneErrorBoundary } from "@/components/PaneErrorBoundary";
+import { useBootstrap } from "@/hooks/useBootstrap";
+import { useAgentTimeout } from "@/hooks/useAgentTimeout";
+import { BootstrapLoading } from "@/components/BootstrapLoading";
 
 function App() {
+  const { loading } = useBootstrap();
   useAgentEvents();
+  useAgentTimeout();
+
+  if (loading) {
+    return <BootstrapLoading />;
+  }
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -20,13 +30,17 @@ function App() {
             minSize={15}
             className="border-r border-border"
           >
-            <ProjectSidebar />
+            <PaneErrorBoundary paneName="Sidebar">
+              <ProjectSidebar />
+            </PaneErrorBoundary>
           </ResizablePanel>
 
           <ResizableHandle />
 
           <ResizablePanel defaultSize={50} minSize={25}>
-            <ChatPane />
+            <PaneErrorBoundary paneName="Chat">
+              <ChatPane />
+            </PaneErrorBoundary>
           </ResizablePanel>
 
           <ResizableHandle />
@@ -36,7 +50,9 @@ function App() {
             minSize={20}
             className="border-l border-border"
           >
-            <RightPane />
+            <PaneErrorBoundary paneName="Files & Terminal">
+              <RightPane />
+            </PaneErrorBoundary>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

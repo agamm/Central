@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWRY0DK2CK71719KZPXVYX1",
+  "taskId": "git-commit",
+  "invocationKey": "central-tauri-build:S000042:git-commit",
+  "stepId": "S000042",
+  "kind": "agent",
+  "title": "Git Commit: Phase 7 - Crash Recovery + Polish",
+  "labels": [
+    "agent",
+    "git",
+    "phase-7-polish"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWRY0DK2CK71719KZPXVYX1/input.json",
+    "outputJsonPath": "tasks/01KHWRY0DK2CK71719KZPXVYX1/result.json"
+  },
+  "inputs": {
+    "phase": {
+      "description": "Persist all session state to SQLite on every message (append-only messages with full detail: content + thinking + tool_calls + usage). On restart: restore sessions from SQLite, mark previously-running sessions as interrupted. Orphan sidecar process cleanup on app quit (register cleanup handler, track all child PIDs, force-kill on shutdown). Agent timeout handling (configurable timeout, AbortController). React error boundaries for all major panes. Loading/empty states for all panes. Performance audit considerations for 5 concurrent agents.",
+      "id": "phase-7-polish",
+      "name": "Crash Recovery + Polish",
+      "screenshotDescription": "App showing multiple agents in various states (one running, one completed, one failed), demonstrating robust state handling and polished UI.",
+      "tasks": [
+        "Persist all session state to SQLite on every message",
+        "On restart: restore sessions, mark running→interrupted",
+        "Orphan process cleanup on app quit",
+        "Agent timeout handling",
+        "Error boundaries for React",
+        "Loading/empty states for all panes",
+        "Performance audit with 5 concurrent agents"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm tsc --noEmit && pnpm eslint src/"
+    },
+    "phaseIndex": 7,
+    "projectPath": "/Users/agam/dev/CentralTauri"
+  }
+}

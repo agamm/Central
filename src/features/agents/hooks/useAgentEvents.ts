@@ -85,7 +85,12 @@ async function handleSessionFailed(
   notifySessionFailed(session?.prompt ?? null, error);
 }
 
-/** Dispatch a sidecar event to the appropriate handler */
+/**
+ * Dispatch a sidecar event to the appropriate handler.
+ * Performance: Events from all 5 agents route through here. Each handler
+ * only updates the specific session's data in the store, so only components
+ * subscribed to that session (or the active session) re-render.
+ */
 async function handleEvent(event: SidecarEvent): Promise<void> {
   const store = useAgentStore.getState();
 

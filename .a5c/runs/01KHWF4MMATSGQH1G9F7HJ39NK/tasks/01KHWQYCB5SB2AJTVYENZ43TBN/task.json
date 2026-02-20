@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWQYCB5SB2AJTVYENZ43TBN",
+  "taskId": "implement-phase",
+  "invocationKey": "central-tauri-build:S000037:implement-phase",
+  "stepId": "S000037",
+  "kind": "agent",
+  "title": "Implement: Crash Recovery + Polish (7/8)",
+  "labels": [
+    "agent",
+    "implementation",
+    "phase-7-polish"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWQYCB5SB2AJTVYENZ43TBN/input.json",
+    "outputJsonPath": "tasks/01KHWQYCB5SB2AJTVYENZ43TBN/result.json"
+  },
+  "inputs": {
+    "claudeMdPath": "/Users/agam/dev/CentralTauri/CLAUDE.md",
+    "phase": {
+      "description": "Persist all session state to SQLite on every message (append-only messages with full detail: content + thinking + tool_calls + usage). On restart: restore sessions from SQLite, mark previously-running sessions as interrupted. Orphan sidecar process cleanup on app quit (register cleanup handler, track all child PIDs, force-kill on shutdown). Agent timeout handling (configurable timeout, AbortController). React error boundaries for all major panes. Loading/empty states for all panes. Performance audit considerations for 5 concurrent agents.",
+      "id": "phase-7-polish",
+      "name": "Crash Recovery + Polish",
+      "screenshotDescription": "App showing multiple agents in various states (one running, one completed, one failed), demonstrating robust state handling and polished UI.",
+      "tasks": [
+        "Persist all session state to SQLite on every message",
+        "On restart: restore sessions, mark running→interrupted",
+        "Orphan process cleanup on app quit",
+        "Agent timeout handling",
+        "Error boundaries for React",
+        "Loading/empty states for all panes",
+        "Performance audit with 5 concurrent agents"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm tsc --noEmit && pnpm eslint src/"
+    },
+    "phaseIndex": 7,
+    "planPath": "/Users/agam/dev/CentralTauri/PLAN.md",
+    "previousPhases": [
+      {
+        "id": "phase-1-setup",
+        "name": "Project Setup",
+        "summary": "Scaffolded complete Tauri v2 + React 19 + TypeScript strict project. Configured Vite, ESLint flat config, Prettier, Tailwind v3 + shadcn/ui with dark theme HSL vars from PLAN.md, Zustand, neverthrow, lucide-react. Rust backend with git2-rs (vendored), tauri-plugin-sql (SQLite), dialog, notification, shell plugins. SQLite schema with all 4 tables (projects, agent_sessions, messages, app_settings) + indexes. Feature-based directory structure. All checks pass: tsc --noEmit, cargo build, cargo clippy, vitest (3/3), vite build."
+      },
+      {
+        "id": "phase-2-layout",
+        "name": "Core Layout + Projects",
+        "summary": "Implemented Phase 2: Core Layout + Projects. Three-pane resizable layout (left 20%, middle 50%, right 30%), project sidebar with full CRUD, folder picker via Tauri dialog, SQLite persistence via @tauri-apps/plugin-sql JS API, Zustand store with selectors, dark theme styling. 8 shadcn/ui components installed. All TypeScript and Rust compiles clean."
+      },
+      {
+        "id": "phase-3-agents",
+        "name": "Agent Orchestration",
+        "summary": "Implemented Phase 3: Agent Orchestration. Mock Node.js sidecar with JSON-lines protocol, Rust sidecar manager with Tauri events, agent CRUD commands, SQLite persistence, Zustand agent store, and full Chat UI (MessageBubble, ThinkingBlock, ToolCallBlock, PromptInput, MessageQueue). Event bridge connects backend to frontend."
+      },
+      {
+        "id": "phase-4-monitoring",
+        "name": "Agent Monitoring + Switching",
+        "summary": "Implemented Phase 4: Agent Monitoring + Switching. Added agent sessions nested under projects in sidebar with status badges (spinner/green/red/gray/amber dots). Click session switches active agent. Scroll positions preserved per-session. macOS notifications on completion/failure. Selective Zustand subscriptions for performance. Extracted sessionActions.ts and ChatEmptyState.tsx from ChatPane."
+      },
+      {
+        "id": "phase-5-files",
+        "name": "File Viewer + Git",
+        "summary": "Implemented Phase 5: File Viewer + Git. Rust git2-rs commands split into 6 sub-modules (tree, status, diff, types, git_helpers). CodeMirror 6 read-only viewer with custom dark theme, Compartment-based dynamic language switching, lazy language imports. File tree with git status indicators. Diff viewer with line coloring. Git status bar. FilesPanel with resizable split."
+      },
+      {
+        "id": "phase-6-terminal",
+        "name": "Terminal",
+        "summary": "Implemented Phase 6: Terminal. xterm.js v5 with fit/web-links/webgl addons, portable-pty Rust backend, PTY streaming via Tauri events, debounced ResizeObserver. Right pane split: FilesPanel (60%) + TerminalPanel (40%). One terminal per project. Dark theme matching app HSL variables."
+      }
+    ],
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "totalPhases": 8
+  }
+}

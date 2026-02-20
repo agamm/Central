@@ -177,6 +177,17 @@ pub async fn pty_kill(
     Ok(())
 }
 
+/// Kill all PTY sessions — called on app shutdown to prevent orphans
+pub fn shutdown_all_ptys(state: &PtyHandle) {
+    if let Ok(mut guard) = state.lock() {
+        let ids: Vec<String> = guard.sessions.keys().cloned().collect();
+        for id in ids {
+            // Dropping closes master + writer, killing the child process
+            guard.sessions.remove(&id);
+        }
+    }
+}
+
 /// Background thread that reads PTY output and emits events
 fn spawn_reader_thread(
     app: AppHandle,

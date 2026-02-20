@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWRCTDDR3FG4QB3X9Q3DFRA",
+  "taskId": "quality-score",
+  "invocationKey": "central-tauri-build:S000040:quality-score",
+  "stepId": "S000040",
+  "kind": "agent",
+  "title": "Quality Score: Crash Recovery + Polish",
+  "labels": [
+    "agent",
+    "phase-7-polish",
+    "quality"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWRCTDDR3FG4QB3X9Q3DFRA/input.json",
+    "outputJsonPath": "tasks/01KHWRCTDDR3FG4QB3X9Q3DFRA/result.json"
+  },
+  "inputs": {
+    "buildResult": {
+      "errors": [],
+      "output": "All 3 checks pass: tsc --noEmit (0 errors), cargo clippy (0 warnings), eslint (0 errors, 1 expected warning). No fixes needed.",
+      "success": true
+    },
+    "implementResult": {
+      "decisions": [
+        "Minimal class-based ErrorBoundary (one exception to no-classes rule)",
+        "Session restore marks ALL running as interrupted via single SQL UPDATE",
+        "Bootstrap blocks rendering until restore completes",
+        "Agent timeout 30min default, 30s check interval",
+        "Cleanup on Tauri window Destroyed event",
+        "No new npm or cargo dependencies added"
+      ],
+      "filesCreated": [
+        "src/hooks/useBootstrap.ts",
+        "src/hooks/useAgentTimeout.ts",
+        "src/components/PaneErrorBoundary.tsx",
+        "src/components/BootstrapLoading.tsx"
+      ],
+      "filesModified": [
+        "src/App.tsx",
+        "src/core/constants.ts",
+        "src/features/agents/api.ts",
+        "src/features/agents/store.ts",
+        "src/features/agents/hooks/useAgentEvents.ts",
+        "src/features/agents/components/ChatPane.tsx",
+        "src/features/agents/components/MessageList.tsx",
+        "src/features/projects/components/ProjectSidebar.tsx",
+        "src-tauri/src/lib.rs",
+        "src-tauri/src/commands/terminal.rs"
+      ],
+      "summary": "Implemented Phase 7: Crash Recovery + Polish. Session restore on mount with running→interrupted marking, orphan sidecar/PTY cleanup on window destroy, 30min agent timeout with 30s check interval, error boundaries for all 3 major panes, bootstrap loading screen, enhanced loading states, performance documentation."
+    },
+    "phase": {
+      "description": "Persist all session state to SQLite on every message (append-only messages with full detail: content + thinking + tool_calls + usage). On restart: restore sessions from SQLite, mark previously-running sessions as interrupted. Orphan sidecar process cleanup on app quit (register cleanup handler, track all child PIDs, force-kill on shutdown). Agent timeout handling (configurable timeout, AbortController). React error boundaries for all major panes. Loading/empty states for all panes. Performance audit considerations for 5 concurrent agents.",
+      "id": "phase-7-polish",
+      "name": "Crash Recovery + Polish",
+      "screenshotDescription": "App showing multiple agents in various states (one running, one completed, one failed), demonstrating robust state handling and polished UI.",
+      "tasks": [
+        "Persist all session state to SQLite on every message",
+        "On restart: restore sessions, mark running→interrupted",
+        "Orphan process cleanup on app quit",
+        "Agent timeout handling",
+        "Error boundaries for React",
+        "Loading/empty states for all panes",
+        "Performance audit with 5 concurrent agents"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && cargo test --manifest-path src-tauri/Cargo.toml && pnpm tsc --noEmit && pnpm eslint src/"
+    },
+    "phaseIndex": 7,
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "screenshotResult": {
+      "description": "App renders with all three panes showing empty states. Bootstrap completed (no loading screen). Left pane: projects sidebar. Center: chat empty state. Right: file viewer + terminal empty states. Error boundaries invisible when no errors (correct).",
+      "issues": [],
+      "matches": true,
+      "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-7-screenshot.png"
+    }
+  }
+}

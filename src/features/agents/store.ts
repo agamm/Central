@@ -6,6 +6,15 @@ import type {
   QueuedMessage,
 } from "./types";
 
+/**
+ * Performance note for 5 concurrent agents:
+ * - Messages are keyed by session ID so only the active session's messages
+ *   cause re-renders in the chat pane (via selective selector on activeSessionId).
+ * - Background agents append to messagesBySession without triggering chat UI updates.
+ * - Session map updates are O(1) per session.
+ * - TODO: If message counts grow very large (>1000 per session), consider
+ *   virtualized rendering in MessageList.
+ */
 interface AgentState {
   readonly sessions: ReadonlyMap<string, AgentSession>;
   readonly activeSessionId: string | null;

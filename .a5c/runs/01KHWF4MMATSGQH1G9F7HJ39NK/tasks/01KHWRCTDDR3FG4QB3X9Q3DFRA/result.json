@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWRCTDDR3FG4QB3X9Q3DFRA",
+  "taskId": "quality-score",
+  "invocationKey": "central-tauri-build:S000040:quality-score",
+  "status": "ok",
+  "result": {
+    "guardrailChecks": {
+      "cleanupListeners": {
+        "details": "useBootstrap uses cancelled flag, useAgentTimeout clears interval, cleanup_on_exit handles sidecar and PTY",
+        "pass": true
+      },
+      "dependencyDirection": {
+        "details": "hooks → features → core. No circular imports.",
+        "pass": true
+      },
+      "errorBoundaryException": {
+        "details": "Class-based ErrorBoundary properly documented as the one exception to no-classes rule",
+        "pass": true
+      },
+      "maxFileLines": {
+        "details": "All files under 300 lines (max: useBootstrap.ts at 103)",
+        "pass": true
+      },
+      "maxFunctionLines": {
+        "details": "All functions under 50 lines. Largest: restoreSessions ~20 lines",
+        "pass": true
+      },
+      "noAnyType": {
+        "details": "No 'any' types found",
+        "pass": true
+      },
+      "noConsoleLog": {
+        "details": "No committed console.log",
+        "pass": true
+      },
+      "noInlineSecrets": {
+        "details": "No secrets found",
+        "pass": true
+      },
+      "resultTypes": {
+        "details": "neverthrow Result types used consistently in api calls and bootstrap",
+        "pass": true
+      },
+      "zustandSelectors": {
+        "details": "All Zustand usage via selectors or getState()",
+        "pass": true
+      }
+    },
+    "issues": [
+      {
+        "description": "useAgentTimeout checks session.createdAt for timeout, but a session that sends follow-ups should probably track last activity time. Acceptable for MVP.",
+        "severity": "low"
+      }
+    ],
+    "score": 90,
+    "strengths": [
+      "All 3 build checks passed on first attempt — zero errors",
+      "Proper cancellation pattern in useBootstrap (cancelled flag)",
+      "Clean separation: findTimedOutSessionIds is pure, abortTimedOutSession handles side effects",
+      "cleanup_on_exit handles both sidecar and PTY shutdown",
+      "Error boundary fallback UI is polished with retry button",
+      "No new dependencies added"
+    ],
+    "summary": "Phase 7 passes all quality gates. Session restore, timeout, error boundaries, and orphan cleanup are well-structured. All checks passed on first try."
+  },
+  "startedAt": "2026-02-20T05:32:28.606Z",
+  "finishedAt": "2026-02-20T05:32:28.606Z",
+  "value": {
+    "guardrailChecks": {
+      "cleanupListeners": {
+        "details": "useBootstrap uses cancelled flag, useAgentTimeout clears interval, cleanup_on_exit handles sidecar and PTY",
+        "pass": true
+      },
+      "dependencyDirection": {
+        "details": "hooks → features → core. No circular imports.",
+        "pass": true
+      },
+      "errorBoundaryException": {
+        "details": "Class-based ErrorBoundary properly documented as the one exception to no-classes rule",
+        "pass": true
+      },
+      "maxFileLines": {
+        "details": "All files under 300 lines (max: useBootstrap.ts at 103)",
+        "pass": true
+      },
+      "maxFunctionLines": {
+        "details": "All functions under 50 lines. Largest: restoreSessions ~20 lines",
+        "pass": true
+      },
+      "noAnyType": {
+        "details": "No 'any' types found",
+        "pass": true
+      },
+      "noConsoleLog": {
+        "details": "No committed console.log",
+        "pass": true
+      },
+      "noInlineSecrets": {
+        "details": "No secrets found",
+        "pass": true
+      },
+      "resultTypes": {
+        "details": "neverthrow Result types used consistently in api calls and bootstrap",
+        "pass": true
+      },
+      "zustandSelectors": {
+        "details": "All Zustand usage via selectors or getState()",
+        "pass": true
+      }
+    },
+    "issues": [
+      {
+        "description": "useAgentTimeout checks session.createdAt for timeout, but a session that sends follow-ups should probably track last activity time. Acceptable for MVP.",
+        "severity": "low"
+      }
+    ],
+    "score": 90,
+    "strengths": [
+      "All 3 build checks passed on first attempt — zero errors",
+      "Proper cancellation pattern in useBootstrap (cancelled flag)",
+      "Clean separation: findTimedOutSessionIds is pure, abortTimedOutSession handles side effects",
+      "cleanup_on_exit handles both sidecar and PTY shutdown",
+      "Error boundary fallback UI is polished with retry button",
+      "No new dependencies added"
+    ],
+    "summary": "Phase 7 passes all quality gates. Session restore, timeout, error boundaries, and orphan cleanup are well-structured. All checks passed on first try."
+  }
+}

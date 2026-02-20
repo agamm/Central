@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWQYCB5SB2AJTVYENZ43TBN",
+  "taskId": "implement-phase",
+  "invocationKey": "central-tauri-build:S000037:implement-phase",
+  "status": "ok",
+  "result": {
+    "decisions": [
+      "Minimal class-based ErrorBoundary (one exception to no-classes rule)",
+      "Session restore marks ALL running as interrupted via single SQL UPDATE",
+      "Bootstrap blocks rendering until restore completes",
+      "Agent timeout 30min default, 30s check interval",
+      "Cleanup on Tauri window Destroyed event",
+      "No new npm or cargo dependencies added"
+    ],
+    "filesCreated": [
+      "src/hooks/useBootstrap.ts",
+      "src/hooks/useAgentTimeout.ts",
+      "src/components/PaneErrorBoundary.tsx",
+      "src/components/BootstrapLoading.tsx"
+    ],
+    "filesModified": [
+      "src/App.tsx",
+      "src/core/constants.ts",
+      "src/features/agents/api.ts",
+      "src/features/agents/store.ts",
+      "src/features/agents/hooks/useAgentEvents.ts",
+      "src/features/agents/components/ChatPane.tsx",
+      "src/features/agents/components/MessageList.tsx",
+      "src/features/projects/components/ProjectSidebar.tsx",
+      "src-tauri/src/lib.rs",
+      "src-tauri/src/commands/terminal.rs"
+    ],
+    "summary": "Implemented Phase 7: Crash Recovery + Polish. Session restore on mount with running→interrupted marking, orphan sidecar/PTY cleanup on window destroy, 30min agent timeout with 30s check interval, error boundaries for all 3 major panes, bootstrap loading screen, enhanced loading states, performance documentation."
+  },
+  "startedAt": "2026-02-20T05:28:42.280Z",
+  "finishedAt": "2026-02-20T05:28:42.280Z",
+  "value": {
+    "decisions": [
+      "Minimal class-based ErrorBoundary (one exception to no-classes rule)",
+      "Session restore marks ALL running as interrupted via single SQL UPDATE",
+      "Bootstrap blocks rendering until restore completes",
+      "Agent timeout 30min default, 30s check interval",
+      "Cleanup on Tauri window Destroyed event",
+      "No new npm or cargo dependencies added"
+    ],
+    "filesCreated": [
+      "src/hooks/useBootstrap.ts",
+      "src/hooks/useAgentTimeout.ts",
+      "src/components/PaneErrorBoundary.tsx",
+      "src/components/BootstrapLoading.tsx"
+    ],
+    "filesModified": [
+      "src/App.tsx",
+      "src/core/constants.ts",
+      "src/features/agents/api.ts",
+      "src/features/agents/store.ts",
+      "src/features/agents/hooks/useAgentEvents.ts",
+      "src/features/agents/components/ChatPane.tsx",
+      "src/features/agents/components/MessageList.tsx",
+      "src/features/projects/components/ProjectSidebar.tsx",
+      "src-tauri/src/lib.rs",
+      "src-tauri/src/commands/terminal.rs"
+    ],
+    "summary": "Implemented Phase 7: Crash Recovery + Polish. Session restore on mount with running→interrupted marking, orphan sidecar/PTY cleanup on window destroy, 30min agent timeout with 30s check interval, error boundaries for all 3 major panes, bootstrap loading screen, enhanced loading states, performance documentation."
+  }
+}

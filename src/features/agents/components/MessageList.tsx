@@ -9,6 +9,11 @@ interface MessageListProps {
   readonly onScrollPositionChange: (position: number) => void;
 }
 
+/**
+ * Performance: Only the active session's messages are passed here (filtered
+ * in ChatPane via selector). With 5 concurrent agents, only 1 MessageList
+ * renders at a time. TODO: Virtualize if message count exceeds ~500 per session.
+ */
 function MessageList({
   messages,
   initialScrollPosition,

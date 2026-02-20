@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWRJ5TV33CTVPCCZX90NKME",
+  "taskId": "__sdk.breakpoint",
+  "invocationKey": "central-tauri-build:S000041:__sdk.breakpoint",
+  "stepId": "S000041",
+  "kind": "breakpoint",
+  "title": "breakpoint",
+  "metadata": {
+    "label": "breakpoint",
+    "payload": {
+      "context": {
+        "files": [
+          {
+            "format": "image",
+            "label": "UI Screenshot",
+            "path": "artifacts/phase-7-polish/screenshot.png"
+          },
+          {
+            "format": "markdown",
+            "label": "Phase Summary",
+            "path": "artifacts/phase-7-polish/summary.md"
+          }
+        ]
+      },
+      "question": "Phase 7/8: \"Crash Recovery + Polish\" complete. Quality: 90/100. Fix iterations: 0. Build: PASS. Review and approve to continue?",
+      "title": "Phase 7: Crash Recovery + Polish Review"
+    },
+    "requestedAt": "2026-02-20T05:32:33.499Z"
+  },
+  "inputs": {
+    "label": "breakpoint",
+    "payload": {
+      "context": {
+        "files": [
+          {
+            "format": "image",
+            "label": "UI Screenshot",
+            "path": "artifacts/phase-7-polish/screenshot.png"
+          },
+          {
+            "format": "markdown",
+            "label": "Phase Summary",
+            "path": "artifacts/phase-7-polish/summary.md"
+          }
+        ]
+      },
+      "question": "Phase 7/8: \"Crash Recovery + Polish\" complete. Quality: 90/100. Fix iterations: 0. Build: PASS. Review and approve to continue?",
+      "title": "Phase 7: Crash Recovery + Polish Review"
+    },
+    "requestedAt": "2026-02-20T05:32:33.499Z"
+  }
+}
