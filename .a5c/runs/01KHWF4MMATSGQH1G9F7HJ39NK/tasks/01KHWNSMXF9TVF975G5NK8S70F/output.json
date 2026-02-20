@@ -1,0 +1,6 @@
+{
+  "matches": true,
+  "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-4-screenshot.png",
+  "description": "Three-pane dark layout renders correctly. Left pane: PROJECTS header with + button, empty state with 'Add Project' button. Middle pane: Chat area with 'Select a project' empty state and prompt input. Right pane: 'No project selected' placeholder. Agent nesting and status badges cannot be verified without Tauri backend (Vite-only), but UI compiles and renders without errors. The new AgentList, SessionItem, StatusBadge components are structurally integrated.",
+  "issues": []
+}

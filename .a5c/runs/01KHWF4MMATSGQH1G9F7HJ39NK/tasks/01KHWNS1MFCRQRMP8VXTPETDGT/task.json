@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWNS1MFCRQRMP8VXTPETDGT",
+  "taskId": "build-verify",
+  "invocationKey": "central-tauri-build:S000020:build-verify",
+  "stepId": "S000020",
+  "kind": "agent",
+  "title": "Build Verify: Agent Monitoring + Switching",
+  "labels": [
+    "agent",
+    "build",
+    "phase-4-monitoring",
+    "verification"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWNS1MFCRQRMP8VXTPETDGT/input.json",
+    "outputJsonPath": "tasks/01KHWNS1MFCRQRMP8VXTPETDGT/result.json"
+  },
+  "inputs": {
+    "phase": {
+      "description": "Left pane: agents nested under projects with status badges (running=spinner, completed=green dot, failed=red dot, aborted=gray dot). Click agent → switch chat + right pane context. Preserve scroll position and chat state per agent using Zustand per-agent state. Use React useTransition for agent switching to keep UI responsive. macOS notifications on agent completion/failure (Tauri notification plugin). Performance: selective Zustand subscriptions, only render visible agent's stream. Throttle/virtualize rendering for 5 agents streaming.",
+      "id": "phase-4-monitoring",
+      "name": "Agent Monitoring + Switching",
+      "screenshotDescription": "Left pane showing project with nested agent sessions, each with colored status badges. One agent selected showing its chat.",
+      "tasks": [
+        "Left pane: agents nested under projects with status badges",
+        "Click agent → switch chat + right pane context",
+        "Preserve scroll position and chat state per agent",
+        "Status badges: running (spinner), completed (green), failed (red), aborted (gray)",
+        "macOS notifications on completion/failure",
+        "Performance: selective subscriptions, only render visible agent stream"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && pnpm tsc --noEmit && pnpm eslint src/"
+    },
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "verifyCommand": "cd /Users/agam/dev/CentralTauri && pnpm tsc --noEmit && pnpm eslint src/"
+  }
+}

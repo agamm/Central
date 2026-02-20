@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWND3T21987QYCNRKAD1V1A",
+  "taskId": "implement-phase",
+  "invocationKey": "central-tauri-build:S000019:implement-phase",
+  "stepId": "S000019",
+  "kind": "agent",
+  "title": "Implement: Agent Monitoring + Switching (4/8)",
+  "labels": [
+    "agent",
+    "implementation",
+    "phase-4-monitoring"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWND3T21987QYCNRKAD1V1A/input.json",
+    "outputJsonPath": "tasks/01KHWND3T21987QYCNRKAD1V1A/result.json"
+  },
+  "inputs": {
+    "claudeMdPath": "/Users/agam/dev/CentralTauri/CLAUDE.md",
+    "phase": {
+      "description": "Left pane: agents nested under projects with status badges (running=spinner, completed=green dot, failed=red dot, aborted=gray dot). Click agent → switch chat + right pane context. Preserve scroll position and chat state per agent using Zustand per-agent state. Use React useTransition for agent switching to keep UI responsive. macOS notifications on agent completion/failure (Tauri notification plugin). Performance: selective Zustand subscriptions, only render visible agent's stream. Throttle/virtualize rendering for 5 agents streaming.",
+      "id": "phase-4-monitoring",
+      "name": "Agent Monitoring + Switching",
+      "screenshotDescription": "Left pane showing project with nested agent sessions, each with colored status badges. One agent selected showing its chat.",
+      "tasks": [
+        "Left pane: agents nested under projects with status badges",
+        "Click agent → switch chat + right pane context",
+        "Preserve scroll position and chat state per agent",
+        "Status badges: running (spinner), completed (green), failed (red), aborted (gray)",
+        "macOS notifications on completion/failure",
+        "Performance: selective subscriptions, only render visible agent stream"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && pnpm tsc --noEmit && pnpm eslint src/"
+    },
+    "phaseIndex": 4,
+    "planPath": "/Users/agam/dev/CentralTauri/PLAN.md",
+    "previousPhases": [
+      {
+        "id": "phase-1-setup",
+        "name": "Project Setup",
+        "summary": "Scaffolded complete Tauri v2 + React 19 + TypeScript strict project. Configured Vite, ESLint flat config, Prettier, Tailwind v3 + shadcn/ui with dark theme HSL vars from PLAN.md, Zustand, neverthrow, lucide-react. Rust backend with git2-rs (vendored), tauri-plugin-sql (SQLite), dialog, notification, shell plugins. SQLite schema with all 4 tables (projects, agent_sessions, messages, app_settings) + indexes. Feature-based directory structure. All checks pass: tsc --noEmit, cargo build, cargo clippy, vitest (3/3), vite build."
+      },
+      {
+        "id": "phase-2-layout",
+        "name": "Core Layout + Projects",
+        "summary": "Implemented Phase 2: Core Layout + Projects. Three-pane resizable layout (left 20%, middle 50%, right 30%), project sidebar with full CRUD, folder picker via Tauri dialog, SQLite persistence via @tauri-apps/plugin-sql JS API, Zustand store with selectors, dark theme styling. 8 shadcn/ui components installed. All TypeScript and Rust compiles clean."
+      },
+      {
+        "id": "phase-3-agents",
+        "name": "Agent Orchestration",
+        "summary": "Implemented Phase 3: Agent Orchestration. Mock Node.js sidecar with JSON-lines protocol, Rust sidecar manager with Tauri events, agent CRUD commands, SQLite persistence, Zustand agent store, and full Chat UI (MessageBubble, ThinkingBlock, ToolCallBlock, PromptInput, MessageQueue). Event bridge connects backend to frontend."
+      }
+    ],
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "totalPhases": 8
+  }
+}

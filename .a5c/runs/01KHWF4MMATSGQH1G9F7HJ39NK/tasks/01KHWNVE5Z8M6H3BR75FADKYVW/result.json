@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWNVE5Z8M6H3BR75FADKYVW",
+  "taskId": "quality-score",
+  "invocationKey": "central-tauri-build:S000022:quality-score",
+  "status": "ok",
+  "result": {
+    "breakdown": {
+      "buildSuccess": 20,
+      "codeQuality": 24,
+      "completeness": 38,
+      "uiCorrectness": 7
+    },
+    "feedback": "All 6 Phase 4 tasks implemented. Agents nested under projects, session switching with lazy message loading, scroll position preserved, status badges for all states, macOS notifications, selective subscriptions. Build passes all checks. Main guardrail violation: handleEvent in useAgentEvents.ts is 108 lines (>50 limit). Minor: inline import() type in ProjectList.tsx.",
+    "recommendations": [
+      "Split handleEvent in useAgentEvents.ts into sub-handlers to keep each under 50 lines",
+      "Extract createSystemMessage factory in useAgentEvents.ts for duplicated ChatMessage construction",
+      "Replace inline import() type in ProjectList.tsx with named import",
+      "Consider separating expand/select state in ProjectList.tsx",
+      "Add loading/error UI state to AgentList.tsx for fetchSessions effect"
+    ],
+    "score": 84
+  },
+  "startedAt": "2026-02-20T04:46:55.564Z",
+  "finishedAt": "2026-02-20T04:46:55.564Z",
+  "value": {
+    "breakdown": {
+      "buildSuccess": 20,
+      "codeQuality": 24,
+      "completeness": 38,
+      "uiCorrectness": 7
+    },
+    "feedback": "All 6 Phase 4 tasks implemented. Agents nested under projects, session switching with lazy message loading, scroll position preserved, status badges for all states, macOS notifications, selective subscriptions. Build passes all checks. Main guardrail violation: handleEvent in useAgentEvents.ts is 108 lines (>50 limit). Minor: inline import() type in ProjectList.tsx.",
+    "recommendations": [
+      "Split handleEvent in useAgentEvents.ts into sub-handlers to keep each under 50 lines",
+      "Extract createSystemMessage factory in useAgentEvents.ts for duplicated ChatMessage construction",
+      "Replace inline import() type in ProjectList.tsx with named import",
+      "Consider separating expand/select state in ProjectList.tsx",
+      "Add loading/error UI state to AgentList.tsx for fetchSessions effect"
+    ],
+    "score": 84
+  }
+}

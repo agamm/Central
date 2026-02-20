@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWNYRVPY8BADS0BHNTJ61H0",
+  "taskId": "__sdk.breakpoint",
+  "invocationKey": "central-tauri-build:S000023:__sdk.breakpoint",
+  "stepId": "S000023",
+  "kind": "breakpoint",
+  "title": "breakpoint",
+  "metadata": {
+    "label": "breakpoint",
+    "payload": {
+      "context": {
+        "files": [
+          {
+            "format": "image",
+            "label": "UI Screenshot",
+            "path": "artifacts/phase-4-monitoring/screenshot.png"
+          },
+          {
+            "format": "markdown",
+            "label": "Phase Summary",
+            "path": "artifacts/phase-4-monitoring/summary.md"
+          }
+        ]
+      },
+      "question": "Phase 4/8: \"Agent Monitoring + Switching\" complete. Quality: 84/100. Fix iterations: 0. Build: PASS. Review and approve to continue?",
+      "title": "Phase 4: Agent Monitoring + Switching Review"
+    },
+    "requestedAt": "2026-02-20T04:47:00.470Z"
+  },
+  "inputs": {
+    "label": "breakpoint",
+    "payload": {
+      "context": {
+        "files": [
+          {
+            "format": "image",
+            "label": "UI Screenshot",
+            "path": "artifacts/phase-4-monitoring/screenshot.png"
+          },
+          {
+            "format": "markdown",
+            "label": "Phase Summary",
+            "path": "artifacts/phase-4-monitoring/summary.md"
+          }
+        ]
+      },
+      "question": "Phase 4/8: \"Agent Monitoring + Switching\" complete. Quality: 84/100. Fix iterations: 0. Build: PASS. Review and approve to continue?",
+      "title": "Phase 4: Agent Monitoring + Switching Review"
+    },
+    "requestedAt": "2026-02-20T04:47:00.470Z"
+  }
+}

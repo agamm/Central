@@ -1,0 +1,17 @@
+{
+  "score": 84,
+  "breakdown": {
+    "completeness": 38,
+    "codeQuality": 24,
+    "buildSuccess": 20,
+    "uiCorrectness": 7
+  },
+  "feedback": "All 6 Phase 4 tasks implemented. Agents nested under projects, session switching with lazy message loading, scroll position preserved, status badges for all states, macOS notifications, selective subscriptions. Build passes all checks. Main guardrail violation: handleEvent in useAgentEvents.ts is 108 lines (>50 limit). Minor: inline import() type in ProjectList.tsx.",
+  "recommendations": [
+    "Split handleEvent in useAgentEvents.ts into sub-handlers to keep each under 50 lines",
+    "Extract createSystemMessage factory in useAgentEvents.ts for duplicated ChatMessage construction",
+    "Replace inline import() type in ProjectList.tsx with named import",
+    "Consider separating expand/select state in ProjectList.tsx",
+    "Add loading/error UI state to AgentList.tsx for fetchSessions effect"
+  ]
+}

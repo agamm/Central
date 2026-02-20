@@ -2,7 +2,10 @@ import { useCallback } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ProjectItem } from "./ProjectItem";
 import { EmptyProjectState } from "./EmptyProjectState";
+import { AgentList } from "@/features/agents/components/AgentList";
 import { useProjectStore } from "../store";
+import { useAgentStore } from "@/features/agents/store";
+import * as agentApi from "@/features/agents/api";
 
 interface ProjectListProps {
   readonly onAddProject: () => void;
@@ -14,6 +17,9 @@ function ProjectList({ onAddProject }: ProjectListProps) {
   const selectProject = useProjectStore((s) => s.selectProject);
   const renameProject = useProjectStore((s) => s.renameProject);
   const deleteProject = useProjectStore((s) => s.deleteProject);
+  const switchSession = useAgentStore((s) => s.switchSession);
+  const setMessages = useAgentStore((s) => s.setMessages);
+  const messagesBySession = useAgentStore((s) => s.messagesBySession);
 
   const handleSelect = useCallback(
     (id: string) => {
@@ -36,6 +42,19 @@ function ProjectList({ onAddProject }: ProjectListProps) {
     [deleteProject],
   );
 
+  const handleSessionSelect = useCallback(
+    (sessionId: string, projectId: string) => {
+      selectProject(projectId);
+      switchSession(sessionId);
+
+      // Lazy-load messages if not already in store
+      if (!messagesBySession.has(sessionId)) {
+        void loadSessionMessages(sessionId, setMessages);
+      }
+    },
+    [selectProject, switchSession, messagesBySession, setMessages],
+  );
+
   if (projects.length === 0) {
     return <EmptyProjectState onAddProject={onAddProject} />;
   }
@@ -48,13 +67,30 @@ function ProjectList({ onAddProject }: ProjectListProps) {
             key={project.id}
             project={project}
             isSelected={selectedProjectId === project.id}
+            isExpanded={selectedProjectId === project.id}
             onSelect={handleSelect}
             onRename={handleRename}
             onDelete={handleDelete}
-          />
+          >
+            <AgentList
+              projectId={project.id}
+              onSessionSelect={handleSessionSelect}
+            />
+          </ProjectItem>
         ))}
       </div>
     </ScrollArea>
+  );
+}
+
+async function loadSessionMessages(
+  sessionId: string,
+  setMessages: (sid: string, msgs: readonly import("@/core/types").Message[]) => void,
+): Promise<void> {
+  const result = await agentApi.getMessages(sessionId);
+  result.match(
+    (messages) => { setMessages(sessionId, messages); },
+    () => { /* Messages will load when events arrive */ },
   );
 }
 

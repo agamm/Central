@@ -1,108 +1,121 @@
 import { useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { useAgentStore } from "../store";
 import * as agentApi from "../api";
-import type { AgentEventPayload, SidecarEvent } from "../types";
+import { notifySessionCompleted, notifySessionFailed } from "../notifications";
+import type { AgentEventPayload, ChatMessage, SidecarEvent } from "../types";
 
-/** Process a sidecar event: update store and persist to SQLite */
+type Store = ReturnType<typeof useAgentStore.getState>;
+
+function makeSystemMessage(
+  sessionId: string,
+  content: string,
+  toolCalls: string | null,
+): ChatMessage {
+  return {
+    id: crypto.randomUUID(),
+    sessionId,
+    role: "system",
+    content,
+    thinking: null,
+    toolCalls,
+    usage: null,
+    timestamp: new Date().toISOString(),
+  };
+}
+
+async function handleMessageEvent(
+  store: Store,
+  event: Extract<SidecarEvent, { type: "message" }>,
+): Promise<void> {
+  const toolCallsJson = event.toolCalls ? JSON.stringify(event.toolCalls) : null;
+  const usageJson = event.usage ? JSON.stringify(event.usage) : null;
+
+  const result = await agentApi.addMessage(
+    event.sessionId, event.role, event.content,
+    event.thinking ?? null, toolCallsJson, usageJson,
+  );
+
+  result.match(
+    (msg) => { store.addMessage(event.sessionId, msg); },
+    () => {
+      store.addMessage(event.sessionId, {
+        id: crypto.randomUUID(),
+        sessionId: event.sessionId,
+        role: event.role as "assistant" | "user" | "system",
+        content: event.content,
+        thinking: event.thinking ?? null,
+        toolCalls: toolCallsJson,
+        usage: usageJson,
+        timestamp: new Date().toISOString(),
+      });
+    },
+  );
+}
+
+async function handleSessionCompleted(
+  store: Store,
+  sessionId: string,
+): Promise<void> {
+  store.updateSessionStatus(sessionId, "completed");
+  await agentApi.updateSessionStatus(sessionId, "completed");
+
+  const session = store.sessions.get(sessionId);
+  notifySessionCompleted(session?.prompt ?? null);
+
+  const queued = store.dequeueMessage(sessionId);
+  if (queued) {
+    await invoke("send_agent_message", { sessionId, message: queued.content });
+    store.updateSessionStatus(sessionId, "running");
+    await agentApi.updateSessionStatus(sessionId, "running");
+  }
+}
+
+async function handleSessionFailed(
+  store: Store,
+  sessionId: string,
+  error: string,
+): Promise<void> {
+  store.updateSessionStatus(sessionId, "failed");
+  store.setError(error);
+  await agentApi.updateSessionStatus(sessionId, "failed");
+
+  const session = store.sessions.get(sessionId);
+  notifySessionFailed(session?.prompt ?? null, error);
+}
+
+/** Dispatch a sidecar event to the appropriate handler */
 async function handleEvent(event: SidecarEvent): Promise<void> {
   const store = useAgentStore.getState();
 
   switch (event.type) {
     case "ready":
       break;
-
     case "session_started":
       store.updateSessionStatus(event.sessionId, "running");
       break;
-
-    case "message": {
-      const toolCallsJson = event.toolCalls
-        ? JSON.stringify(event.toolCalls)
-        : null;
-      const usageJson = event.usage ? JSON.stringify(event.usage) : null;
-
-      const result = await agentApi.addMessage(
-        event.sessionId,
-        event.role,
-        event.content,
-        event.thinking ?? null,
-        toolCallsJson,
-        usageJson,
-      );
-
-      result.match(
-        (msg) => { store.addMessage(event.sessionId, msg); },
-        () => {
-          // Persistence failed — still show in UI
-          store.addMessage(event.sessionId, {
-            id: crypto.randomUUID(),
-            sessionId: event.sessionId,
-            role: event.role as "assistant" | "user" | "system",
-            content: event.content,
-            thinking: event.thinking ?? null,
-            toolCalls: toolCallsJson,
-            usage: usageJson,
-            timestamp: new Date().toISOString(),
-          });
-        },
-      );
+    case "message":
+      await handleMessageEvent(store, event);
       break;
-    }
-
     case "tool_use":
-      store.addMessage(event.sessionId, {
-        id: crypto.randomUUID(),
-        sessionId: event.sessionId,
-        role: "system",
-        content: `Tool: ${event.toolName}`,
-        thinking: null,
-        toolCalls: JSON.stringify([
-          { name: event.toolName, input: event.input },
-        ]),
-        usage: null,
-        timestamp: new Date().toISOString(),
-      });
+      store.addMessage(event.sessionId, makeSystemMessage(
+        event.sessionId,
+        `Tool: ${event.toolName}`,
+        JSON.stringify([{ name: event.toolName, input: event.input }]),
+      ));
       break;
-
     case "tool_result":
-      store.addMessage(event.sessionId, {
-        id: crypto.randomUUID(),
-        sessionId: event.sessionId,
-        role: "system",
-        content: `${event.toolName}: ${event.output}`,
-        thinking: null,
-        toolCalls: null,
-        usage: null,
-        timestamp: new Date().toISOString(),
-      });
+      store.addMessage(event.sessionId, makeSystemMessage(
+        event.sessionId, `${event.toolName}: ${event.output}`, null,
+      ));
       break;
-
-    case "session_completed": {
-      store.updateSessionStatus(event.sessionId, "completed");
-      await agentApi.updateSessionStatus(event.sessionId, "completed");
-
-      // Auto-send next queued message if any
-      const queued = store.dequeueMessage(event.sessionId);
-      if (queued) {
-        const { invoke } = await import("@tauri-apps/api/core");
-        await invoke("send_agent_message", {
-          sessionId: event.sessionId,
-          message: queued.content,
-        });
-        store.updateSessionStatus(event.sessionId, "running");
-        await agentApi.updateSessionStatus(event.sessionId, "running");
-      }
+    case "session_completed":
+      await handleSessionCompleted(store, event.sessionId);
       break;
-    }
-
-    case "session_failed": {
-      store.updateSessionStatus(event.sessionId, "failed");
-      store.setError(event.error);
-      await agentApi.updateSessionStatus(event.sessionId, "failed");
+    case "session_failed":
+      await handleSessionFailed(store, event.sessionId, event.error);
       break;
-    }
-
     case "error":
       store.setError(event.message);
       break;

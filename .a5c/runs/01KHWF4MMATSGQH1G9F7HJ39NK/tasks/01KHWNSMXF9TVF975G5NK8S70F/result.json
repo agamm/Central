@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWNSMXF9TVF975G5NK8S70F",
+  "taskId": "screenshot-verify",
+  "invocationKey": "central-tauri-build:S000021:screenshot-verify",
+  "status": "ok",
+  "result": {
+    "description": "Three-pane dark layout renders correctly. Left pane: PROJECTS header with + button, empty state with 'Add Project' button. Middle pane: Chat area with 'Select a project' empty state and prompt input. Right pane: 'No project selected' placeholder. Agent nesting and status badges cannot be verified without Tauri backend (Vite-only), but UI compiles and renders without errors. The new AgentList, SessionItem, StatusBadge components are structurally integrated.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-4-screenshot.png"
+  },
+  "startedAt": "2026-02-20T04:45:06.179Z",
+  "finishedAt": "2026-02-20T04:45:06.179Z",
+  "value": {
+    "description": "Three-pane dark layout renders correctly. Left pane: PROJECTS header with + button, empty state with 'Add Project' button. Middle pane: Chat area with 'Select a project' empty state and prompt input. Right pane: 'No project selected' placeholder. Agent nesting and status badges cannot be verified without Tauri backend (Vite-only), but UI compiles and renders without errors. The new AgentList, SessionItem, StatusBadge components are structurally integrated.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-4-screenshot.png"
+  }
+}

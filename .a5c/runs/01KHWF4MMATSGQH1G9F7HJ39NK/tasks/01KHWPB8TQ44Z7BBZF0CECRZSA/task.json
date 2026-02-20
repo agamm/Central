@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWPB8TQ44Z7BBZF0CECRZSA",
+  "taskId": "git-commit",
+  "invocationKey": "central-tauri-build:S000024:git-commit",
+  "stepId": "S000024",
+  "kind": "agent",
+  "title": "Git Commit: Phase 4 - Agent Monitoring + Switching",
+  "labels": [
+    "agent",
+    "git",
+    "phase-4-monitoring"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWPB8TQ44Z7BBZF0CECRZSA/input.json",
+    "outputJsonPath": "tasks/01KHWPB8TQ44Z7BBZF0CECRZSA/result.json"
+  },
+  "inputs": {
+    "phase": {
+      "description": "Left pane: agents nested under projects with status badges (running=spinner, completed=green dot, failed=red dot, aborted=gray dot). Click agent → switch chat + right pane context. Preserve scroll position and chat state per agent using Zustand per-agent state. Use React useTransition for agent switching to keep UI responsive. macOS notifications on agent completion/failure (Tauri notification plugin). Performance: selective Zustand subscriptions, only render visible agent's stream. Throttle/virtualize rendering for 5 agents streaming.",
+      "id": "phase-4-monitoring",
+      "name": "Agent Monitoring + Switching",
+      "screenshotDescription": "Left pane showing project with nested agent sessions, each with colored status badges. One agent selected showing its chat.",
+      "tasks": [
+        "Left pane: agents nested under projects with status badges",
+        "Click agent → switch chat + right pane context",
+        "Preserve scroll position and chat state per agent",
+        "Status badges: running (spinner), completed (green), failed (red), aborted (gray)",
+        "macOS notifications on completion/failure",
+        "Performance: selective subscriptions, only render visible agent stream"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && pnpm tsc --noEmit && pnpm eslint src/"
+    },
+    "phaseIndex": 4,
+    "projectPath": "/Users/agam/dev/CentralTauri"
+  }
+}

@@ -11,6 +11,7 @@ interface AgentState {
   readonly activeSessionId: string | null;
   readonly messagesBySession: ReadonlyMap<string, readonly ChatMessage[]>;
   readonly messageQueue: readonly QueuedMessage[];
+  readonly scrollPositionBySession: ReadonlyMap<string, number>;
   readonly loading: boolean;
   readonly error: string | null;
 }
@@ -34,6 +35,8 @@ interface AgentActions {
   readonly dequeueMessage: (sessionId: string) => QueuedMessage | undefined;
   readonly cancelQueuedMessage: (messageId: string) => void;
   readonly editQueuedMessage: (messageId: string, content: string) => void;
+  readonly saveScrollPosition: (sessionId: string, position: number) => void;
+  readonly getScrollPosition: (sessionId: string) => number;
   readonly setLoading: (loading: boolean) => void;
   readonly setError: (error: string | null) => void;
   readonly clearSessionData: (sessionId: string) => void;
@@ -46,6 +49,7 @@ const useAgentStore = create<AgentStore>()((set, get) => ({
   activeSessionId: null,
   messagesBySession: new Map(),
   messageQueue: [],
+  scrollPositionBySession: new Map(),
   loading: false,
   error: null,
 
@@ -117,6 +121,16 @@ const useAgentStore = create<AgentStore>()((set, get) => ({
     set({ messageQueue: updated });
   },
 
+  saveScrollPosition: (sessionId, position) => {
+    const scrollMap = new Map(get().scrollPositionBySession);
+    scrollMap.set(sessionId, position);
+    set({ scrollPositionBySession: scrollMap });
+  },
+
+  getScrollPosition: (sessionId) => {
+    return get().scrollPositionBySession.get(sessionId) ?? 0;
+  },
+
   setLoading: (loading) => {
     set({ loading });
   },
@@ -132,6 +146,9 @@ const useAgentStore = create<AgentStore>()((set, get) => ({
     const msgMap = new Map(get().messagesBySession);
     msgMap.delete(sessionId);
 
+    const scrollMap = new Map(get().scrollPositionBySession);
+    scrollMap.delete(sessionId);
+
     const queue = get().messageQueue.filter(
       (m) => m.sessionId !== sessionId,
     );
@@ -141,6 +158,7 @@ const useAgentStore = create<AgentStore>()((set, get) => ({
       sessions,
       messagesBySession: msgMap,
       messageQueue: queue,
+      scrollPositionBySession: scrollMap,
       activeSessionId: activeId === sessionId ? null : activeId,
     });
   },

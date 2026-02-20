@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWND3T21987QYCNRKAD1V1A",
+  "taskId": "implement-phase",
+  "invocationKey": "central-tauri-build:S000019:implement-phase",
+  "status": "ok",
+  "result": {
+    "decisions": [
+      "Lucide Loader2 with animate-spin for running badge",
+      "Sessions expanded when project selected",
+      "Lazy-load messages from SQLite on session switch",
+      "Extracted ChatEmptyState and sessionActions for 300-line guardrail",
+      "useMemo for actions object to fix exhaustive-deps warning",
+      "Notification permission requested lazily on first notification"
+    ],
+    "filesCreated": [
+      "src/features/agents/components/StatusBadge.tsx",
+      "src/features/agents/components/SessionItem.tsx",
+      "src/features/agents/components/AgentList.tsx",
+      "src/features/agents/components/ChatEmptyState.tsx",
+      "src/features/agents/notifications.ts",
+      "src/features/agents/sessionActions.ts"
+    ],
+    "filesModified": [
+      "src/features/agents/store.ts",
+      "src/features/agents/hooks/useAgentEvents.ts",
+      "src/features/agents/components/ChatPane.tsx",
+      "src/features/agents/components/MessageList.tsx",
+      "src/features/agents/index.ts",
+      "src/features/projects/components/ProjectItem.tsx",
+      "src/features/projects/components/ProjectList.tsx"
+    ],
+    "summary": "Implemented Phase 4: Agent Monitoring + Switching. Added agent sessions nested under projects in sidebar with status badges (spinner/green/red/gray/amber dots). Click session switches active agent. Scroll positions preserved per-session. macOS notifications on completion/failure. Selective Zustand subscriptions for performance. Extracted sessionActions.ts and ChatEmptyState.tsx from ChatPane."
+  },
+  "startedAt": "2026-02-20T04:43:48.031Z",
+  "finishedAt": "2026-02-20T04:43:48.031Z",
+  "value": {
+    "decisions": [
+      "Lucide Loader2 with animate-spin for running badge",
+      "Sessions expanded when project selected",
+      "Lazy-load messages from SQLite on session switch",
+      "Extracted ChatEmptyState and sessionActions for 300-line guardrail",
+      "useMemo for actions object to fix exhaustive-deps warning",
+      "Notification permission requested lazily on first notification"
+    ],
+    "filesCreated": [
+      "src/features/agents/components/StatusBadge.tsx",
+      "src/features/agents/components/SessionItem.tsx",
+      "src/features/agents/components/AgentList.tsx",
+      "src/features/agents/components/ChatEmptyState.tsx",
+      "src/features/agents/notifications.ts",
+      "src/features/agents/sessionActions.ts"
+    ],
+    "filesModified": [
+      "src/features/agents/store.ts",
+      "src/features/agents/hooks/useAgentEvents.ts",
+      "src/features/agents/components/ChatPane.tsx",
+      "src/features/agents/components/MessageList.tsx",
+      "src/features/agents/index.ts",
+      "src/features/projects/components/ProjectItem.tsx",
+      "src/features/projects/components/ProjectList.tsx"
+    ],
+    "summary": "Implemented Phase 4: Agent Monitoring + Switching. Added agent sessions nested under projects in sidebar with status badges (spinner/green/red/gray/amber dots). Click session switches active agent. Scroll positions preserved per-session. macOS notifications on completion/failure. Selective Zustand subscriptions for performance. Extracted sessionActions.ts and ChatEmptyState.tsx from ChatPane."
+  }
+}
