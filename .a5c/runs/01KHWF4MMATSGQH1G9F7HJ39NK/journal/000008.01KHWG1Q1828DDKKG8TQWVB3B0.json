@@ -1,0 +1,20 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-20T03:03:45.448Z",
+  "data": {
+    "effectId": "01KHWG1Q0TVM8NQ61569N93V7W",
+    "invocationKey": "central-tauri-build:S000004:quality-score",
+    "invocationHash": "3b6d3cba89d76ec802d3c11d5b67eb88e4417b7671af564b2ac9e3af66419dac",
+    "stepId": "S000004",
+    "taskId": "quality-score",
+    "kind": "agent",
+    "label": "agent",
+    "taskDefRef": "tasks/01KHWG1Q0TVM8NQ61569N93V7W/task.json",
+    "labels": [
+      "agent",
+      "quality",
+      "phase-1-setup"
+    ]
+  },
+  "checksum": "7bd5c1e703b345746f4f7a48c048cb8b8a9f06bc2fb43466f03d45e45f126387"
+}

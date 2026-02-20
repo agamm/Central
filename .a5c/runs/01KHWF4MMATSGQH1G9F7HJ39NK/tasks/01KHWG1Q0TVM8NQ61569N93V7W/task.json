@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWG1Q0TVM8NQ61569N93V7W",
+  "taskId": "quality-score",
+  "invocationKey": "central-tauri-build:S000004:quality-score",
+  "stepId": "S000004",
+  "kind": "agent",
+  "title": "Quality Score: Project Setup",
+  "labels": [
+    "agent",
+    "phase-1-setup",
+    "quality"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWG1Q0TVM8NQ61569N93V7W/input.json",
+    "outputJsonPath": "tasks/01KHWG1Q0TVM8NQ61569N93V7W/result.json"
+  },
+  "inputs": {
+    "buildResult": {
+      "errors": [],
+      "output": "All 3 checks passed: pnpm tsc --noEmit (0 errors), cargo clippy (0 warnings), pnpm vitest run (3/3 tests pass)",
+      "success": true
+    },
+    "implementResult": {
+      "decisions": [
+        "Manual scaffolding for full control over config",
+        "Tailwind v3 (not v4) for shadcn/ui compatibility",
+        "ESLint v10 flat config",
+        "include_str! for SQL migrations in Rust",
+        "Indexes on foreign keys for query performance",
+        "Readonly core types matching append-only data model"
+      ],
+      "filesCreated": [
+        "package.json",
+        "tsconfig.json",
+        "tsconfig.node.json",
+        "index.html",
+        "vite.config.ts",
+        "vitest.config.ts",
+        "eslint.config.js",
+        "postcss.config.js",
+        "tailwind.config.ts",
+        "components.json",
+        ".prettierrc",
+        ".prettierignore",
+        ".gitignore",
+        "src/main.tsx",
+        "src/App.tsx",
+        "src/globals.css",
+        "src/vite-env.d.ts",
+        "src/test-setup.ts",
+        "src/lib/utils.ts",
+        "src/core/types.ts",
+        "src/core/constants.ts",
+        "src/core/index.ts",
+        "src/core/constants.test.ts",
+        "src/shared/index.ts",
+        "src/features/agents/index.ts",
+        "src/features/projects/index.ts",
+        "src/features/files/index.ts",
+        "src/features/terminal/index.ts",
+        "src/features/settings/index.ts",
+        "src-tauri/tauri.conf.json",
+        "src-tauri/Cargo.toml",
+        "src-tauri/build.rs",
+        "src-tauri/src/main.rs",
+        "src-tauri/src/lib.rs",
+        "src-tauri/src/commands.rs",
+        "src-tauri/capabilities/default.json",
+        "src-tauri/migrations/001_initial_schema.sql"
+      ],
+      "filesModified": [],
+      "summary": "Scaffolded complete Tauri v2 + React 19 + TypeScript strict project. Configured Vite, ESLint flat config, Prettier, Tailwind v3 + shadcn/ui with dark theme HSL vars from PLAN.md, Zustand, neverthrow, lucide-react. Rust backend with git2-rs (vendored), tauri-plugin-sql (SQLite), dialog, notification, shell plugins. SQLite schema with all 4 tables (projects, agent_sessions, messages, app_settings) + indexes. Feature-based directory structure. All checks pass: tsc --noEmit, cargo build, cargo clippy, vitest (3/3), vite build."
+    },
+    "phase": {
+      "description": "Scaffold Tauri v2 + React 19 + TypeScript project. Configure Vite (clearScreen: false, strictPort: true, port 1420). Install and configure: ESLint, Prettier, clippy, rustfmt, shadcn/ui (dark theme CSS vars), Zustand, neverthrow, lucide-react. Add git2-rs with vendored features to Cargo.toml. Set up SQLite via Tauri plugin with initial schema (projects, agent_sessions, messages, app_settings tables). Set up vitest. Verify pnpm tauri dev runs clean.",
+      "id": "phase-1-setup",
+      "name": "Project Setup",
+      "screenshotDescription": "Default Tauri welcome page renders in the app window",
+      "tasks": [
+        "pnpm create tauri-app with React + TypeScript template",
+        "Configure Vite for Tauri (clearScreen, strictPort, envPrefix)",
+        "Set up ESLint + Prettier + clippy + rustfmt",
+        "Install shadcn/ui, configure dark theme CSS variables in globals.css",
+        "Add Zustand, neverthrow, lucide-react",
+        "Add git2-rs to Cargo.toml with vendored-libgit2 + vendored-openssl",
+        "Set up SQLite via Tauri plugin, create initial schema",
+        "Set up vitest",
+        "Verify pnpm tauri dev runs clean"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && pnpm tauri dev --no-watch 2>&1 | head -50"
+    },
+    "phaseIndex": 1,
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "screenshotResult": {
+      "description": "Dark-themed page with near-black background. Centered 'Central' heading in white text, subtitle 'Orchestrate parallel Claude Code agents' in muted gray. Full-screen flex centering, HSL CSS variables working correctly. Clean render, no errors.",
+      "issues": [],
+      "matches": true,
+      "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-1-screenshot.png"
+    }
+  }
+}

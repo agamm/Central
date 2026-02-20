@@ -1,0 +1,5 @@
+{
+  "success": true,
+  "errors": [],
+  "output": "All 3 checks passed: pnpm tsc --noEmit (0 errors), cargo clippy (0 warnings), pnpm vitest run (3/3 tests pass)"
+}

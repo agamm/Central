@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWF53NWD2STR7HTRK7MHVXQ",
+  "taskId": "implement-phase",
+  "invocationKey": "central-tauri-build:S000001:implement-phase",
+  "stepId": "S000001",
+  "kind": "agent",
+  "title": "Implement: Project Setup (1/8)",
+  "labels": [
+    "agent",
+    "implementation",
+    "phase-1-setup"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWF53NWD2STR7HTRK7MHVXQ/input.json",
+    "outputJsonPath": "tasks/01KHWF53NWD2STR7HTRK7MHVXQ/result.json"
+  },
+  "inputs": {
+    "claudeMdPath": "/Users/agam/dev/CentralTauri/CLAUDE.md",
+    "phase": {
+      "description": "Scaffold Tauri v2 + React 19 + TypeScript project. Configure Vite (clearScreen: false, strictPort: true, port 1420). Install and configure: ESLint, Prettier, clippy, rustfmt, shadcn/ui (dark theme CSS vars), Zustand, neverthrow, lucide-react. Add git2-rs with vendored features to Cargo.toml. Set up SQLite via Tauri plugin with initial schema (projects, agent_sessions, messages, app_settings tables). Set up vitest. Verify pnpm tauri dev runs clean.",
+      "id": "phase-1-setup",
+      "name": "Project Setup",
+      "screenshotDescription": "Default Tauri welcome page renders in the app window",
+      "tasks": [
+        "pnpm create tauri-app with React + TypeScript template",
+        "Configure Vite for Tauri (clearScreen, strictPort, envPrefix)",
+        "Set up ESLint + Prettier + clippy + rustfmt",
+        "Install shadcn/ui, configure dark theme CSS variables in globals.css",
+        "Add Zustand, neverthrow, lucide-react",
+        "Add git2-rs to Cargo.toml with vendored-libgit2 + vendored-openssl",
+        "Set up SQLite via Tauri plugin, create initial schema",
+        "Set up vitest",
+        "Verify pnpm tauri dev runs clean"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && pnpm tauri dev --no-watch 2>&1 | head -50"
+    },
+    "phaseIndex": 1,
+    "planPath": "/Users/agam/dev/CentralTauri/PLAN.md",
+    "previousPhases": [],
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "totalPhases": 8
+  }
+}

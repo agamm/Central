@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWFX15W9PCJ048N347EA944",
+  "taskId": "screenshot-verify",
+  "invocationKey": "central-tauri-build:S000003:screenshot-verify",
+  "status": "ok",
+  "result": {
+    "description": "Dark-themed page with near-black background. Centered 'Central' heading in white text, subtitle 'Orchestrate parallel Claude Code agents' in muted gray. Full-screen flex centering, HSL CSS variables working correctly. Clean render, no errors.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-1-screenshot.png"
+  },
+  "startedAt": "2026-02-20T03:03:38.941Z",
+  "finishedAt": "2026-02-20T03:03:38.941Z",
+  "value": {
+    "description": "Dark-themed page with near-black background. Centered 'Central' heading in white text, subtitle 'Orchestrate parallel Claude Code agents' in muted gray. Full-screen flex centering, HSL CSS variables working correctly. Clean render, no errors.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-1-screenshot.png"
+  }
+}

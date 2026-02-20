@@ -1,0 +1,14 @@
+{
+  "type": "RUN_CREATED",
+  "recordedAt": "2026-02-20T02:47:52.741Z",
+  "data": {
+    "runId": "01KHWF4MMATSGQH1G9F7HJ39NK",
+    "processId": "central-tauri-build",
+    "entrypoint": {
+      "importPath": "../../processes/central-tauri-build.js",
+      "exportName": "process"
+    },
+    "inputsRef": "inputs.json"
+  },
+  "checksum": "33dbb78be61f79508315fccca235718d5b6ce2b6e91a87b1aacab1de5445f436"
+}

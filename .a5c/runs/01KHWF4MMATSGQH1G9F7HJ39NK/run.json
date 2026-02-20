@@ -1,0 +1,13 @@
+{
+  "runId": "01KHWF4MMATSGQH1G9F7HJ39NK",
+  "request": "central-tauri-build",
+  "processId": "central-tauri-build",
+  "entrypoint": {
+    "importPath": "../../processes/central-tauri-build.js",
+    "exportName": "process"
+  },
+  "processPath": "../../processes/central-tauri-build.js",
+  "layoutVersion": "2026.01-storage-preview",
+  "createdAt": "2026-02-20T02:47:52.726Z",
+  "completionSecret": "ac6cc6f929e8dd94617573c12176ecdf"
+}

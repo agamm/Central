@@ -1,0 +1,21 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-20T03:00:38.612Z",
+  "data": {
+    "effectId": "01KHWFW0J5DPXH7S24Z2HAR9QX",
+    "invocationKey": "central-tauri-build:S000002:build-verify",
+    "invocationHash": "a60fce998fa7cd208dd599a6843e8594dbaa54b3f9ebd1c03f2daa9f32db46d7",
+    "stepId": "S000002",
+    "taskId": "build-verify",
+    "kind": "agent",
+    "label": "agent",
+    "taskDefRef": "tasks/01KHWFW0J5DPXH7S24Z2HAR9QX/task.json",
+    "labels": [
+      "agent",
+      "verification",
+      "build",
+      "phase-1-setup"
+    ]
+  },
+  "checksum": "3de0a5935b508b6c5d7dafd095346857ff66f2edb78450e02d2e9c7b148da24a"
+}
