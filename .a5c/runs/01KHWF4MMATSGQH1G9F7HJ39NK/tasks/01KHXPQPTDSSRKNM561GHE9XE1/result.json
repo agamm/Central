@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHXPQPTDSSRKNM561GHE9XE1",
+  "taskId": "screenshot-verify",
+  "invocationKey": "central-tauri-build:S000051:screenshot-verify",
+  "status": "ok",
+  "result": {
+    "description": "App now shows a refined native-macOS-feeling dark theme. Background is very dark (near black). Panel separators are barely visible hairlines. Text hierarchy is muted — 'PROJECTS' header is small and dim, empty state text is appropriately subdued. Icons are low-opacity. The overall feel is much closer to Cursor/Conductor than default shadcn. No blue tint, no boxy card containers, no harsh borders. The input area at bottom is embedded with a subtle border. Three-pane layout with panels differentiated by slight shade differences rather than heavy borders.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-9-screenshot.png"
+  },
+  "startedAt": "2026-02-20T14:20:06.668Z",
+  "finishedAt": "2026-02-20T14:20:06.668Z",
+  "value": {
+    "description": "App now shows a refined native-macOS-feeling dark theme. Background is very dark (near black). Panel separators are barely visible hairlines. Text hierarchy is muted — 'PROJECTS' header is small and dim, empty state text is appropriately subdued. Icons are low-opacity. The overall feel is much closer to Cursor/Conductor than default shadcn. No blue tint, no boxy card containers, no harsh borders. The input area at bottom is embedded with a subtle border. Three-pane layout with panels differentiated by slight shade differences rather than heavy borders.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-9-screenshot.png"
+  }
+}

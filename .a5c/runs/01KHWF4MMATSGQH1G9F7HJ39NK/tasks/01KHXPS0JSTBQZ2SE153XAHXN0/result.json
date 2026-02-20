@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHXPS0JSTBQZ2SE153XAHXN0",
+  "taskId": "__sdk.breakpoint",
+  "invocationKey": "central-tauri-build:S000053:__sdk.breakpoint",
+  "status": "ok",
+  "result": {
+    "approved": true,
+    "feedback": "Approved. Design polish looks good."
+  },
+  "startedAt": "2026-02-20T17:50:17.760Z",
+  "finishedAt": "2026-02-20T17:50:17.760Z",
+  "value": {
+    "approved": true,
+    "feedback": "Approved. Design polish looks good."
+  }
+}

@@ -10,49 +10,49 @@
   }
 
   .dark {
-    /* Core palette from PLAN.md design language */
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
+    /* Neutral, desaturated palette — no blue tint */
+    --background: 0 0% 5%;
+    --foreground: 0 0% 87%;
 
-    --card: 224 71% 6%;
-    --card-foreground: 213 31% 91%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 87%;
 
-    --popover: 224 71% 6%;
-    --popover-foreground: 213 31% 91%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 87%;
 
-    --primary: 213 31% 91%;
-    --primary-foreground: 224 71% 4%;
+    --primary: 0 0% 87%;
+    --primary-foreground: 0 0% 5%;
 
-    --secondary: 223 47% 11%;
-    --secondary-foreground: 213 31% 91%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 87%;
 
-    --muted: 223 47% 11%;
-    --muted-foreground: 215 20% 55%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 48%;
 
-    --accent: 223 47% 11%;
-    --accent-foreground: 213 31% 91%;
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 87%;
 
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 213 31% 91%;
+    --destructive: 0 50% 30%;
+    --destructive-foreground: 0 0% 87%;
 
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
-    --ring: 213 31% 91%;
+    --border: 0 0% 13%;
+    --input: 0 0% 11%;
+    --ring: 0 0% 40%;
 
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --chart-1: 220 60% 50%;
+    --chart-2: 160 50% 42%;
+    --chart-3: 30 70% 50%;
+    --chart-4: 280 55% 55%;
+    --chart-5: 340 65% 50%;
 
-    --sidebar-background: 224 71% 4%;
-    --sidebar-foreground: 213 31% 91%;
-    --sidebar-primary: 213 31% 91%;
-    --sidebar-primary-foreground: 224 71% 4%;
-    --sidebar-accent: 223 47% 11%;
-    --sidebar-accent-foreground: 213 31% 91%;
-    --sidebar-border: 216 34% 17%;
-    --sidebar-ring: 213 31% 91%;
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 0 0% 87%;
+    --sidebar-primary: 0 0% 87%;
+    --sidebar-primary-foreground: 0 0% 4%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 87%;
+    --sidebar-border: 0 0% 13%;
+    --sidebar-ring: 0 0% 40%;
   }
 }
 
@@ -68,7 +68,6 @@
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Prevent text selection and context menu for native app feel */
     user-select: none;
     overflow: hidden;
   }
@@ -81,4 +80,60 @@
       Menlo, Consolas, monospace;
     font-size: 12px;
   }
+
+  /* Subtle transitions on all interactive elements */
+  button,
+  a,
+  [role="button"],
+  input,
+  textarea,
+  select {
+    transition: background-color 150ms ease, color 150ms ease,
+      border-color 150ms ease, opacity 150ms ease;
+  }
+}
+
+/* Custom thin scrollbar — auto-hide style */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(0 0% 18%) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(0 0% 20%);
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(0 0% 28%);
+  }
+}
+
+/* Global scrollbar override for all scrollable areas */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: hsl(0 0% 18%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(0 0% 26%);
 }

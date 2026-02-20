@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHXPQ2WAHPCE1NHNYPF2JWQR",
+  "taskId": "build-verify",
+  "invocationKey": "central-tauri-build:S000050:build-verify",
+  "stepId": "S000050",
+  "kind": "agent",
+  "title": "Build Verify: Design Polish — Native macOS Feel",
+  "labels": [
+    "agent",
+    "build",
+    "phase-9-design-polish",
+    "verification"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHXPQ2WAHPCE1NHNYPF2JWQR/input.json",
+    "outputJsonPath": "tasks/01KHXPQ2WAHPCE1NHNYPF2JWQR/result.json"
+  },
+  "inputs": {
+    "phase": {
+      "description": "Make the app look and feel like a native macOS IDE (reference: Cursor/Conductor workspace UI) rather than a default shadcn/ui web app. Key changes:\n\nREFERENCE IMAGE ANALYSIS (Conductor workspace):\n- Background: Very dark (#0d0d0d to #111111 range), darker than current shadcn default\n- Borders: Ultra-subtle, barely visible — ~5-8% opacity white or very dark gray (e.g., hsl(0 0% 15%)), NOT the current 17% lightness blue-gray\n- Selected items: Subtle background shift (slightly lighter surface), no harsh outlines or bright highlights\n- Text hierarchy: Primary text ~85% white, secondary ~50% white, tertiary ~35% white — all muted, no pure white anywhere\n- Panels: Differentiated by very slight background shade (1-2% difference), not by borders\n- Inputs: Dark background with very subtle border, muted placeholder text, slightly rounded\n- Tab bars: Plain text tabs, minimal — no shadcn Tab styling. Active tab slightly lighter, inactive very muted\n- Buttons: Ghost-style by default, very subtle hover states\n- Empty states: Simple centered text, no heavy illustrations or boxes\n- Scrollbars: Thin, dark, auto-hide\n- Overall: Zero shadows, completely flat, feels like part of the OS not a web page\n\nSPECIFIC TASKS:\n1. Update globals.css HSL variables: darken background to ~hsl(0 0% 5%), surface to hsl(0 0% 7%), reduce border contrast to ~hsl(0 0% 12-15%), desaturate everything (move from blue-tinted to neutral dark)\n2. Update ResizableHandle to be 1px hairline, nearly invisible\n3. Refine sidebar: items should have subtle rounded hover states, selected state is slightly lighter bg not bold/bright\n4. Chat input area: dark bg, subtle border, rounded corners, placeholder text very muted\n5. Terminal tab bar: plain text, minimal, no shadcn Tab component overhead\n6. Message bubbles: remove any boxy card styling, use subtle bg difference only\n7. File tree: tighten spacing, ensure git status dots are small and refined\n8. Status badges: smaller, more refined, match native macOS aesthetic\n9. Custom thin scrollbar CSS (webkit-scrollbar) for all scrollable areas\n10. Ensure all hover/focus states are subtle and not flashy\n11. Remove any remaining default shadcn visual artifacts (large border-radius, heavy shadows, etc.)\n12. Add subtle CSS transitions (150ms) for hover/active states to feel polished",
+      "id": "phase-9-design-polish",
+      "name": "Design Polish — Native macOS Feel",
+      "screenshotDescription": "App with refined native-macOS-feeling dark theme: ultra-subtle borders, muted color hierarchy, no shadcn visual artifacts, feels like Cursor/Conductor not a web app.",
+      "tasks": [
+        "Update globals.css: darker bg, desaturated palette, ultra-subtle borders",
+        "Refine ResizableHandle to 1px hairline",
+        "Refine sidebar: subtle hover/selected states, tighter spacing",
+        "Refine chat input and message bubbles",
+        "Refine terminal tab bar to plain minimal style",
+        "Custom thin scrollbars (webkit)",
+        "Subtle CSS transitions for all interactive states",
+        "Ensure file tree, status badges, empty states match native feel",
+        "Screenshot comparison with reference image to verify"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && pnpm tsc --noEmit && pnpm eslint src/"
+    },
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "verifyCommand": "cd /Users/agam/dev/CentralTauri && pnpm tsc --noEmit && pnpm eslint src/"
+  }
+}

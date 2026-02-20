@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHXPS0JSTBQZ2SE153XAHXN0",
+  "taskId": "__sdk.breakpoint",
+  "invocationKey": "central-tauri-build:S000053:__sdk.breakpoint",
+  "stepId": "S000053",
+  "kind": "breakpoint",
+  "title": "breakpoint",
+  "metadata": {
+    "label": "breakpoint",
+    "payload": {
+      "context": {
+        "files": [
+          {
+            "format": "image",
+            "label": "UI Screenshot",
+            "path": "artifacts/phase-9-design-polish/screenshot.png"
+          },
+          {
+            "format": "markdown",
+            "label": "Phase Summary",
+            "path": "artifacts/phase-9-design-polish/summary.md"
+          }
+        ]
+      },
+      "question": "Phase 9/9: \"Design Polish — Native macOS Feel\" complete. Quality: 88/100. Fix iterations: 0. Build: PASS. Review and approve to continue?",
+      "title": "Phase 9: Design Polish — Native macOS Feel Review"
+    },
+    "requestedAt": "2026-02-20T14:20:34.777Z"
+  },
+  "inputs": {
+    "label": "breakpoint",
+    "payload": {
+      "context": {
+        "files": [
+          {
+            "format": "image",
+            "label": "UI Screenshot",
+            "path": "artifacts/phase-9-design-polish/screenshot.png"
+          },
+          {
+            "format": "markdown",
+            "label": "Phase Summary",
+            "path": "artifacts/phase-9-design-polish/summary.md"
+          }
+        ]
+      },
+      "question": "Phase 9/9: \"Design Polish — Native macOS Feel\" complete. Quality: 88/100. Fix iterations: 0. Build: PASS. Review and approve to continue?",
+      "title": "Phase 9: Design Polish — Native macOS Feel Review"
+    },
+    "requestedAt": "2026-02-20T14:20:34.777Z"
+  }
+}

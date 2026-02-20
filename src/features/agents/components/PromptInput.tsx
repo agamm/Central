@@ -38,7 +38,7 @@ function PromptInput({
   );
 
   return (
-    <div className="border-t border-border px-4 py-3">
+    <div className="border-t border-border/50 px-4 py-3">
       <div className="flex items-end gap-2">
         <textarea
           value={value}
@@ -48,10 +48,10 @@ function PromptInput({
           disabled={disabled}
           rows={1}
           className={cn(
-            "flex-1 resize-none rounded-md border border-input bg-background px-3 py-2",
-            "text-sm text-foreground placeholder:text-muted-foreground",
-            "focus:outline-none focus:ring-1 focus:ring-ring",
-            "disabled:cursor-not-allowed disabled:opacity-50",
+            "flex-1 resize-none rounded-lg border border-border/60 bg-muted/40 px-3 py-2",
+            "text-sm text-foreground/90 placeholder:text-muted-foreground/50",
+            "focus:outline-none focus:border-border",
+            "disabled:cursor-not-allowed disabled:opacity-40",
             "min-h-[36px] max-h-[120px] select-text",
           )}
           style={{ fieldSizing: "content" } as React.CSSProperties}
@@ -61,22 +61,22 @@ function PromptInput({
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9 shrink-0 text-destructive hover:text-destructive"
+            className="h-8 w-8 shrink-0 text-red-400/80 hover:text-red-400 hover:bg-red-400/10"
             onClick={onAbort}
             title="Stop agent"
           >
-            <Square className="h-4 w-4" />
+            <Square className="h-3.5 w-3.5" />
           </Button>
         ) : (
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9 shrink-0"
+            className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
             onClick={handleSubmit}
             disabled={disabled || value.trim().length === 0}
             title="Send message"
           >
-            <Send className="h-4 w-4" />
+            <Send className="h-3.5 w-3.5" />
           </Button>
         )}
       </div>

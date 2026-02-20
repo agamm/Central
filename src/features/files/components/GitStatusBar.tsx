@@ -8,8 +8,8 @@ interface GitStatusBarProps {
 function GitStatusBar({ status }: GitStatusBarProps) {
   if (!status || !status.is_repo) {
     return (
-      <div className="flex items-center border-t border-border px-3 py-1">
-        <span className="text-[10px] text-muted-foreground">
+      <div className="flex items-center border-t border-border/50 px-3 py-1">
+        <span className="text-[10px] text-muted-foreground/50">
           Not a git repository
         </span>
       </div>
@@ -17,7 +17,7 @@ function GitStatusBar({ status }: GitStatusBarProps) {
   }
 
   return (
-    <div className="flex items-center gap-3 border-t border-border px-3 py-1">
+    <div className="flex items-center gap-3 border-t border-border/50 px-3 py-1">
       <BranchDisplay branch={status.branch} />
       <AheadBehindDisplay ahead={status.ahead} behind={status.behind} />
     </div>
@@ -32,7 +32,7 @@ function BranchDisplay({ branch }: BranchDisplayProps) {
   return (
     <div className="flex items-center gap-1">
       <GitBranch className="h-3 w-3 text-muted-foreground" />
-      <span className="text-[10px] font-medium text-foreground">
+      <span className="text-[10px] font-medium text-foreground/70">
         {branch}
       </span>
     </div>

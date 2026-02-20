@@ -70,9 +70,9 @@ function ProjectItem({
         onClick={handleClick}
         onKeyDown={(e) => { if (e.key === "Enter") handleClick(); }}
         className={cn(
-          "group flex items-center gap-1 rounded-md px-2 py-1.5 text-sm transition-colors",
-          "cursor-pointer hover:bg-accent",
-          isSelected && "bg-muted",
+          "group flex items-center gap-1 rounded px-2 py-1 text-sm",
+          "cursor-pointer hover:bg-accent/60",
+          isSelected && "bg-accent/80",
         )}
       >
         <ChevronRight
@@ -81,7 +81,7 @@ function ProjectItem({
             isExpanded && "rotate-90",
           )}
         />
-        <Folder className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <Folder className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
 
         {isEditing ? (
           <Input
@@ -94,7 +94,7 @@ function ProjectItem({
             onClick={(e) => { e.stopPropagation(); }}
           />
         ) : (
-          <span className="flex-1 truncate">{project.name}</span>
+          <span className="flex-1 truncate text-foreground/85">{project.name}</span>
         )}
 
         {!isEditing && (

@@ -20,15 +20,15 @@ interface FileTreeNodeProps {
 function gitStatusColor(status: GitFileStatus | null): string {
   switch (status) {
     case "modified":
-      return "text-yellow-400";
+      return "text-yellow-400/80";
     case "added":
-      return "text-green-400";
+      return "text-green-400/80";
     case "deleted":
-      return "text-red-400";
+      return "text-red-400/80";
     case "renamed":
-      return "text-blue-400";
+      return "text-blue-400/80";
     case "conflicted":
-      return "text-orange-400";
+      return "text-orange-400/80";
     default:
       return "text-muted-foreground";
   }
@@ -37,15 +37,15 @@ function gitStatusColor(status: GitFileStatus | null): string {
 function gitStatusDot(status: GitFileStatus | null): string | null {
   switch (status) {
     case "modified":
-      return "bg-yellow-400";
+      return "bg-yellow-400/70";
     case "added":
-      return "bg-green-400";
+      return "bg-green-400/70";
     case "deleted":
-      return "bg-red-400";
+      return "bg-red-400/70";
     case "renamed":
-      return "bg-blue-400";
+      return "bg-blue-400/70";
     case "conflicted":
-      return "bg-orange-400";
+      return "bg-orange-400/70";
     default:
       return null;
   }
@@ -83,14 +83,14 @@ function FileTreeNode({
   return (
     <button
       type="button"
-      className={`flex w-full items-center gap-1.5 py-0.5 pr-2 text-left text-xs hover:bg-muted/50 ${
-        isSelected ? "bg-muted" : ""
+      className={`flex w-full items-center gap-1 py-px pr-2 text-left text-xs hover:bg-accent/40 ${
+        isSelected ? "bg-accent/60" : ""
       }`}
       style={{ paddingLeft }}
       onClick={() => { onSelectFile(entry.path); }}
     >
       <File
-        className={`h-3.5 w-3.5 shrink-0 ${gitStatusColor(entry.git_status)}`}
+        className={`h-3 w-3 shrink-0 ${gitStatusColor(entry.git_status)}`}
       />
       <span
         className={`truncate ${gitStatusColor(entry.git_status)}`}
@@ -99,7 +99,7 @@ function FileTreeNode({
       </span>
       {dotColor ? (
         <span
-          className={`ml-auto h-1.5 w-1.5 shrink-0 rounded-full ${dotColor}`}
+          className={`ml-auto h-1 w-1 shrink-0 rounded-full ${dotColor}`}
         />
       ) : null}
     </button>
@@ -129,16 +129,16 @@ function DirectoryNode({
     <div>
       <button
         type="button"
-        className="flex w-full items-center gap-1.5 py-0.5 pr-2 text-left text-xs hover:bg-muted/50"
+        className="flex w-full items-center gap-1 py-px pr-2 text-left text-xs hover:bg-accent/40"
         style={{ paddingLeft }}
         onClick={() => { onToggleDir(entry.path); }}
       >
-        <Chevron className="h-3 w-3 shrink-0 text-muted-foreground" />
-        <FolderIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-        <span className="truncate text-foreground">{entry.name}</span>
+        <Chevron className="h-2.5 w-2.5 shrink-0 text-muted-foreground/60" />
+        <FolderIcon className="h-3 w-3 shrink-0 text-muted-foreground/70" />
+        <span className="truncate text-foreground/80">{entry.name}</span>
         {dotColor ? (
           <span
-            className={`ml-auto h-1.5 w-1.5 shrink-0 rounded-full ${dotColor}`}
+            className={`ml-auto h-1 w-1 shrink-0 rounded-full ${dotColor}`}
           />
         ) : null}
       </button>

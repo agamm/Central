@@ -62,15 +62,13 @@ function PaneErrorFallback({
 }: PaneErrorFallbackProps) {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-3 bg-background px-6">
-      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-950/50">
-        <AlertTriangle className="h-5 w-5 text-red-400" />
-      </div>
+      <AlertTriangle className="h-5 w-5 text-red-400/60" />
       <div className="text-center">
-        <p className="text-sm font-medium text-foreground">
+        <p className="text-xs text-foreground/60">
           {paneName} encountered an error
         </p>
         {error && (
-          <p className="mt-1 max-w-[280px] truncate text-xs text-muted-foreground">
+          <p className="mt-1 max-w-[280px] truncate text-[10px] text-muted-foreground/50">
             {error}
           </p>
         )}
@@ -79,7 +77,7 @@ function PaneErrorFallback({
         variant="ghost"
         size="sm"
         onClick={onReset}
-        className="mt-1 gap-1.5 text-xs"
+        className="mt-1 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
       >
         <RotateCcw className="h-3 w-3" />
         Retry

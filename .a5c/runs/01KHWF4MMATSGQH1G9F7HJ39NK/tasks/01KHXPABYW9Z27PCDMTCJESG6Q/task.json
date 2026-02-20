@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHXPABYW9Z27PCDMTCJESG6Q",
+  "taskId": "implement-phase",
+  "invocationKey": "central-tauri-build:S000049:implement-phase",
+  "stepId": "S000049",
+  "kind": "agent",
+  "title": "Implement: Design Polish — Native macOS Feel (9/9)",
+  "labels": [
+    "agent",
+    "implementation",
+    "phase-9-design-polish"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHXPABYW9Z27PCDMTCJESG6Q/input.json",
+    "outputJsonPath": "tasks/01KHXPABYW9Z27PCDMTCJESG6Q/result.json"
+  },
+  "inputs": {
+    "claudeMdPath": "/Users/agam/dev/CentralTauri/CLAUDE.md",
+    "phase": {
+      "description": "Make the app look and feel like a native macOS IDE (reference: Cursor/Conductor workspace UI) rather than a default shadcn/ui web app. Key changes:\n\nREFERENCE IMAGE ANALYSIS (Conductor workspace):\n- Background: Very dark (#0d0d0d to #111111 range), darker than current shadcn default\n- Borders: Ultra-subtle, barely visible — ~5-8% opacity white or very dark gray (e.g., hsl(0 0% 15%)), NOT the current 17% lightness blue-gray\n- Selected items: Subtle background shift (slightly lighter surface), no harsh outlines or bright highlights\n- Text hierarchy: Primary text ~85% white, secondary ~50% white, tertiary ~35% white — all muted, no pure white anywhere\n- Panels: Differentiated by very slight background shade (1-2% difference), not by borders\n- Inputs: Dark background with very subtle border, muted placeholder text, slightly rounded\n- Tab bars: Plain text tabs, minimal — no shadcn Tab styling. Active tab slightly lighter, inactive very muted\n- Buttons: Ghost-style by default, very subtle hover states\n- Empty states: Simple centered text, no heavy illustrations or boxes\n- Scrollbars: Thin, dark, auto-hide\n- Overall: Zero shadows, completely flat, feels like part of the OS not a web page\n\nSPECIFIC TASKS:\n1. Update globals.css HSL variables: darken background to ~hsl(0 0% 5%), surface to hsl(0 0% 7%), reduce border contrast to ~hsl(0 0% 12-15%), desaturate everything (move from blue-tinted to neutral dark)\n2. Update ResizableHandle to be 1px hairline, nearly invisible\n3. Refine sidebar: items should have subtle rounded hover states, selected state is slightly lighter bg not bold/bright\n4. Chat input area: dark bg, subtle border, rounded corners, placeholder text very muted\n5. Terminal tab bar: plain text, minimal, no shadcn Tab component overhead\n6. Message bubbles: remove any boxy card styling, use subtle bg difference only\n7. File tree: tighten spacing, ensure git status dots are small and refined\n8. Status badges: smaller, more refined, match native macOS aesthetic\n9. Custom thin scrollbar CSS (webkit-scrollbar) for all scrollable areas\n10. Ensure all hover/focus states are subtle and not flashy\n11. Remove any remaining default shadcn visual artifacts (large border-radius, heavy shadows, etc.)\n12. Add subtle CSS transitions (150ms) for hover/active states to feel polished",
+      "id": "phase-9-design-polish",
+      "name": "Design Polish — Native macOS Feel",
+      "screenshotDescription": "App with refined native-macOS-feeling dark theme: ultra-subtle borders, muted color hierarchy, no shadcn visual artifacts, feels like Cursor/Conductor not a web app.",
+      "tasks": [
+        "Update globals.css: darker bg, desaturated palette, ultra-subtle borders",
+        "Refine ResizableHandle to 1px hairline",
+        "Refine sidebar: subtle hover/selected states, tighter spacing",
+        "Refine chat input and message bubbles",
+        "Refine terminal tab bar to plain minimal style",
+        "Custom thin scrollbars (webkit)",
+        "Subtle CSS transitions for all interactive states",
+        "Ensure file tree, status badges, empty states match native feel",
+        "Screenshot comparison with reference image to verify"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && pnpm tsc --noEmit && pnpm eslint src/"
+    },
+    "phaseIndex": 9,
+    "planPath": "/Users/agam/dev/CentralTauri/PLAN.md",
+    "previousPhases": [
+      {
+        "id": "phase-1-setup",
+        "name": "Project Setup",
+        "summary": "Scaffolded complete Tauri v2 + React 19 + TypeScript strict project. Configured Vite, ESLint flat config, Prettier, Tailwind v3 + shadcn/ui with dark theme HSL vars from PLAN.md, Zustand, neverthrow, lucide-react. Rust backend with git2-rs (vendored), tauri-plugin-sql (SQLite), dialog, notification, shell plugins. SQLite schema with all 4 tables (projects, agent_sessions, messages, app_settings) + indexes. Feature-based directory structure. All checks pass: tsc --noEmit, cargo build, cargo clippy, vitest (3/3), vite build."
+      },
+      {
+        "id": "phase-2-layout",
+        "name": "Core Layout + Projects",
+        "summary": "Implemented Phase 2: Core Layout + Projects. Three-pane resizable layout (left 20%, middle 50%, right 30%), project sidebar with full CRUD, folder picker via Tauri dialog, SQLite persistence via @tauri-apps/plugin-sql JS API, Zustand store with selectors, dark theme styling. 8 shadcn/ui components installed. All TypeScript and Rust compiles clean."
+      },
+      {
+        "id": "phase-3-agents",
+        "name": "Agent Orchestration",
+        "summary": "Implemented Phase 3: Agent Orchestration. Mock Node.js sidecar with JSON-lines protocol, Rust sidecar manager with Tauri events, agent CRUD commands, SQLite persistence, Zustand agent store, and full Chat UI (MessageBubble, ThinkingBlock, ToolCallBlock, PromptInput, MessageQueue). Event bridge connects backend to frontend."
+      },
+      {
+        "id": "phase-4-monitoring",
+        "name": "Agent Monitoring + Switching",
+        "summary": "Implemented Phase 4: Agent Monitoring + Switching. Added agent sessions nested under projects in sidebar with status badges (spinner/green/red/gray/amber dots). Click session switches active agent. Scroll positions preserved per-session. macOS notifications on completion/failure. Selective Zustand subscriptions for performance. Extracted sessionActions.ts and ChatEmptyState.tsx from ChatPane."
+      },
+      {
+        "id": "phase-5-files",
+        "name": "File Viewer + Git",
+        "summary": "Implemented Phase 5: File Viewer + Git. Rust git2-rs commands split into 6 sub-modules (tree, status, diff, types, git_helpers). CodeMirror 6 read-only viewer with custom dark theme, Compartment-based dynamic language switching, lazy language imports. File tree with git status indicators. Diff viewer with line coloring. Git status bar. FilesPanel with resizable split."
+      },
+      {
+        "id": "phase-6-terminal",
+        "name": "Terminal",
+        "summary": "Implemented Phase 6: Terminal. xterm.js v5 with fit/web-links/webgl addons, portable-pty Rust backend, PTY streaming via Tauri events, debounced ResizeObserver. Right pane split: FilesPanel (60%) + TerminalPanel (40%). One terminal per project. Dark theme matching app HSL variables."
+      },
+      {
+        "id": "phase-7-polish",
+        "name": "Crash Recovery + Polish",
+        "summary": "Implemented Phase 7: Crash Recovery + Polish. Session restore on mount with running→interrupted marking, orphan sidecar/PTY cleanup on window destroy, 30min agent timeout with 30s check interval, error boundaries for all 3 major panes, bootstrap loading screen, enhanced loading states, performance documentation."
+      },
+      {
+        "id": "phase-8-testing",
+        "name": "Testing",
+        "summary": "Phase 8 Testing: 156 total tests (94 vitest + 62 Rust). All pass. Covers agent store (28 tests), agent API (14), session actions (5), project store (12), files store (11), terminal store (15), bootstrap (6), constants (3). Rust: sidecar protocol (16), git_helpers (12), tree (16), diff (6), status (4), greet (2). Parallelism with 5 concurrent agents tested."
+      }
+    ],
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "totalPhases": 9
+  }
+}

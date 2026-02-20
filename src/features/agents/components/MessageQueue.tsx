@@ -30,7 +30,7 @@ function QueueItem({
   };
 
   return (
-    <div className="flex items-center gap-2 rounded border border-border bg-muted/30 px-2 py-1.5">
+    <div className="flex items-center gap-2 rounded border border-border/40 bg-muted/20 px-2 py-1.5">
       <Clock className="h-3 w-3 shrink-0 text-muted-foreground" />
 
       {editing ? (
@@ -91,8 +91,8 @@ function MessageQueue({ messages, onCancel, onEdit }: MessageQueueProps) {
   if (messages.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-1 px-4 py-2 border-t border-border">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+    <div className="flex flex-col gap-1 px-4 py-2 border-t border-border/50">
+      <div className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
         Queued ({messages.length})
       </div>
       {messages.map((msg) => (

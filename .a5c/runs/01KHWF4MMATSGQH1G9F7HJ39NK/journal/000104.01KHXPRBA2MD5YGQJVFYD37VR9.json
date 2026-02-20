@@ -1,0 +1,20 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-20T14:20:12.994Z",
+  "data": {
+    "effectId": "01KHXPRB9NCKESTXK13E59KBHE",
+    "invocationKey": "central-tauri-build:S000052:quality-score",
+    "invocationHash": "db5479c55a2e46fb9eeb79f33e5449caf77cb57d62cd2a096f96c1b0588dfd88",
+    "stepId": "S000052",
+    "taskId": "quality-score",
+    "kind": "agent",
+    "label": "agent",
+    "taskDefRef": "tasks/01KHXPRB9NCKESTXK13E59KBHE/task.json",
+    "labels": [
+      "agent",
+      "quality",
+      "phase-9-design-polish"
+    ]
+  },
+  "checksum": "fa17fe3403c765f64f8229e0d29bc98a3c52ab4f5669c30d3c00b746d4d3379d"
+}

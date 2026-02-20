@@ -60,9 +60,9 @@ function ProjectSidebar() {
   }, []);
 
   return (
-    <div className="flex h-full flex-col bg-background">
+    <div className="flex h-full flex-col" style={{ backgroundColor: "hsl(0 0% 4%)" }}>
       <div className="flex items-center justify-between px-3 py-2">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <h2 className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground/70">
           Projects
         </h2>
         <Tooltip>
@@ -81,7 +81,7 @@ function ProjectSidebar() {
         </Tooltip>
       </div>
 
-      <Separator />
+      <Separator className="opacity-50" />
 
       {loading ? (
         <div className="flex flex-1 items-center justify-center">

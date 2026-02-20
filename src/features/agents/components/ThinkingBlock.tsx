@@ -26,7 +26,7 @@ function ThinkingBlock({ thinking }: ThinkingBlockProps) {
         <span>Thinking</span>
       </div>
       {expanded && (
-        <div className="mt-1.5 ml-5 rounded border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground font-mono whitespace-pre-wrap">
+        <div className="mt-1.5 ml-5 rounded border border-border/40 bg-muted/30 px-3 py-2 text-xs text-muted-foreground/80 font-mono whitespace-pre-wrap select-text">
           {thinking}
         </div>
       )}

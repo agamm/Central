@@ -9,10 +9,10 @@ interface StatusBadgeProps {
 
 const STATUS_DOT_STYLES: Record<AgentStatus, string> = {
   running: "",
-  completed: "bg-emerald-500",
-  failed: "bg-red-500",
-  aborted: "bg-zinc-500",
-  interrupted: "bg-amber-500",
+  completed: "bg-emerald-500/70",
+  failed: "bg-red-500/70",
+  aborted: "bg-zinc-500/60",
+  interrupted: "bg-amber-500/70",
 };
 
 const STATUS_LABELS: Record<AgentStatus, string> = {
@@ -28,7 +28,7 @@ function StatusBadge({ status, className }: StatusBadgeProps) {
     return (
       <Loader2
         className={cn(
-          "h-3 w-3 shrink-0 animate-spin text-blue-400",
+          "h-2.5 w-2.5 shrink-0 animate-spin text-blue-400/70",
           className,
         )}
         aria-label={STATUS_LABELS[status]}
@@ -39,7 +39,7 @@ function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        "h-2 w-2 shrink-0 rounded-full",
+        "h-1.5 w-1.5 shrink-0 rounded-full",
         STATUS_DOT_STYLES[status],
         className,
       )}

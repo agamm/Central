@@ -51,9 +51,9 @@ function SessionItem({ session, isActive, onSelect }: SessionItemProps) {
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       className={cn(
-        "group flex items-center gap-2 rounded-md px-2 py-1 text-xs transition-colors",
-        "cursor-pointer hover:bg-accent",
-        isActive && "bg-muted",
+        "group flex items-center gap-2 rounded px-2 py-1 text-xs",
+        "cursor-pointer hover:bg-accent/50",
+        isActive && "bg-accent/70",
       )}
     >
       <MessageSquare className="h-3 w-3 shrink-0 text-muted-foreground" />

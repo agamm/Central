@@ -31,7 +31,7 @@ function SingleToolCall({ tool }: { readonly tool: ToolCallInfo }) {
         <span className="font-mono">{tool.name}</span>
       </div>
       {expanded && (
-        <div className="mt-1.5 ml-5 rounded border border-border bg-muted/50 px-3 py-2 text-xs font-mono whitespace-pre-wrap text-muted-foreground overflow-x-auto">
+        <div className="mt-1.5 ml-5 rounded border border-border/40 bg-muted/30 px-3 py-2 text-xs font-mono whitespace-pre-wrap text-muted-foreground/80 overflow-x-auto select-text">
           {JSON.stringify(tool.input, null, 2)}
         </div>
       )}

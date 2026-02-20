@@ -1,0 +1,18 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-20T14:20:34.791Z",
+  "data": {
+    "effectId": "01KHXPS0JSTBQZ2SE153XAHXN0",
+    "invocationKey": "central-tauri-build:S000053:__sdk.breakpoint",
+    "invocationHash": "c76c388d98970bcf54c72a8ec82e2502a9b1c916f114027cfc2cb2e8ff2a9ca6",
+    "stepId": "S000053",
+    "taskId": "__sdk.breakpoint",
+    "kind": "breakpoint",
+    "label": "breakpoint",
+    "taskDefRef": "tasks/01KHXPS0JSTBQZ2SE153XAHXN0/task.json",
+    "labels": [
+      "breakpoint"
+    ]
+  },
+  "checksum": "4b022a313fcd9ce946743cebe030568e9c93323999caafc3f4ad81209079817d"
+}

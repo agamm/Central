@@ -47,12 +47,12 @@ function MessageBubble({ message }: MessageBubbleProps) {
         className={cn(
           "max-w-[85%] rounded-lg px-3 py-2",
           isUser
-            ? "bg-primary/10 text-foreground"
-            : "bg-muted text-foreground",
+            ? "bg-accent/50 text-foreground/90"
+            : "text-foreground/85",
         )}
       >
         {message.content && (
-          <div className="text-sm whitespace-pre-wrap break-words select-text">
+          <div className="text-sm whitespace-pre-wrap break-words select-text leading-relaxed">
             {message.content}
           </div>
         )}

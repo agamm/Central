@@ -28,7 +28,6 @@ function App() {
           <ResizablePanel
             defaultSize={20}
             minSize={15}
-            className="border-r border-border"
           >
             <PaneErrorBoundary paneName="Sidebar">
               <ProjectSidebar />
@@ -48,7 +47,6 @@ function App() {
           <ResizablePanel
             defaultSize={30}
             minSize={20}
-            className="border-l border-border"
           >
             <PaneErrorBoundary paneName="Files & Terminal">
               <RightPane />
