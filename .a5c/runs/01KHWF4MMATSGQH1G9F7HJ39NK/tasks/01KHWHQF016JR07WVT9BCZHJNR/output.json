@@ -1,0 +1,5 @@
+{
+  "success": true,
+  "errors": [],
+  "output": "All checks pass after fixing 26 lint errors: pnpm tsc --noEmit (0 errors), cargo clippy (0 warnings), pnpm eslint src/ (0 errors). Fixes: replaced deprecated ElementRef with ComponentRef in shadcn/ui components, removed unnecessary async from getDb, fixed void expression arrow shorthands."
+}

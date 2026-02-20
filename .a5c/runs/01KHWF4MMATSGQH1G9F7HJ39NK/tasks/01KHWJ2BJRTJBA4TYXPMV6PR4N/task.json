@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWJ2BJRTJBA4TYXPMV6PR4N",
+  "taskId": "__sdk.breakpoint",
+  "invocationKey": "central-tauri-build:S000011:__sdk.breakpoint",
+  "stepId": "S000011",
+  "kind": "breakpoint",
+  "title": "breakpoint",
+  "metadata": {
+    "label": "breakpoint",
+    "payload": {
+      "context": {
+        "files": [
+          {
+            "format": "image",
+            "label": "UI Screenshot",
+            "path": "artifacts/phase-2-layout/screenshot.png"
+          },
+          {
+            "format": "markdown",
+            "label": "Phase Summary",
+            "path": "artifacts/phase-2-layout/summary.md"
+          }
+        ]
+      },
+      "question": "Phase 2/8: \"Core Layout + Projects\" complete. Quality: 91/100. Fix iterations: 0. Build: PASS. Review and approve to continue?",
+      "title": "Phase 2: Core Layout + Projects Review"
+    },
+    "requestedAt": "2026-02-20T03:39:03.640Z"
+  },
+  "inputs": {
+    "label": "breakpoint",
+    "payload": {
+      "context": {
+        "files": [
+          {
+            "format": "image",
+            "label": "UI Screenshot",
+            "path": "artifacts/phase-2-layout/screenshot.png"
+          },
+          {
+            "format": "markdown",
+            "label": "Phase Summary",
+            "path": "artifacts/phase-2-layout/summary.md"
+          }
+        ]
+      },
+      "question": "Phase 2/8: \"Core Layout + Projects\" complete. Quality: 91/100. Fix iterations: 0. Build: PASS. Review and approve to continue?",
+      "title": "Phase 2: Core Layout + Projects Review"
+    },
+    "requestedAt": "2026-02-20T03:39:03.640Z"
+  }
+}

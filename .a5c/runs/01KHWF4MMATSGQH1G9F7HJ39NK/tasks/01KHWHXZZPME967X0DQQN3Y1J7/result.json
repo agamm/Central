@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWHXZZPME967X0DQQN3Y1J7",
+  "taskId": "quality-score",
+  "invocationKey": "central-tauri-build:S000010:quality-score",
+  "status": "ok",
+  "result": {
+    "breakdown": {
+      "buildSuccess": 20,
+      "codeQuality": 28,
+      "completeness": 37,
+      "uiCorrectness": 6
+    },
+    "feedback": "All 7 phase tasks complete. Strong code quality: functional paradigm, no any, Zustand selectors, neverthrow Results, all files under 300 lines. Build clean on all 4 checks. Minor gaps: no project feature tests, stale name bug in AddProjectDialog, store errors not surfaced to UI.",
+    "recommendations": [
+      "Add src/features/projects/store.test.ts for project store logic",
+      "Fix stale name in AddProjectDialog with useEffect on defaultName",
+      "Surface store errors to user via toast/banner",
+      "Use barrel exports instead of direct store imports in placeholder components"
+    ],
+    "score": 91
+  },
+  "startedAt": "2026-02-20T03:38:58.232Z",
+  "finishedAt": "2026-02-20T03:38:58.232Z",
+  "value": {
+    "breakdown": {
+      "buildSuccess": 20,
+      "codeQuality": 28,
+      "completeness": 37,
+      "uiCorrectness": 6
+    },
+    "feedback": "All 7 phase tasks complete. Strong code quality: functional paradigm, no any, Zustand selectors, neverthrow Results, all files under 300 lines. Build clean on all 4 checks. Minor gaps: no project feature tests, stale name bug in AddProjectDialog, store errors not surfaced to UI.",
+    "recommendations": [
+      "Add src/features/projects/store.test.ts for project store logic",
+      "Fix stale name in AddProjectDialog with useEffect on defaultName",
+      "Surface store errors to user via toast/banner",
+      "Use barrel exports instead of direct store imports in placeholder components"
+    ],
+    "score": 91
+  }
+}

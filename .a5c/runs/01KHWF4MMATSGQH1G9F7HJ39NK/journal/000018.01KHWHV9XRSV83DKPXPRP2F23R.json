@@ -1,0 +1,21 @@
+{
+  "type": "EFFECT_REQUESTED",
+  "recordedAt": "2026-02-20T03:35:12.568Z",
+  "data": {
+    "effectId": "01KHWHV9X9TAFBHC5T6JXF3V5T",
+    "invocationKey": "central-tauri-build:S000009:screenshot-verify",
+    "invocationHash": "930d475b49e7041e290ff37c1253aa361eda5a041b08c9afa82c0712f65e9a07",
+    "stepId": "S000009",
+    "taskId": "screenshot-verify",
+    "kind": "agent",
+    "label": "agent",
+    "taskDefRef": "tasks/01KHWHV9X9TAFBHC5T6JXF3V5T/task.json",
+    "labels": [
+      "agent",
+      "verification",
+      "screenshot",
+      "phase-2-layout"
+    ]
+  },
+  "checksum": "6dbee53e679cbe5d04fdaa3203987d03cae1a399a0e63e2808e5c77d5ef83125"
+}

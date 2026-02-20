@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWHXZZPME967X0DQQN3Y1J7",
+  "taskId": "quality-score",
+  "invocationKey": "central-tauri-build:S000010:quality-score",
+  "stepId": "S000010",
+  "kind": "agent",
+  "title": "Quality Score: Core Layout + Projects",
+  "labels": [
+    "agent",
+    "phase-2-layout",
+    "quality"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWHXZZPME967X0DQQN3Y1J7/input.json",
+    "outputJsonPath": "tasks/01KHWHXZZPME967X0DQQN3Y1J7/result.json"
+  },
+  "inputs": {
+    "buildResult": {
+      "errors": [],
+      "output": "All checks pass after fixing 26 lint errors: pnpm tsc --noEmit (0 errors), cargo clippy (0 warnings), pnpm eslint src/ (0 errors). Fixes: replaced deprecated ElementRef with ComponentRef in shadcn/ui components, removed unnecessary async from getDb, fixed void expression arrow shorthands.",
+      "success": true
+    },
+    "implementResult": {
+      "decisions": [
+        "Used @tauri-apps/plugin-sql JS API for CRUD (Rust API is pub(crate))",
+        "crypto.randomUUID() for IDs instead of uuid dep",
+        "Optimistic local state updates in Zustand store",
+        "Commands dir module for future extensibility"
+      ],
+      "filesCreated": [
+        "src/components/ui/resizable.tsx",
+        "src/components/ui/button.tsx",
+        "src/components/ui/scroll-area.tsx",
+        "src/components/ui/dialog.tsx",
+        "src/components/ui/input.tsx",
+        "src/components/ui/dropdown-menu.tsx",
+        "src/components/ui/tooltip.tsx",
+        "src/components/ui/separator.tsx",
+        "src/features/projects/api.ts",
+        "src/features/projects/store.ts",
+        "src/features/projects/components/ProjectSidebar.tsx",
+        "src/features/projects/components/ProjectList.tsx",
+        "src/features/projects/components/ProjectItem.tsx",
+        "src/features/projects/components/EmptyProjectState.tsx",
+        "src/features/projects/components/AddProjectDialog.tsx",
+        "src/features/agents/ChatPlaceholder.tsx",
+        "src/features/files/FilesPlaceholder.tsx"
+      ],
+      "filesModified": [
+        "src/App.tsx",
+        "src/features/projects/index.ts",
+        "src/features/agents/index.ts",
+        "src/features/files/index.ts",
+        "src-tauri/src/commands/mod.rs"
+      ],
+      "summary": "Implemented Phase 2: Core Layout + Projects. Three-pane resizable layout (left 20%, middle 50%, right 30%), project sidebar with full CRUD, folder picker via Tauri dialog, SQLite persistence via @tauri-apps/plugin-sql JS API, Zustand store with selectors, dark theme styling. 8 shadcn/ui components installed. All TypeScript and Rust compiles clean."
+    },
+    "phase": {
+      "description": "Three-pane layout with shadcn/ui ResizablePanelGroup (left: projects, middle: chat placeholder, right: files placeholder). Left pane: project list with \"Add Project\" button. Folder picker via Tauri dialog API. Project CRUD (add, rename, soft-delete) with SQLite persistence. Empty state CTA \"Add your first project\". Zustand project store with selective subscriptions. Design language: Linear/Raycast inspired, dark theme with HSL vars from PLAN.md (bg hsl(224,71%,4%), surface hsl(224,71%,6%), etc). Inter font for UI (13px), JetBrains Mono for code. 4px spacing base, 1px borders, no shadows.",
+      "id": "phase-2-layout",
+      "name": "Core Layout + Projects",
+      "screenshotDescription": "Three-pane layout with dark theme, left pane showing empty project list with Add Project button and CTA",
+      "tasks": [
+        "Three-pane layout with ResizablePanelGroup",
+        "Left pane: project list with Add Project button",
+        "Folder picker via Tauri dialog API",
+        "Project CRUD with SQLite persistence",
+        "Empty state CTA",
+        "Zustand project store with persistence",
+        "Dark theme with design tokens from PLAN.md"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && pnpm tsc --noEmit && pnpm eslint src/"
+    },
+    "phaseIndex": 2,
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "screenshotResult": {
+      "description": "Three-pane dark layout. Left: PROJECTS header with + button, empty state 'No projects yet' with Add Project CTA. Center: 'Select a project to get started' empty state. Right: 'No project selected' empty state. All panes separated with subtle borders. Dark navy/blue-black theme throughout.",
+      "issues": [],
+      "matches": true,
+      "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-2-screenshot.png"
+    }
+  }
+}

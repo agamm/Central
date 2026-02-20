@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWJ2BJRTJBA4TYXPMV6PR4N",
+  "taskId": "__sdk.breakpoint",
+  "invocationKey": "central-tauri-build:S000011:__sdk.breakpoint",
+  "status": "ok",
+  "result": {
+    "approved": true,
+    "response": "Phase 2 approved. Proceeding to Phase 3."
+  },
+  "startedAt": "2026-02-20T04:03:33.550Z",
+  "finishedAt": "2026-02-20T04:03:33.550Z",
+  "value": {
+    "approved": true,
+    "response": "Phase 2 approved. Proceeding to Phase 3."
+  }
+}

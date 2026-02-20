@@ -1,2 +1,1 @@
-// File viewer + Git — Phase 5
-export {};
+export { FilesPlaceholder } from "./FilesPlaceholder";

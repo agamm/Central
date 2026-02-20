@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <radialGradient id="bgGlow" cx="40%" cy="35%" r="80%">
+      <stop offset="0%" stop-color="#1e1e2e"/>
+      <stop offset="100%" stop-color="#0e0e14"/>
+    </radialGradient>
+
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.18"/>
+      <stop offset="50%" stop-color="#8b5cf6" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.18"/>
+    </linearGradient>
+
+    <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c4b5fd"/>
+      <stop offset="40%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+
+    <linearGradient id="flameGrad" x1="100%" y1="0%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#a78bfa" stop-opacity="1.0"/>
+      <stop offset="50%" stop-color="#8b5cf6" stop-opacity="0.85"/>
+      <stop offset="72%" stop-color="#7c3aed" stop-opacity="0.5"/>
+      <stop offset="88%" stop-color="#6d28d9" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#4c1d95" stop-opacity="0.02"/>
+    </linearGradient>
+
+    <!-- Flame displacement filter — stronger displacement for more organic flame edges -->
+    <filter id="pointFlame" x="-30%" y="-30%" width="160%" height="160%">
+      <feTurbulence type="turbulence" baseFrequency="0.005 0.02" numOctaves="6" seed="31" result="waveTurb"/>
+      <feDisplacementMap in="SourceGraphic" in2="waveTurb" scale="42" xChannelSelector="R" yChannelSelector="G" result="wavy1"/>
+      <feTurbulence type="turbulence" baseFrequency="0.012 0.04" numOctaves="4" seed="47" result="flickerTurb"/>
+      <feDisplacementMap in="wavy1" in2="flickerTurb" scale="18" xChannelSelector="G" yChannelSelector="R" result="wavyShape"/>
+      <feTurbulence type="turbulence" baseFrequency="0.008 0.025" numOctaves="5" seed="13" result="flameTex"/>
+      <feGaussianBlur in="flameTex" stdDeviation="4 2" result="softTex"/>
+      <feColorMatrix in="softTex" type="matrix"
+        values="0 0 0 0 0.65  0 0 0 0 0.4  0 0 0 0 0.95  0 0 0 1 0" result="tinted"/>
+      <feComposite in="tinted" in2="wavyShape" operator="in" result="textured"/>
+      <feMerge>
+        <feMergeNode in="wavyShape"/>
+        <feMergeNode in="textured"/>
+      </feMerge>
+    </filter>
+
+    <!-- Soft bridge glow between flame and C -->
+    <filter id="bridgeGlow" x="-40%" y="-20%" width="180%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="30 15"/>
+    </filter>
+
+    <!-- Arc filter: glow + internal texture -->
+    <filter id="arcEffect" x="-50%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="28" result="blur"/>
+      <feColorMatrix in="blur" type="matrix"
+        values="0 0 0 0 0.55  0 0 0 0 0.36  0 0 0 0 0.96  0 0 0 0.5 0" result="purpleGlow"/>
+      <feTurbulence type="turbulence" baseFrequency="0.012 0.022" numOctaves="4" seed="7" result="tex1"/>
+      <feColorMatrix in="tex1" type="matrix"
+        values="0 0 0 0 0.9  0 0 0 0 0.7  0 0 0 0 1.0  0 0 0 0.4 0" result="tinted1"/>
+      <feComposite in="tinted1" in2="SourceAlpha" operator="in" result="clipped1"/>
+      <feTurbulence type="turbulence" baseFrequency="0.04 0.06" numOctaves="3" seed="23" result="tex2"/>
+      <feColorMatrix in="tex2" type="matrix"
+        values="0 0 0 0 0.7  0 0 0 0 0.5  0 0 0 0 0.95  0 0 0 0.25 0" result="tinted2"/>
+      <feComposite in="tinted2" in2="SourceAlpha" operator="in" result="clipped2"/>
+      <feMerge>
+        <feMergeNode in="purpleGlow"/>
+        <feMergeNode in="SourceGraphic"/>
+        <feMergeNode in="clipped1"/>
+        <feMergeNode in="clipped2"/>
+      </feMerge>
+    </filter>
+
+    <radialGradient id="innerLight" cx="35%" cy="38%" r="55%">
+      <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.12"/>
+      <stop offset="50%" stop-color="#8b5cf6" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="noiseFilter" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="monoNoise"/>
+    </filter>
+
+    <!-- Apple squircle clip mask (~22.37% corner radius) -->
+    <clipPath id="iconMask">
+      <rect width="1024" height="1024" rx="229" ry="229"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#iconMask)">
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="url(#bgGlow)"/>
+  <rect width="1024" height="1024" fill="url(#innerLight)"/>
+  <rect width="1024" height="1024" filter="url(#noiseFilter)" opacity="0.16"/>
+
+  <!--
+    Flame: 2-layer (soft glow + displaced texture). No solid base to avoid straight-line edges.
+    Moderate size, gently inward-curving outer edges. Right edge within C stroke body.
+  -->
+
+  <!-- Layer 1: Soft diffuse glow (fills gaps, no hard edges) -->
+  <path
+    d="M 465,280
+       C 450,370 425,440 390,512
+       C 425,584 450,654 465,744
+       C 425,728 335,680 255,625
+       C 195,585 150,558 118,538
+       C 98,526 88,519 85,512
+       C 88,505 98,498 118,486
+       C 150,466 195,439 255,399
+       C 335,344 425,296 465,280 Z"
+    fill="url(#flameGrad)"
+    filter="url(#bridgeGlow)"
+    opacity="0.7"
+  />
+
+  <!-- Layer 2: Displaced textured flame (organic edges + texture) -->
+  <path
+    d="M 465,280
+       C 450,370 425,440 390,512
+       C 425,584 450,654 465,744
+       C 425,728 335,680 255,625
+       C 195,585 150,558 118,538
+       C 98,526 88,519 85,512
+       C 88,505 98,498 118,486
+       C 150,466 195,439 255,399
+       C 335,344 425,296 465,280 Z"
+    fill="url(#flameGrad)"
+    filter="url(#pointFlame)"
+    opacity="0.85"
+  />
+
+  <!-- C arc — rendered on top, covers flame junction -->
+  <path
+    d="M 777,364 A 230,230 0 1 0 777,660"
+    fill="none"
+    stroke="url(#arcGrad)"
+    stroke-width="115"
+    stroke-linecap="butt"
+    filter="url(#arcEffect)"
+  />
+  </g>
+</svg>

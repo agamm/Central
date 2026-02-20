@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWHQF016JR07WVT9BCZHJNR",
+  "taskId": "build-verify",
+  "invocationKey": "central-tauri-build:S000008:build-verify",
+  "status": "ok",
+  "result": {
+    "errors": [],
+    "output": "All checks pass after fixing 26 lint errors: pnpm tsc --noEmit (0 errors), cargo clippy (0 warnings), pnpm eslint src/ (0 errors). Fixes: replaced deprecated ElementRef with ComponentRef in shadcn/ui components, removed unnecessary async from getDb, fixed void expression arrow shorthands.",
+    "success": true
+  },
+  "startedAt": "2026-02-20T03:35:07.498Z",
+  "finishedAt": "2026-02-20T03:35:07.498Z",
+  "value": {
+    "errors": [],
+    "output": "All checks pass after fixing 26 lint errors: pnpm tsc --noEmit (0 errors), cargo clippy (0 warnings), pnpm eslint src/ (0 errors). Fixes: replaced deprecated ElementRef with ComponentRef in shadcn/ui components, removed unnecessary async from getDb, fixed void expression arrow shorthands.",
+    "success": true
+  }
+}

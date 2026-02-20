@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWH72YXYRWN5EAFWNCFJN76",
+  "taskId": "implement-phase",
+  "invocationKey": "central-tauri-build:S000007:implement-phase",
+  "stepId": "S000007",
+  "kind": "agent",
+  "title": "Implement: Core Layout + Projects (2/8)",
+  "labels": [
+    "agent",
+    "implementation",
+    "phase-2-layout"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWH72YXYRWN5EAFWNCFJN76/input.json",
+    "outputJsonPath": "tasks/01KHWH72YXYRWN5EAFWNCFJN76/result.json"
+  },
+  "inputs": {
+    "claudeMdPath": "/Users/agam/dev/CentralTauri/CLAUDE.md",
+    "phase": {
+      "description": "Three-pane layout with shadcn/ui ResizablePanelGroup (left: projects, middle: chat placeholder, right: files placeholder). Left pane: project list with \"Add Project\" button. Folder picker via Tauri dialog API. Project CRUD (add, rename, soft-delete) with SQLite persistence. Empty state CTA \"Add your first project\". Zustand project store with selective subscriptions. Design language: Linear/Raycast inspired, dark theme with HSL vars from PLAN.md (bg hsl(224,71%,4%), surface hsl(224,71%,6%), etc). Inter font for UI (13px), JetBrains Mono for code. 4px spacing base, 1px borders, no shadows.",
+      "id": "phase-2-layout",
+      "name": "Core Layout + Projects",
+      "screenshotDescription": "Three-pane layout with dark theme, left pane showing empty project list with Add Project button and CTA",
+      "tasks": [
+        "Three-pane layout with ResizablePanelGroup",
+        "Left pane: project list with Add Project button",
+        "Folder picker via Tauri dialog API",
+        "Project CRUD with SQLite persistence",
+        "Empty state CTA",
+        "Zustand project store with persistence",
+        "Dark theme with design tokens from PLAN.md"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && pnpm tsc --noEmit && pnpm eslint src/"
+    },
+    "phaseIndex": 2,
+    "planPath": "/Users/agam/dev/CentralTauri/PLAN.md",
+    "previousPhases": [
+      {
+        "id": "phase-1-setup",
+        "name": "Project Setup",
+        "summary": "Scaffolded complete Tauri v2 + React 19 + TypeScript strict project. Configured Vite, ESLint flat config, Prettier, Tailwind v3 + shadcn/ui with dark theme HSL vars from PLAN.md, Zustand, neverthrow, lucide-react. Rust backend with git2-rs (vendored), tauri-plugin-sql (SQLite), dialog, notification, shell plugins. SQLite schema with all 4 tables (projects, agent_sessions, messages, app_settings) + indexes. Feature-based directory structure. All checks pass: tsc --noEmit, cargo build, cargo clippy, vitest (3/3), vite build."
+      }
+    ],
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "totalPhases": 8
+  }
+}

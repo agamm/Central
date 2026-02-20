@@ -1,0 +1,35 @@
+{
+  "summary": "Implemented Phase 2: Core Layout + Projects. Three-pane resizable layout (left 20%, middle 50%, right 30%), project sidebar with full CRUD, folder picker via Tauri dialog, SQLite persistence via @tauri-apps/plugin-sql JS API, Zustand store with selectors, dark theme styling. 8 shadcn/ui components installed. All TypeScript and Rust compiles clean.",
+  "filesCreated": [
+    "src/components/ui/resizable.tsx",
+    "src/components/ui/button.tsx",
+    "src/components/ui/scroll-area.tsx",
+    "src/components/ui/dialog.tsx",
+    "src/components/ui/input.tsx",
+    "src/components/ui/dropdown-menu.tsx",
+    "src/components/ui/tooltip.tsx",
+    "src/components/ui/separator.tsx",
+    "src/features/projects/api.ts",
+    "src/features/projects/store.ts",
+    "src/features/projects/components/ProjectSidebar.tsx",
+    "src/features/projects/components/ProjectList.tsx",
+    "src/features/projects/components/ProjectItem.tsx",
+    "src/features/projects/components/EmptyProjectState.tsx",
+    "src/features/projects/components/AddProjectDialog.tsx",
+    "src/features/agents/ChatPlaceholder.tsx",
+    "src/features/files/FilesPlaceholder.tsx"
+  ],
+  "filesModified": [
+    "src/App.tsx",
+    "src/features/projects/index.ts",
+    "src/features/agents/index.ts",
+    "src/features/files/index.ts",
+    "src-tauri/src/commands/mod.rs"
+  ],
+  "decisions": [
+    "Used @tauri-apps/plugin-sql JS API for CRUD (Rust API is pub(crate))",
+    "crypto.randomUUID() for IDs instead of uuid dep",
+    "Optimistic local state updates in Zustand store",
+    "Commands dir module for future extensibility"
+  ]
+}

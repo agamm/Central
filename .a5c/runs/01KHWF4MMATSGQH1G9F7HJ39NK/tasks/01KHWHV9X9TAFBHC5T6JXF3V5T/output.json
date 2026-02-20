@@ -1,0 +1,6 @@
+{
+  "matches": true,
+  "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-2-screenshot.png",
+  "description": "Three-pane dark layout. Left: PROJECTS header with + button, empty state 'No projects yet' with Add Project CTA. Center: 'Select a project to get started' empty state. Right: 'No project selected' empty state. All panes separated with subtle borders. Dark navy/blue-black theme throughout.",
+  "issues": []
+}

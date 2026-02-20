@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "2026.01.tasks-v1",
+  "effectId": "01KHWHQF016JR07WVT9BCZHJNR",
+  "taskId": "build-verify",
+  "invocationKey": "central-tauri-build:S000008:build-verify",
+  "stepId": "S000008",
+  "kind": "agent",
+  "title": "Build Verify: Core Layout + Projects",
+  "labels": [
+    "agent",
+    "build",
+    "phase-2-layout",
+    "verification"
+  ],
+  "io": {
+    "inputJsonPath": "tasks/01KHWHQF016JR07WVT9BCZHJNR/input.json",
+    "outputJsonPath": "tasks/01KHWHQF016JR07WVT9BCZHJNR/result.json"
+  },
+  "inputs": {
+    "phase": {
+      "description": "Three-pane layout with shadcn/ui ResizablePanelGroup (left: projects, middle: chat placeholder, right: files placeholder). Left pane: project list with \"Add Project\" button. Folder picker via Tauri dialog API. Project CRUD (add, rename, soft-delete) with SQLite persistence. Empty state CTA \"Add your first project\". Zustand project store with selective subscriptions. Design language: Linear/Raycast inspired, dark theme with HSL vars from PLAN.md (bg hsl(224,71%,4%), surface hsl(224,71%,6%), etc). Inter font for UI (13px), JetBrains Mono for code. 4px spacing base, 1px borders, no shadows.",
+      "id": "phase-2-layout",
+      "name": "Core Layout + Projects",
+      "screenshotDescription": "Three-pane layout with dark theme, left pane showing empty project list with Add Project button and CTA",
+      "tasks": [
+        "Three-pane layout with ResizablePanelGroup",
+        "Left pane: project list with Add Project button",
+        "Folder picker via Tauri dialog API",
+        "Project CRUD with SQLite persistence",
+        "Empty state CTA",
+        "Zustand project store with persistence",
+        "Dark theme with design tokens from PLAN.md"
+      ],
+      "verifyCommand": "cd /Users/agam/dev/CentralTauri && pnpm tsc --noEmit && pnpm eslint src/"
+    },
+    "projectPath": "/Users/agam/dev/CentralTauri",
+    "verifyCommand": "cd /Users/agam/dev/CentralTauri && pnpm tsc --noEmit && pnpm eslint src/"
+  }
+}

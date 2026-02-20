@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "2026.01.results-v1",
+  "effectId": "01KHWHV9X9TAFBHC5T6JXF3V5T",
+  "taskId": "screenshot-verify",
+  "invocationKey": "central-tauri-build:S000009:screenshot-verify",
+  "status": "ok",
+  "result": {
+    "description": "Three-pane dark layout. Left: PROJECTS header with + button, empty state 'No projects yet' with Add Project CTA. Center: 'Select a project to get started' empty state. Right: 'No project selected' empty state. All panes separated with subtle borders. Dark navy/blue-black theme throughout.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-2-screenshot.png"
+  },
+  "startedAt": "2026-02-20T03:36:34.860Z",
+  "finishedAt": "2026-02-20T03:36:34.860Z",
+  "value": {
+    "description": "Three-pane dark layout. Left: PROJECTS header with + button, empty state 'No projects yet' with Add Project CTA. Center: 'Select a project to get started' empty state. Right: 'No project selected' empty state. All panes separated with subtle borders. Dark navy/blue-black theme throughout.",
+    "issues": [],
+    "matches": true,
+    "screenshotPath": "/Users/agam/dev/CentralTauri/.a5c/runs/artifacts/phase-2-screenshot.png"
+  }
+}

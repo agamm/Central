@@ -1,2 +1,1 @@
-// Agent orchestration — Phase 3
-export {};
+export { ChatPlaceholder } from "./ChatPlaceholder";
