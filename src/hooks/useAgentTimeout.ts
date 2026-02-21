@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { useAgentStore } from "@/features/agents/store";
-import * as agentApi from "@/features/agents/api";
 import {
   AGENT_TIMEOUT_MS,
   AGENT_TIMEOUT_CHECK_INTERVAL_MS,
@@ -38,7 +37,6 @@ async function abortTimedOutSession(sessionId: string): Promise<void> {
 
   store.updateSessionStatus(sessionId, "failed");
   store.setError(`Session timed out after ${AGENT_TIMEOUT_MS / 60000} minutes`);
-  await agentApi.updateSessionStatus(sessionId, "failed");
 }
 
 /**

@@ -1,6 +1,21 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { ok, err } from "neverthrow";
 import { useAgentStore } from "./store";
 import { createMockSession, createMockMessage } from "@/shared/test-helpers";
+
+vi.mock("./api", () => ({
+  createSession: vi.fn().mockResolvedValue(ok({ id: "mock" })),
+  updateSessionStatus: vi.fn().mockResolvedValue(ok(undefined)),
+  addMessage: vi.fn().mockResolvedValue(ok({ id: "mock-msg" })),
+  deleteSession: vi.fn().mockResolvedValue(ok(undefined)),
+  markInterruptedSessions: vi.fn().mockResolvedValue(ok(0)),
+  getAllSessions: vi.fn().mockResolvedValue(ok([])),
+  getMessages: vi.fn().mockResolvedValue(ok([])),
+}));
+
+vi.mock("@/shared/debugLog", () => ({
+  debugLog: vi.fn(),
+}));
 
 function resetStore(): void {
   useAgentStore.setState({
@@ -20,6 +35,7 @@ function resetStore(): void {
 describe("AgentStore", () => {
   beforeEach(() => {
     resetStore();
+    vi.clearAllMocks();
   });
 
   describe("setSession", () => {
@@ -79,6 +95,21 @@ describe("AgentStore", () => {
 
       expect(useAgentStore.getState().sessions.size).toBe(0);
     });
+
+    it("fires async persist call to SQLite", async () => {
+      const api = await import("./api");
+      const session = createMockSession({ status: "running" });
+      const store = useAgentStore.getState();
+      store.setSession(session);
+
+      store.updateSessionStatus(session.id, "completed");
+
+      expect(vi.mocked(api.updateSessionStatus)).toHaveBeenCalledWith(
+        session.id,
+        "completed",
+        expect.any(String),
+      );
+    });
   });
 
   describe("switchSession", () => {
@@ -131,6 +162,24 @@ describe("AgentStore", () => {
       );
       expect(useAgentStore.getState().messagesBySession.get("s2")).toHaveLength(
         1,
+      );
+    });
+
+    it("fires async persist call to SQLite", async () => {
+      const api = await import("./api");
+      const store = useAgentStore.getState();
+      // Session must exist for persist to fire (orphan guard)
+      store.setSession(createMockSession({ id: "s1" }));
+      const msg = createMockMessage({ sessionId: "s1" });
+      store.addMessage("s1", msg);
+
+      expect(vi.mocked(api.addMessage)).toHaveBeenCalledWith(
+        "s1",
+        msg.role,
+        msg.content,
+        msg.thinking,
+        msg.toolCalls,
+        msg.usage,
       );
     });
   });
@@ -312,6 +361,83 @@ describe("AgentStore", () => {
     });
   });
 
+  describe("createSession", () => {
+    it("creates session in SQLite and adds to store", async () => {
+      const api = await import("./api");
+      const mockSession = createMockSession({ projectId: "p1", prompt: "test" });
+      vi.mocked(api.createSession).mockResolvedValue(ok(mockSession));
+
+      const result = await useAgentStore.getState().createSession("p1", "test", null);
+
+      expect(result).toEqual(mockSession);
+      expect(useAgentStore.getState().sessions.get(mockSession.id)).toEqual(mockSession);
+      expect(useAgentStore.getState().activeSessionId).toBe(mockSession.id);
+    });
+
+    it("sets error and returns null on failure", async () => {
+      const api = await import("./api");
+      vi.mocked(api.createSession).mockResolvedValue(err("DB error"));
+
+      const result = await useAgentStore.getState().createSession("p1", "test", null);
+
+      expect(result).toBeNull();
+      expect(useAgentStore.getState().error).toBe("DB error");
+      expect(useAgentStore.getState().sessions.size).toBe(0);
+    });
+  });
+
+  describe("deleteSession", () => {
+    it("clears session data and persists deletion to SQLite", async () => {
+      const api = await import("./api");
+      vi.mocked(api.deleteSession).mockResolvedValue(ok(undefined));
+
+      const session = createMockSession();
+      const store = useAgentStore.getState();
+      store.setSession(session);
+      store.addMessage(session.id, createMockMessage({ sessionId: session.id }));
+
+      useAgentStore.getState().deleteSession(session.id);
+
+      const state = useAgentStore.getState();
+      expect(state.sessions.has(session.id)).toBe(false);
+      expect(state.messagesBySession.has(session.id)).toBe(false);
+      expect(vi.mocked(api.deleteSession)).toHaveBeenCalledWith(session.id);
+    });
+  });
+
+  describe("hydrate", () => {
+    it("loads sessions and messages from SQLite", async () => {
+      const api = await import("./api");
+      const session = createMockSession({ id: "s1" });
+      const msg = createMockMessage({ id: "m1", sessionId: "s1", content: "hello" });
+
+      vi.mocked(api.markInterruptedSessions).mockResolvedValue(ok(0));
+      vi.mocked(api.getAllSessions).mockResolvedValue(ok([session]));
+      vi.mocked(api.getMessages).mockResolvedValue(ok([msg]));
+
+      await useAgentStore.getState().hydrate();
+
+      const state = useAgentStore.getState();
+      expect(state.sessions.size).toBe(1);
+      expect(state.activeSessionId).toBe("s1");
+      expect(state.messagesBySession.get("s1")).toHaveLength(1);
+      expect(state.loading).toBe(false);
+    });
+
+    it("handles empty database", async () => {
+      const api = await import("./api");
+      vi.mocked(api.markInterruptedSessions).mockResolvedValue(ok(0));
+      vi.mocked(api.getAllSessions).mockResolvedValue(ok([]));
+
+      await useAgentStore.getState().hydrate();
+
+      const state = useAgentStore.getState();
+      expect(state.sessions.size).toBe(0);
+      expect(state.activeSessionId).toBeNull();
+      expect(state.loading).toBe(false);
+    });
+  });
+
   describe("parallelism — multiple concurrent sessions", () => {
     it("manages 5 concurrent sessions independently", () => {
       const store = useAgentStore.getState();
@@ -325,7 +451,6 @@ describe("AgentStore", () => {
 
       expect(useAgentStore.getState().sessions.size).toBe(5);
 
-      // Update one session without affecting others
       const target = sessions[2];
       const first = sessions[0];
       if (!target || !first) throw new Error("test setup failed");
@@ -354,6 +479,245 @@ describe("AgentStore", () => {
         const msgs = useAgentStore.getState().messagesBySession.get(id);
         expect(msgs).toHaveLength(3);
       }
+    });
+  });
+
+  describe("resilience — race conditions and edge cases", () => {
+    it("handles rapid-fire addMessage across 5 parallel sessions", async () => {
+      const api = await import("./api");
+      vi.mocked(api.addMessage).mockResolvedValue(
+        ok({
+          id: "mock",
+          sessionId: "s",
+          role: "assistant" as const,
+          content: "",
+          thinking: null,
+          toolCalls: null,
+          usage: null,
+          timestamp: "",
+        }),
+      );
+
+      const store = useAgentStore.getState();
+      const sessionIds = ["s1", "s2", "s3", "s4", "s5"];
+
+      // Sessions must exist for persist to fire
+      for (const sid of sessionIds) {
+        store.setSession(createMockSession({ id: sid }));
+      }
+
+      for (const sid of sessionIds) {
+        for (let i = 0; i < 10; i++) {
+          store.addMessage(
+            sid,
+            createMockMessage({
+              sessionId: sid,
+              content: `msg-${i}`,
+            }),
+          );
+        }
+      }
+
+      for (const sid of sessionIds) {
+        const msgs = useAgentStore.getState().messagesBySession.get(sid);
+        expect(msgs).toHaveLength(10);
+        msgs?.forEach((m, i) => {
+          expect(m.content).toBe(`msg-${i}`);
+        });
+      }
+
+      expect(vi.mocked(api.addMessage)).toHaveBeenCalledTimes(50);
+    });
+
+    it("handles concurrent updateSessionStatus across sessions", () => {
+      const store = useAgentStore.getState();
+      const sessions = Array.from({ length: 5 }, () =>
+        createMockSession({ status: "running" }),
+      );
+
+      for (const s of sessions) store.setSession(s);
+
+      sessions.forEach((s, i) => {
+        store.updateSessionStatus(s.id, i % 2 === 0 ? "completed" : "failed");
+      });
+
+      const state = useAgentStore.getState();
+      sessions.forEach((s, i) => {
+        const stored = state.sessions.get(s.id);
+        expect(stored?.status).toBe(i % 2 === 0 ? "completed" : "failed");
+        expect(stored?.endedAt).toBeTruthy();
+      });
+    });
+
+    it("handles updateSessionStatus on non-existent session without corrupting state", () => {
+      const store = useAgentStore.getState();
+      const session = createMockSession({ status: "running" });
+      store.setSession(session);
+
+      store.updateSessionStatus("phantom-session", "completed");
+
+      const state = useAgentStore.getState();
+      expect(state.sessions.size).toBe(1);
+      expect(state.sessions.get(session.id)?.status).toBe("running");
+    });
+
+    it("handles addMessage after clearSessionData — skips persist for orphan", async () => {
+      const api = await import("./api");
+      vi.mocked(api.addMessage).mockClear();
+
+      const store = useAgentStore.getState();
+      const session = createMockSession();
+      store.setSession(session);
+      store.addMessage(
+        session.id,
+        createMockMessage({ sessionId: session.id }),
+      );
+
+      const callsBefore = vi.mocked(api.addMessage).mock.calls.length;
+      store.clearSessionData(session.id);
+
+      // Stale event arrives for deleted session
+      store.addMessage(
+        session.id,
+        createMockMessage({
+          sessionId: session.id,
+          content: "stale event",
+        }),
+      );
+
+      // In-memory: message still appears (UI shows it)
+      const msgs = useAgentStore.getState().messagesBySession.get(session.id);
+      expect(msgs).toHaveLength(1);
+      expect(msgs?.[0]?.content).toBe("stale event");
+
+      // Persist: NOT called for orphan message (session no longer in store)
+      expect(vi.mocked(api.addMessage).mock.calls.length).toBe(callsBefore);
+    });
+  });
+
+  describe("resilience — persistence failures", () => {
+    it("addMessage updates UI even when SQLite fails", async () => {
+      const api = await import("./api");
+      vi.mocked(api.addMessage).mockRejectedValue(new Error("disk full"));
+
+      const store = useAgentStore.getState();
+      const msg = createMockMessage({
+        sessionId: "s1",
+        content: "should appear",
+      });
+
+      store.addMessage("s1", msg);
+
+      const msgs = useAgentStore.getState().messagesBySession.get("s1");
+      expect(msgs).toHaveLength(1);
+      expect(msgs?.[0]?.content).toBe("should appear");
+    });
+
+    it("updateSessionStatus updates UI even when SQLite fails", async () => {
+      const api = await import("./api");
+      vi.mocked(api.updateSessionStatus).mockRejectedValue(
+        new Error("locked"),
+      );
+
+      const store = useAgentStore.getState();
+      const session = createMockSession({ status: "running" });
+      store.setSession(session);
+
+      store.updateSessionStatus(session.id, "completed");
+
+      expect(
+        useAgentStore.getState().sessions.get(session.id)?.status,
+      ).toBe("completed");
+    });
+
+    it("createSession returns null and sets error when SQLite fails", async () => {
+      const api = await import("./api");
+      vi.mocked(api.createSession).mockResolvedValue(err("DB locked"));
+
+      const result = await useAgentStore
+        .getState()
+        .createSession("p1", "test", null);
+
+      expect(result).toBeNull();
+      expect(useAgentStore.getState().error).toBe("DB locked");
+      expect(useAgentStore.getState().sessions.size).toBe(0);
+    });
+  });
+
+  describe("resilience — hydration edge cases", () => {
+    it("hydrate sets loading=false after completion", async () => {
+      const api = await import("./api");
+      vi.mocked(api.markInterruptedSessions).mockResolvedValue(ok(0));
+      vi.mocked(api.getAllSessions).mockResolvedValue(ok([]));
+
+      await useAgentStore.getState().hydrate();
+      expect(useAgentStore.getState().loading).toBe(false);
+    });
+
+    it("hydrate handles getAllSessions failure gracefully", async () => {
+      const api = await import("./api");
+      vi.mocked(api.markInterruptedSessions).mockResolvedValue(ok(0));
+      vi.mocked(api.getAllSessions).mockResolvedValue(err("table missing"));
+
+      await useAgentStore.getState().hydrate();
+
+      const state = useAgentStore.getState();
+      expect(state.error).toBe("table missing");
+      expect(state.loading).toBe(false);
+      expect(state.sessions.size).toBe(0);
+    });
+
+    it("hydrate with messages load failure still loads sessions", async () => {
+      const api = await import("./api");
+      const session = createMockSession({ id: "s1" });
+      vi.mocked(api.markInterruptedSessions).mockResolvedValue(ok(0));
+      vi.mocked(api.getAllSessions).mockResolvedValue(ok([session]));
+      vi.mocked(api.getMessages).mockResolvedValue(err("corrupt messages"));
+
+      await useAgentStore.getState().hydrate();
+
+      const state = useAgentStore.getState();
+      expect(state.sessions.size).toBe(1);
+      expect(state.activeSessionId).toBe("s1");
+      expect(state.messagesBySession.has("s1")).toBe(false);
+    });
+  });
+
+  describe("resilience — completion with queued messages", () => {
+    it("dequeue returns correct message after rapid queue/dequeue cycles", () => {
+      const store = useAgentStore.getState();
+
+      store.queueMessage("s1", "s1-first");
+      store.queueMessage("s2", "s2-first");
+      store.queueMessage("s1", "s1-second");
+      store.queueMessage("s2", "s2-second");
+
+      const d1 = useAgentStore.getState().dequeueMessage("s1");
+      expect(d1?.content).toBe("s1-first");
+
+      const d2 = useAgentStore.getState().dequeueMessage("s2");
+      expect(d2?.content).toBe("s2-first");
+
+      expect(useAgentStore.getState().dequeueMessage("s1")?.content).toBe(
+        "s1-second",
+      );
+      expect(useAgentStore.getState().dequeueMessage("s2")?.content).toBe(
+        "s2-second",
+      );
+
+      expect(useAgentStore.getState().dequeueMessage("s1")).toBeUndefined();
+    });
+
+    it("clearSessionData during queued message doesn't affect other sessions", () => {
+      const store = useAgentStore.getState();
+      store.queueMessage("s1", "msg for s1");
+      store.queueMessage("s2", "msg for s2");
+
+      store.clearSessionData("s1");
+
+      const queue = useAgentStore.getState().messageQueue;
+      expect(queue).toHaveLength(1);
+      expect(queue[0]?.sessionId).toBe("s2");
     });
   });
 });

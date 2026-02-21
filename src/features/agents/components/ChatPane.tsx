@@ -3,7 +3,6 @@ import { invoke } from "@tauri-apps/api/core";
 import { useProjectStore } from "@/features/projects/store";
 import { useAgentStore } from "../store";
 import { useElapsedTime } from "../hooks/useElapsedTime";
-import * as agentApi from "../api";
 import { startNewSession, sendFollowUp } from "../sessionActions";
 import { MessageList } from "./MessageList";
 import { MessageQueue } from "./MessageQueue";
@@ -23,8 +22,7 @@ function ChatPane() {
   const sessions = useAgentStore((s) => s.sessions);
   const messagesBySession = useAgentStore((s) => s.messagesBySession);
   const messageQueue = useAgentStore((s) => s.messageQueue);
-  const setSession = useAgentStore((s) => s.setSession);
-  const switchSession = useAgentStore((s) => s.switchSession);
+  const createSession = useAgentStore((s) => s.createSession);
   const addMessage = useAgentStore((s) => s.addMessage);
   const updateStatus = useAgentStore((s) => s.updateSessionStatus);
   const queueMessage = useAgentStore((s) => s.queueMessage);
@@ -65,8 +63,8 @@ function ChatPane() {
     : 0;
 
   const actions = useMemo(
-    () => ({ setSession, switchSession, addMessage, updateStatus, setError }),
-    [setSession, switchSession, addMessage, updateStatus, setError],
+    () => ({ createSession, addMessage, updateStatus, setError }),
+    [createSession, addMessage, updateStatus, setError],
   );
 
   const handleSubmit = useCallback(
@@ -89,7 +87,7 @@ function ChatPane() {
       }
 
       const resumeSdkId = sdkSessionIds.get(activeSessionId)
-        ?? activeSession?.sdkSessionId;
+        ?? activeSession.sdkSessionId;
       await sendFollowUp(activeSessionId, selectedProject.path, content, actions, resumeSdkId);
     },
     [
@@ -110,7 +108,6 @@ function ChatPane() {
     try {
       await invoke("abort_agent_session", { sessionId: activeSessionId });
       updateStatus(activeSessionId, "aborted");
-      await agentApi.updateSessionStatus(activeSessionId, "aborted");
     } catch (e) {
       setError(`Failed to abort: ${String(e)}`);
     }

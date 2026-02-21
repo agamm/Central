@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import * as agentApi from "./api";
+import { debugLog } from "@/shared/debugLog";
 import type {
   AgentSession,
   AgentStatus,
@@ -53,9 +55,20 @@ interface AgentActions {
   readonly setLoading: (loading: boolean) => void;
   readonly setError: (error: string | null) => void;
   readonly clearSessionData: (sessionId: string) => void;
+  readonly deleteSession: (sessionId: string) => void;
+  readonly createSession: (
+    projectId: string,
+    prompt: string,
+    model: string | null,
+  ) => Promise<AgentSession | null>;
+  readonly hydrate: () => Promise<void>;
 }
 
 type AgentStore = AgentState & AgentActions;
+
+const persistError = (op: string, e: unknown): void => {
+  debugLog("STORE", `Persist failed [${op}]: ${String(e)}`);
+};
 
 const useAgentStore = create<AgentStore>()((set, get) => ({
   sessions: new Map(),
@@ -84,6 +97,9 @@ const useAgentStore = create<AgentStore>()((set, get) => ({
       status !== "running" ? new Date().toISOString() : existing.endedAt;
     sessions.set(sessionId, { ...existing, status, endedAt });
     set({ sessions });
+    agentApi
+      .updateSessionStatus(sessionId, status, endedAt ?? undefined)
+      .catch((e: unknown) => { persistError("updateSessionStatus", e); });
   },
 
   switchSession: (sessionId) => {
@@ -95,6 +111,19 @@ const useAgentStore = create<AgentStore>()((set, get) => ({
     const existing = msgMap.get(sessionId) ?? [];
     msgMap.set(sessionId, [...existing, message]);
     set({ messagesBySession: msgMap });
+    // Only persist if session still exists (skip orphan messages from stale events)
+    if (get().sessions.has(sessionId)) {
+      agentApi
+        .addMessage(
+          sessionId,
+          message.role,
+          message.content,
+          message.thinking,
+          message.toolCalls,
+          message.usage,
+        )
+        .catch((e: unknown) => { persistError("addMessage", e); });
+    }
   },
 
   setMessages: (sessionId, messages) => {
@@ -204,6 +233,69 @@ const useAgentStore = create<AgentStore>()((set, get) => ({
       sessionElapsedMs: elapsedMap,
       sdkSessionIds: sdkMap,
       activeSessionId: activeId === sessionId ? null : activeId,
+    });
+  },
+
+  deleteSession: (sessionId) => {
+    // Clear in-memory state first (immediate UI update)
+    get().clearSessionData(sessionId);
+    // Then delete from SQLite
+    agentApi.deleteSession(sessionId)
+      .catch((e: unknown) => { persistError("deleteSession", e); });
+  },
+
+  createSession: async (projectId, prompt, model) => {
+    const result = await agentApi.createSession(projectId, prompt, model);
+    if (result.isErr()) {
+      set({ error: result.error });
+      return null;
+    }
+    const session = result.value;
+    const sessions = new Map(get().sessions);
+    sessions.set(session.id, session);
+    set({ sessions, activeSessionId: session.id });
+    return session;
+  },
+
+  hydrate: async () => {
+    set({ loading: true });
+
+    const interruptResult = await agentApi.markInterruptedSessions();
+    if (interruptResult.isErr()) {
+      set({ error: interruptResult.error });
+    }
+
+    const sessionsResult = await agentApi.getAllSessions();
+    if (sessionsResult.isErr()) {
+      set({ error: sessionsResult.error, loading: false });
+      return;
+    }
+
+    const sessions = new Map<string, AgentSession>();
+    for (const s of sessionsResult.value) {
+      sessions.set(s.id, s);
+    }
+
+    const lastSession = sessionsResult.value[0] ?? null;
+    let messagesBySession = new Map(get().messagesBySession);
+
+    if (lastSession) {
+      const messagesResult = await agentApi.getMessages(lastSession.id);
+      if (messagesResult.isOk()) {
+        const chatMessages = messagesResult.value.map((m) => ({
+          ...m,
+          isStreaming: false as const,
+        }));
+        messagesBySession = new Map(messagesBySession);
+        messagesBySession.set(lastSession.id, chatMessages);
+      }
+    }
+
+    set({
+      sessions,
+      activeSessionId: lastSession?.id ?? null,
+      messagesBySession,
+      loading: false,
     });
   },
 }));

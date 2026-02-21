@@ -7,7 +7,6 @@ import { AgentList } from "@/features/agents/components/AgentList";
 import { useProjectStore } from "../store";
 import { useAgentStore } from "@/features/agents/store";
 import * as agentApi from "@/features/agents/api";
-import { debugLog } from "@/shared/debugLog";
 
 interface ProjectListProps {
   readonly onAddProject: () => void;
@@ -22,7 +21,7 @@ function ProjectList({ onAddProject }: ProjectListProps) {
   const switchSession = useAgentStore((s) => s.switchSession);
   const setMessages = useAgentStore((s) => s.setMessages);
   const messagesBySession = useAgentStore((s) => s.messagesBySession);
-  const clearSessionData = useAgentStore((s) => s.clearSessionData);
+  const deleteSession = useAgentStore((s) => s.deleteSession);
 
   const handleSelect = useCallback(
     (id: string) => {
@@ -67,17 +66,10 @@ function ProjectList({ onAddProject }: ProjectListProps) {
     (sessionId: string) => {
       // Try to kill the worker if one exists (ignore errors for stale sessions)
       void invoke("abort_agent_session", { sessionId }).catch(() => {});
-      // Delete from DB
-      void agentApi.deleteSession(sessionId).then((result) => {
-        result.match(
-          () => debugLog("REACT", `Session ${sessionId} deleted from DB`),
-          (e) => debugLog("REACT", `Failed to delete session ${sessionId}: ${e}`),
-        );
-      });
-      // Clear from store (switches away if this was the active session)
-      clearSessionData(sessionId);
+      // Clear from store + delete from DB
+      deleteSession(sessionId);
     },
-    [clearSessionData],
+    [deleteSession],
   );
 
   if (projects.length === 0) {

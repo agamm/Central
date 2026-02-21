@@ -1,5 +1,4 @@
 import { invoke } from "@tauri-apps/api/core";
-import * as agentApi from "./api";
 import { debugLog } from "@/shared/debugLog";
 import type { AgentSession, AgentStatus, ChatMessage } from "./types";
 
@@ -17,21 +16,23 @@ function createUserMessage(sessionId: string, content: string): ChatMessage {
 }
 
 interface SessionActions {
-  readonly setSession: (s: AgentSession) => void;
-  readonly switchSession: (id: string) => void;
+  readonly createSession: (
+    projectId: string,
+    prompt: string,
+    model: string | null,
+  ) => Promise<AgentSession | null>;
   readonly addMessage: (sid: string, msg: ChatMessage) => void;
   readonly updateStatus: (sid: string, status: AgentStatus) => void;
   readonly setError: (e: string) => void;
 }
 
-async function persistAndAddUserMessage(
+function addUserMessage(
   sessionId: string,
   content: string,
   addMessage: (sid: string, msg: ChatMessage) => void,
-): Promise<void> {
+): void {
   const userMsg = createUserMessage(sessionId, content);
   addMessage(sessionId, userMsg);
-  await agentApi.addMessage(sessionId, "user", content, null, null, null);
 }
 
 async function startNewSession(
@@ -42,18 +43,11 @@ async function startNewSession(
 ): Promise<void> {
   debugLog("REACT", `startNewSession: projectId=${projectId}, path=${projectPath}`);
 
-  const result = await agentApi.createSession(projectId, content, null);
-  if (result.isErr()) {
-    debugLog("REACT", `createSession FAILED: ${result.error}`);
-    actions.setError(result.error);
-    return;
-  }
+  const session = await actions.createSession(projectId, content, null);
+  if (!session) return;
 
-  const session = result.value;
   debugLog("REACT", `Session created: id=${session.id}`);
-  actions.setSession(session);
-  actions.switchSession(session.id);
-  await persistAndAddUserMessage(session.id, content, actions.addMessage);
+  addUserMessage(session.id, content, actions.addMessage);
 
   try {
     debugLog("REACT", `Invoking start_agent_session: sid=${session.id}`);
@@ -78,16 +72,12 @@ async function sendFollowUp(
   actions: Pick<SessionActions, "addMessage" | "updateStatus" | "setError">,
   resumeSessionId?: string | null,
 ): Promise<void> {
-  await persistAndAddUserMessage(sessionId, content, actions.addMessage);
+  addUserMessage(sessionId, content, actions.addMessage);
   actions.updateStatus(sessionId, "running");
-  await agentApi.updateSessionStatus(sessionId, "running");
 
   try {
-    // Try sending to an existing worker first
     await invoke("send_agent_message", { sessionId, message: content });
   } catch {
-    // Worker doesn't exist (e.g. stale session from previous app run).
-    // Spawn a new worker with this message as the prompt + resume context.
     debugLog("REACT", `send_agent_message failed for ${sessionId}, spawning new worker (resume=${resumeSessionId ?? "none"})`);
     try {
       await invoke("start_agent_session", {

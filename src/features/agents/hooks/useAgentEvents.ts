@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { useAgentStore } from "../store";
-import * as agentApi from "../api";
 import { debugLog } from "@/shared/debugLog";
 import { notifySessionCompleted, notifySessionFailed } from "../notifications";
 import type { AgentEventPayload, ChatMessage, SidecarEvent } from "../types";
@@ -47,10 +46,10 @@ function mergeToolCallsJson(
   return JSON.stringify([...existing, ...pending]);
 }
 
-async function handleMessageEvent(
+function handleMessageEvent(
   store: Store,
   event: Extract<SidecarEvent, { type: "message" }>,
-): Promise<void> {
+): void {
   const pending = drainPendingToolCalls(event.sessionId);
   const toolCallsJson = mergeToolCallsJson(
     event.toolCalls ? JSON.stringify(event.toolCalls) : null,
@@ -58,62 +57,57 @@ async function handleMessageEvent(
   );
   const usageJson = event.usage ? JSON.stringify(event.usage) : null;
 
-  const result = await agentApi.addMessage(
-    event.sessionId,
-    event.role,
-    event.content,
-    event.thinking ?? null,
-    toolCallsJson,
-    usageJson,
-  );
+  const msg: ChatMessage = {
+    id: crypto.randomUUID(),
+    sessionId: event.sessionId,
+    role: event.role as "assistant" | "user" | "system",
+    content: event.content,
+    thinking: event.thinking ?? null,
+    toolCalls: toolCallsJson,
+    usage: usageJson,
+    timestamp: new Date().toISOString(),
+  };
 
-  result.match(
-    (msg) => {
-      const merged: ChatMessage = { ...msg, toolCalls: toolCallsJson };
-      store.addMessage(event.sessionId, merged);
-    },
-    () => {
-      store.addMessage(event.sessionId, {
-        id: crypto.randomUUID(),
-        sessionId: event.sessionId,
-        role: event.role as "assistant" | "user" | "system",
-        content: event.content,
-        thinking: event.thinking ?? null,
-        toolCalls: toolCallsJson,
-        usage: usageJson,
-        timestamp: new Date().toISOString(),
-      });
-    },
-  );
+  store.addMessage(event.sessionId, msg);
 }
 
 async function handleSessionCompleted(
   store: Store,
   sessionId: string,
 ): Promise<void> {
-  // Flush any remaining pending tool calls into the last assistant message
   flushPendingToolCallsToLastMessage(store, sessionId);
 
-  // Calculate elapsed time
   const startedAt = store.sessionStartedAt.get(sessionId);
   if (startedAt) {
     const elapsed = Date.now() - new Date(startedAt).getTime();
     store.setSessionElapsed(sessionId, elapsed);
   }
 
-  store.updateSessionStatus(sessionId, "completed");
-  await agentApi.updateSessionStatus(sessionId, "completed");
-
-  const session = store.sessions.get(sessionId);
-  notifySessionCompleted(session?.prompt ?? null);
-
   const queued = store.dequeueMessage(sessionId);
+
   if (queued) {
+    // Skip "completed" status — go straight to "running" for the next turn.
+    // This avoids a race where two async SQLite writes (completed, then running)
+    // could arrive out of order, leaving the DB stuck on "completed".
+    store.addMessage(sessionId, {
+      id: crypto.randomUUID(),
+      sessionId,
+      role: "user",
+      content: queued.content,
+      thinking: null,
+      toolCalls: null,
+      usage: null,
+      timestamp: new Date().toISOString(),
+    });
     await invoke("send_agent_message", { sessionId, message: queued.content });
     store.updateSessionStatus(sessionId, "running");
     store.setSessionStartedAt(sessionId, new Date().toISOString());
-    await agentApi.updateSessionStatus(sessionId, "running");
+  } else {
+    store.updateSessionStatus(sessionId, "completed");
   }
+
+  const session = useAgentStore.getState().sessions.get(sessionId);
+  notifySessionCompleted(session?.prompt ?? null);
 }
 
 /**
@@ -153,12 +147,11 @@ function findLastIndex<T>(
   return -1;
 }
 
-async function handleSessionFailed(
+function handleSessionFailed(
   store: Store,
   sessionId: string,
   error: string,
-): Promise<void> {
-  // Calculate elapsed time even on failure
+): void {
   const startedAt = store.sessionStartedAt.get(sessionId);
   if (startedAt) {
     const elapsed = Date.now() - new Date(startedAt).getTime();
@@ -169,7 +162,6 @@ async function handleSessionFailed(
 
   store.updateSessionStatus(sessionId, "failed");
   store.setError(error);
-  await agentApi.updateSessionStatus(sessionId, "failed");
 
   const session = store.sessions.get(sessionId);
   notifySessionFailed(session?.prompt ?? null, error);
@@ -194,7 +186,7 @@ async function handleEvent(event: SidecarEvent): Promise<void> {
       break;
     case "message":
       debugLog("REACT-EVENT", `Message: sid=${event.sessionId} role=${event.role} content=${event.content.slice(0, 100)}`);
-      await handleMessageEvent(store, event);
+      handleMessageEvent(store, event);
       break;
     case "tool_use":
       debugLog("REACT-EVENT", `Tool use: sid=${event.sessionId} tool=${event.toolName}`);
@@ -219,7 +211,7 @@ async function handleEvent(event: SidecarEvent): Promise<void> {
       break;
     case "session_failed":
       debugLog("REACT-EVENT", `Session FAILED: ${event.sessionId} error=${event.error}`);
-      await handleSessionFailed(store, event.sessionId, event.error);
+      handleSessionFailed(store, event.sessionId, event.error);
       break;
     case "error":
       debugLog("REACT-EVENT", `Error event: ${event.message}`);

@@ -2,28 +2,14 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { invoke } from "@tauri-apps/api/core";
 import { startNewSession, sendFollowUp } from "./sessionActions";
 import type { SessionActions } from "./sessionActions";
-import { ok, err } from "neverthrow";
 
-// Mock the API module
-vi.mock("./api", () => ({
-  createSession: vi.fn(),
-  addMessage: vi.fn(),
-  updateSessionStatus: vi.fn(),
-}));
-
-// Mock debugLog so it doesn't call invoke("debug_log")
 vi.mock("@/shared/debugLog", () => ({
   debugLog: vi.fn(),
 }));
 
-async function getApi(): Promise<typeof import("./api")> {
-  return import("./api");
-}
-
 function createMockActions(): SessionActions {
   return {
-    setSession: vi.fn(),
-    switchSession: vi.fn(),
+    createSession: vi.fn(),
     addMessage: vi.fn(),
     updateStatus: vi.fn(),
     setError: vi.fn(),
@@ -36,8 +22,7 @@ describe("sessionActions", () => {
   });
 
   describe("startNewSession", () => {
-    it("creates session, switches to it, and invokes agent", async () => {
-      const api = await getApi();
+    it("creates session via store, adds message, and invokes agent", async () => {
       const actions = createMockActions();
       const sessionData = {
         id: "new-session-id",
@@ -50,25 +35,16 @@ describe("sessionActions", () => {
         endedAt: null,
       };
 
-      vi.mocked(api.createSession).mockResolvedValue(ok(sessionData));
-      vi.mocked(api.addMessage).mockResolvedValue(
-        ok({
-          id: "msg-1",
-          sessionId: "new-session-id",
-          role: "user" as const,
-          content: "Write a test",
-          thinking: null,
-          toolCalls: null,
-          usage: null,
-          timestamp: new Date().toISOString(),
-        }),
-      );
+      vi.mocked(actions.createSession).mockResolvedValue(sessionData);
       vi.mocked(invoke).mockResolvedValue("new-session-id");
 
       await startNewSession("proj-1", "/tmp/project", "Write a test", actions);
 
-      expect(actions.setSession).toHaveBeenCalledWith(sessionData);
-      expect(actions.switchSession).toHaveBeenCalledWith("new-session-id");
+      expect(actions.createSession).toHaveBeenCalledWith(
+        "proj-1",
+        "Write a test",
+        null,
+      );
       expect(actions.addMessage).toHaveBeenCalled();
       expect(invoke).toHaveBeenCalledWith("start_agent_session", {
         sessionId: "new-session-id",
@@ -78,24 +54,17 @@ describe("sessionActions", () => {
       });
     });
 
-    it("sets error when session creation fails", async () => {
-      const api = await getApi();
+    it("returns early when session creation fails", async () => {
       const actions = createMockActions();
-
-      vi.mocked(api.createSession).mockResolvedValue(
-        err("DB error creating session"),
-      );
+      vi.mocked(actions.createSession).mockResolvedValue(null);
 
       await startNewSession("proj-1", "/tmp/project", "prompt", actions);
 
-      expect(actions.setError).toHaveBeenCalledWith(
-        "DB error creating session",
-      );
       expect(invoke).not.toHaveBeenCalled();
+      expect(actions.addMessage).not.toHaveBeenCalled();
     });
 
     it("sets error when invoke fails", async () => {
-      const api = await getApi();
       const actions = createMockActions();
       const sessionData = {
         id: "s1",
@@ -108,19 +77,7 @@ describe("sessionActions", () => {
         endedAt: null,
       };
 
-      vi.mocked(api.createSession).mockResolvedValue(ok(sessionData));
-      vi.mocked(api.addMessage).mockResolvedValue(
-        ok({
-          id: "m1",
-          sessionId: "s1",
-          role: "user" as const,
-          content: "test",
-          thinking: null,
-          toolCalls: null,
-          usage: null,
-          timestamp: new Date().toISOString(),
-        }),
-      );
+      vi.mocked(actions.createSession).mockResolvedValue(sessionData);
       vi.mocked(invoke).mockRejectedValue(new Error("sidecar crash"));
 
       await startNewSession("p1", "/tmp/p", "test", actions);
@@ -133,23 +90,8 @@ describe("sessionActions", () => {
   });
 
   describe("sendFollowUp", () => {
-    it("persists message, updates status, and invokes send", async () => {
-      const api = await getApi();
+    it("adds message, updates status, and invokes send", async () => {
       const actions = createMockActions();
-
-      vi.mocked(api.addMessage).mockResolvedValue(
-        ok({
-          id: "m1",
-          sessionId: "s1",
-          role: "user" as const,
-          content: "follow up",
-          thinking: null,
-          toolCalls: null,
-          usage: null,
-          timestamp: new Date().toISOString(),
-        }),
-      );
-      vi.mocked(api.updateSessionStatus).mockResolvedValue(ok(undefined));
       vi.mocked(invoke).mockResolvedValue(undefined);
 
       await sendFollowUp("s1", "/tmp/project", "follow up", actions);
@@ -163,22 +105,7 @@ describe("sessionActions", () => {
     });
 
     it("falls back to start_agent_session when send fails (stale session)", async () => {
-      const api = await getApi();
       const actions = createMockActions();
-
-      vi.mocked(api.addMessage).mockResolvedValue(
-        ok({
-          id: "m1",
-          sessionId: "s1",
-          role: "user" as const,
-          content: "msg",
-          thinking: null,
-          toolCalls: null,
-          usage: null,
-          timestamp: new Date().toISOString(),
-        }),
-      );
-      vi.mocked(api.updateSessionStatus).mockResolvedValue(ok(undefined));
 
       vi.mocked(invoke)
         .mockRejectedValueOnce(new Error("No worker found"))
@@ -200,22 +127,7 @@ describe("sessionActions", () => {
     });
 
     it("marks session as failed when both send and start fail", async () => {
-      const api = await getApi();
       const actions = createMockActions();
-
-      vi.mocked(api.addMessage).mockResolvedValue(
-        ok({
-          id: "m1",
-          sessionId: "s1",
-          role: "user" as const,
-          content: "msg",
-          thinking: null,
-          toolCalls: null,
-          usage: null,
-          timestamp: new Date().toISOString(),
-        }),
-      );
-      vi.mocked(api.updateSessionStatus).mockResolvedValue(ok(undefined));
 
       vi.mocked(invoke)
         .mockRejectedValueOnce(new Error("No worker found"))

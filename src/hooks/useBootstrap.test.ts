@@ -3,11 +3,17 @@ import { ok, err } from "neverthrow";
 import { useAgentStore } from "@/features/agents/store";
 import { createMockSession, createMockMessage } from "@/shared/test-helpers";
 
-// Mock the agent API module
 vi.mock("@/features/agents/api", () => ({
   markInterruptedSessions: vi.fn(),
   getAllSessions: vi.fn(),
   getMessages: vi.fn(),
+  createSession: vi.fn(),
+  updateSessionStatus: vi.fn(),
+  addMessage: vi.fn(),
+}));
+
+vi.mock("@/shared/debugLog", () => ({
+  debugLog: vi.fn(),
 }));
 
 async function getApi(): Promise<typeof import("@/features/agents/api")> {
@@ -21,47 +27,16 @@ function resetStore(): void {
     messagesBySession: new Map(),
     messageQueue: [],
     scrollPositionBySession: new Map(),
+    sessionStartedAt: new Map(),
+    sessionElapsedMs: new Map(),
+    sdkSessionIds: new Map(),
     loading: false,
     error: null,
   });
 }
 
-/**
- * Extracted from useBootstrap — the core restore logic without
- * the React hook wrapper. Testing the pure logic directly.
- */
 async function restoreSessionsForTest(): Promise<void> {
-  const api = await getApi();
-  const store = useAgentStore.getState();
-
-  const interruptResult = await api.markInterruptedSessions();
-  if (interruptResult.isErr()) {
-    store.setError(interruptResult.error);
-  }
-
-  const sessionsResult = await api.getAllSessions();
-  if (sessionsResult.isErr()) {
-    store.setError(sessionsResult.error);
-    return;
-  }
-
-  const sessions = sessionsResult.value;
-  for (const session of sessions) {
-    store.setSession(session);
-  }
-
-  const lastSession = sessions[0];
-  if (lastSession) {
-    store.switchSession(lastSession.id);
-    const messagesResult = await api.getMessages(lastSession.id);
-    if (messagesResult.isOk()) {
-      const chatMessages = messagesResult.value.map((m) => ({
-        ...m,
-        isStreaming: false as const,
-      }));
-      store.setMessages(lastSession.id, chatMessages);
-    }
-  }
+  await useAgentStore.getState().hydrate();
 }
 
 describe("Session restore (bootstrap logic)", () => {
@@ -91,7 +66,6 @@ describe("Session restore (bootstrap logic)", () => {
     expect(state.sessions.size).toBe(2);
     expect(state.sessions.get("s1")?.status).toBe("completed");
     expect(state.sessions.get("s2")?.status).toBe("interrupted");
-    // Should switch to the first (most recent) session
     expect(state.activeSessionId).toBe("s1");
   });
 
@@ -154,7 +128,6 @@ describe("Session restore (bootstrap logic)", () => {
     await restoreSessionsForTest();
 
     const state = useAgentStore.getState();
-    // Continues despite the error
     expect(state.sessions.size).toBe(1);
     expect(state.activeSessionId).toBe("s1");
   });
@@ -170,7 +143,6 @@ describe("Session restore (bootstrap logic)", () => {
     await restoreSessionsForTest();
 
     const state = useAgentStore.getState();
-    // Session is still loaded, just no messages
     expect(state.sessions.size).toBe(1);
     expect(state.activeSessionId).toBe("s1");
     expect(state.messagesBySession.has("s1")).toBe(false);
