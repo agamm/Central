@@ -37,7 +37,9 @@ function QueueItem({
         <div className="flex flex-1 items-center gap-1">
           <Input
             value={editValue}
-            onChange={(e) => { setEditValue(e.target.value); }}
+            onChange={(e) => {
+              setEditValue(e.target.value);
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSaveEdit();
               if (e.key === "Escape") setEditing(false);
@@ -77,7 +79,9 @@ function QueueItem({
             variant="ghost"
             size="icon"
             className="h-5 w-5"
-            onClick={() => { onCancel(message.id); }}
+            onClick={() => {
+              onCancel(message.id);
+            }}
           >
             <X className="h-3 w-3" />
           </Button>
@@ -91,8 +95,8 @@ function MessageQueue({ messages, onCancel, onEdit }: MessageQueueProps) {
   if (messages.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-1 px-4 py-2 border-t border-border/50">
-      <div className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-medium">
+    <div className="flex flex-col gap-1 border-t border-border/50 px-4 py-2">
+      <div className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground/60">
         Queued ({messages.length})
       </div>
       {messages.map((msg) => (

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-/// Commands sent from Rust to the Node.js sidecar via stdin JSON-lines
+/// Commands sent from Rust to the per-session worker via stdin JSON-lines
 #[derive(Debug, Clone, Serialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 #[allow(dead_code)]
@@ -13,6 +13,10 @@ pub enum SidecarCommand {
         prompt: String,
         #[serde(skip_serializing_if = "Option::is_none")]
         model: Option<String>,
+        #[serde(rename = "maxBudgetUsd", skip_serializing_if = "Option::is_none")]
+        max_budget_usd: Option<f64>,
+        #[serde(rename = "resumeSessionId", skip_serializing_if = "Option::is_none")]
+        resume_session_id: Option<String>,
     },
     SendMessage {
         #[serde(rename = "sessionId")]
@@ -23,19 +27,28 @@ pub enum SidecarCommand {
         #[serde(rename = "sessionId")]
         session_id: String,
     },
-    ListSessions,
+    EndSession {
+        #[serde(rename = "sessionId")]
+        session_id: String,
+    },
+    ToolApprovalResponse {
+        #[serde(rename = "requestId")]
+        request_id: String,
+        allowed: bool,
+        #[serde(rename = "updatedPermissions", skip_serializing_if = "Option::is_none")]
+        updated_permissions: Option<serde_json::Value>,
+    },
 }
 
-/// Events received from the Node.js sidecar via stdout JSON-lines
+/// Events received from the per-session worker via stdout JSON-lines
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum SidecarEvent {
-    Ready {
-        message: String,
-    },
     SessionStarted {
         #[serde(rename = "sessionId")]
         session_id: String,
+        #[serde(rename = "sdkSessionId")]
+        sdk_session_id: String,
     },
     Message {
         #[serde(rename = "sessionId")]
@@ -63,9 +76,34 @@ pub enum SidecarEvent {
         tool_name: String,
         output: String,
     },
+    ToolApprovalRequest {
+        #[serde(rename = "sessionId")]
+        session_id: String,
+        #[serde(rename = "requestId")]
+        request_id: String,
+        #[serde(rename = "toolName")]
+        tool_name: String,
+        input: serde_json::Value,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        suggestions: Option<serde_json::Value>,
+    },
+    ToolProgress {
+        #[serde(rename = "sessionId")]
+        session_id: String,
+        #[serde(rename = "toolName")]
+        tool_name: String,
+        #[serde(rename = "elapsedSeconds")]
+        elapsed_seconds: f64,
+    },
     SessionCompleted {
         #[serde(rename = "sessionId")]
         session_id: String,
+        #[serde(rename = "sdkSessionId")]
+        sdk_session_id: String,
+        #[serde(rename = "totalCostUsd", skip_serializing_if = "Option::is_none")]
+        total_cost_usd: Option<f64>,
+        #[serde(rename = "durationMs", skip_serializing_if = "Option::is_none")]
+        duration_ms: Option<f64>,
     },
     SessionFailed {
         #[serde(rename = "sessionId")]
@@ -94,6 +132,8 @@ mod tests {
             project_path: "/tmp/project".to_string(),
             prompt: "Write tests".to_string(),
             model: Some("claude-opus-4".to_string()),
+            max_budget_usd: Some(1.0),
+            resume_session_id: Some("sdk-abc-123".to_string()),
         };
 
         let json = serde_json::to_string(&cmd).unwrap();
@@ -102,6 +142,8 @@ mod tests {
         assert!(json.contains("\"projectPath\":\"/tmp/project\""));
         assert!(json.contains("\"prompt\":\"Write tests\""));
         assert!(json.contains("\"model\":\"claude-opus-4\""));
+        assert!(json.contains("\"maxBudgetUsd\":1.0"));
+        assert!(json.contains("\"resumeSessionId\":\"sdk-abc-123\""));
     }
 
     #[test]
@@ -111,11 +153,15 @@ mod tests {
             project_path: "/tmp".to_string(),
             prompt: "test".to_string(),
             model: None,
+            max_budget_usd: None,
+            resume_session_id: None,
         };
 
         let json = serde_json::to_string(&cmd).unwrap();
-        // model should be skipped when None
+        // Optional fields should be skipped when None
         assert!(!json.contains("\"model\""));
+        assert!(!json.contains("\"maxBudgetUsd\""));
+        assert!(!json.contains("\"resumeSessionId\""));
     }
 
     #[test]
@@ -143,31 +189,36 @@ mod tests {
     }
 
     #[test]
-    fn serialize_list_sessions_command() {
-        let cmd = SidecarCommand::ListSessions;
+    fn serialize_end_session_command() {
+        let cmd = SidecarCommand::EndSession {
+            session_id: "s1".to_string(),
+        };
         let json = serde_json::to_string(&cmd).unwrap();
-        assert!(json.contains("\"type\":\"list_sessions\""));
+        assert!(json.contains("\"type\":\"end_session\""));
+        assert!(json.contains("\"sessionId\":\"s1\""));
     }
 
     #[test]
-    fn deserialize_ready_event() {
-        let json = r#"{"type":"ready","message":"Sidecar started"}"#;
-        let event: SidecarEvent = serde_json::from_str(json).unwrap();
-        match event {
-            SidecarEvent::Ready { message } => {
-                assert_eq!(message, "Sidecar started");
-            }
-            _ => panic!("Expected Ready event"),
-        }
+    fn serialize_tool_approval_response() {
+        let cmd = SidecarCommand::ToolApprovalResponse {
+            request_id: "apr_1".to_string(),
+            allowed: true,
+            updated_permissions: None,
+        };
+        let json = serde_json::to_string(&cmd).unwrap();
+        assert!(json.contains("\"type\":\"tool_approval_response\""));
+        assert!(json.contains("\"requestId\":\"apr_1\""));
+        assert!(json.contains("\"allowed\":true"));
     }
 
     #[test]
     fn deserialize_session_started_event() {
-        let json = r#"{"type":"session_started","sessionId":"s1"}"#;
+        let json = r#"{"type":"session_started","sessionId":"s1","sdkSessionId":"sdk-abc-123"}"#;
         let event: SidecarEvent = serde_json::from_str(json).unwrap();
         match event {
-            SidecarEvent::SessionStarted { session_id } => {
+            SidecarEvent::SessionStarted { session_id, sdk_session_id } => {
                 assert_eq!(session_id, "s1");
+                assert_eq!(sdk_session_id, "sdk-abc-123");
             }
             _ => panic!("Expected SessionStarted event"),
         }
@@ -274,11 +325,14 @@ mod tests {
 
     #[test]
     fn deserialize_session_completed_event() {
-        let json = r#"{"type":"session_completed","sessionId":"s1"}"#;
+        let json = r#"{"type":"session_completed","sessionId":"s1","sdkSessionId":"sdk-abc","totalCostUsd":0.01,"durationMs":1500}"#;
         let event: SidecarEvent = serde_json::from_str(json).unwrap();
         match event {
-            SidecarEvent::SessionCompleted { session_id } => {
+            SidecarEvent::SessionCompleted { session_id, sdk_session_id, total_cost_usd, duration_ms } => {
                 assert_eq!(session_id, "s1");
+                assert_eq!(sdk_session_id, "sdk-abc");
+                assert_eq!(total_cost_usd, Some(0.01));
+                assert_eq!(duration_ms, Some(1500.0));
             }
             _ => panic!("Expected SessionCompleted event"),
         }
@@ -312,13 +366,53 @@ mod tests {
     #[test]
     fn serialize_agent_event_payload() {
         let payload = AgentEventPayload {
-            event: SidecarEvent::Ready {
-                message: "ok".to_string(),
+            event: SidecarEvent::SessionStarted {
+                session_id: "s1".to_string(),
+                sdk_session_id: "sdk-1".to_string(),
             },
         };
         let json = serde_json::to_string(&payload).unwrap();
         assert!(json.contains("\"event\""));
-        assert!(json.contains("\"type\":\"ready\""));
+        assert!(json.contains("\"type\":\"session_started\""));
+    }
+
+    #[test]
+    fn deserialize_tool_approval_request_event() {
+        let json = r#"{
+            "type":"tool_approval_request",
+            "sessionId":"s1",
+            "requestId":"apr_1",
+            "toolName":"write_file",
+            "input":{"path":"test.rs"}
+        }"#;
+        let event: SidecarEvent = serde_json::from_str(json).unwrap();
+        match event {
+            SidecarEvent::ToolApprovalRequest { session_id, request_id, tool_name, .. } => {
+                assert_eq!(session_id, "s1");
+                assert_eq!(request_id, "apr_1");
+                assert_eq!(tool_name, "write_file");
+            }
+            _ => panic!("Expected ToolApprovalRequest event"),
+        }
+    }
+
+    #[test]
+    fn deserialize_tool_progress_event() {
+        let json = r#"{
+            "type":"tool_progress",
+            "sessionId":"s1",
+            "toolName":"bash",
+            "elapsedSeconds":5.2
+        }"#;
+        let event: SidecarEvent = serde_json::from_str(json).unwrap();
+        match event {
+            SidecarEvent::ToolProgress { session_id, tool_name, elapsed_seconds } => {
+                assert_eq!(session_id, "s1");
+                assert_eq!(tool_name, "bash");
+                assert!((elapsed_seconds - 5.2).abs() < 0.01);
+            }
+            _ => panic!("Expected ToolProgress event"),
+        }
     }
 
     #[test]

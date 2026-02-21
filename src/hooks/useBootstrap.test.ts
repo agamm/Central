@@ -110,9 +110,7 @@ describe("Session restore (bootstrap logic)", () => {
 
     await restoreSessionsForTest();
 
-    const messages = useAgentStore
-      .getState()
-      .messagesBySession.get("s1");
+    const messages = useAgentStore.getState().messagesBySession.get("s1");
     expect(messages).toHaveLength(1);
     expect(messages?.[0]?.content).toBe("restored");
     expect(messages?.[0]?.isStreaming).toBe(false);
@@ -135,9 +133,7 @@ describe("Session restore (bootstrap logic)", () => {
     const api = await getApi();
 
     vi.mocked(api.markInterruptedSessions).mockResolvedValue(ok(0));
-    vi.mocked(api.getAllSessions).mockResolvedValue(
-      err("DB corrupted"),
-    );
+    vi.mocked(api.getAllSessions).mockResolvedValue(err("DB corrupted"));
 
     await restoreSessionsForTest();
 
@@ -169,9 +165,7 @@ describe("Session restore (bootstrap logic)", () => {
 
     vi.mocked(api.markInterruptedSessions).mockResolvedValue(ok(0));
     vi.mocked(api.getAllSessions).mockResolvedValue(ok([session]));
-    vi.mocked(api.getMessages).mockResolvedValue(
-      err("messages table missing"),
-    );
+    vi.mocked(api.getMessages).mockResolvedValue(err("messages table missing"));
 
     await restoreSessionsForTest();
 

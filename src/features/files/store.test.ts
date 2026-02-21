@@ -59,9 +59,7 @@ describe("FilesStore", () => {
 
     it("sets error on failure", async () => {
       const api = await getApi();
-      vi.mocked(api.getFileTree).mockResolvedValue(
-        err("Path does not exist"),
-      );
+      vi.mocked(api.getFileTree).mockResolvedValue(err("Path does not exist"));
 
       await useFilesStore.getState().loadTree("/bad/path");
 
@@ -91,9 +89,7 @@ describe("FilesStore", () => {
 
     it("sets gitStatus to null on failure", async () => {
       const api = await getApi();
-      vi.mocked(api.getGitStatus).mockResolvedValue(
-        err("Not a git repo"),
-      );
+      vi.mocked(api.getGitStatus).mockResolvedValue(err("Not a git repo"));
 
       await useFilesStore.getState().loadGitStatus("/tmp/no-git");
 
@@ -104,9 +100,7 @@ describe("FilesStore", () => {
   describe("selectFile", () => {
     it("sets file content and view mode", async () => {
       const api = await getApi();
-      vi.mocked(api.getFileContent).mockResolvedValue(
-        ok("const x = 42;"),
-      );
+      vi.mocked(api.getFileContent).mockResolvedValue(ok("const x = 42;"));
 
       await useFilesStore.getState().selectFile("/tmp/p", "main.ts");
 

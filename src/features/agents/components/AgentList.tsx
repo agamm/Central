@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { Plus } from "lucide-react";
 import { useAgentStore } from "../store";
 import * as agentApi from "../api";
 import { SessionItem } from "./SessionItem";
@@ -7,9 +8,11 @@ import type { AgentSession } from "@/core/types";
 interface AgentListProps {
   readonly projectId: string;
   readonly onSessionSelect: (sessionId: string, projectId: string) => void;
+  readonly onSessionDelete?: (sessionId: string) => void;
+  readonly onNewChat?: () => void;
 }
 
-function AgentList({ projectId, onSessionSelect }: AgentListProps) {
+function AgentList({ projectId, onSessionSelect, onSessionDelete, onNewChat }: AgentListProps) {
   const [projectSessions, setProjectSessions] = useState<
     readonly AgentSession[]
   >([]);
@@ -24,8 +27,12 @@ function AgentList({ projectId, onSessionSelect }: AgentListProps) {
       if (cancelled) return;
 
       result.match(
-        (fetched) => { setProjectSessions(fetched); },
-        () => { setProjectSessions([]); },
+        (fetched) => {
+          setProjectSessions(fetched);
+        },
+        () => {
+          setProjectSessions([]);
+        },
       );
     };
 
@@ -45,7 +52,15 @@ function AgentList({ projectId, onSessionSelect }: AgentListProps) {
     [onSessionSelect, projectId],
   );
 
-  if (mergedSessions.length === 0) return null;
+  const handleDelete = useCallback(
+    (sessionId: string) => {
+      // Remove from local state so it disappears from the list immediately
+      setProjectSessions((prev) => prev.filter((s) => s.id !== sessionId));
+      // Propagate to parent for DB + store cleanup
+      onSessionDelete?.(sessionId);
+    },
+    [onSessionDelete],
+  );
 
   return (
     <div className="flex flex-col gap-0.5 pl-4">
@@ -55,8 +70,18 @@ function AgentList({ projectId, onSessionSelect }: AgentListProps) {
           session={session}
           isActive={activeSessionId === session.id}
           onSelect={handleSelect}
+          onDelete={handleDelete}
         />
       ))}
+      {onNewChat && (
+        <button
+          onClick={onNewChat}
+          className="flex items-center gap-2 rounded px-2 py-1 text-xs text-muted-foreground/60 hover:bg-accent/50 hover:text-muted-foreground"
+        >
+          <Plus className="h-3 w-3" />
+          <span>New Chat</span>
+        </button>
+      )}
     </div>
   );
 }

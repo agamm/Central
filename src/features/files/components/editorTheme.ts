@@ -4,62 +4,61 @@ import { tags } from "@lezer/highlight";
 
 /**
  * Custom CodeMirror theme matching globals.css dark palette.
- * HSL values from design tokens:
- *   background: hsl(224, 71%, 4%)  -> #060b18
- *   surface:    hsl(224, 71%, 6%)  -> #0a1120
- *   muted:      hsl(223, 47%, 11%) -> #0f1729
- *   border:     hsl(216, 34%, 17%) -> #1d2b3e
- *   foreground: hsl(213, 31%, 91%) -> #dfe6ee
- *   muted-fg:   hsl(215, 20%, 55%) -> #7a8da3
+ * Neutral, desaturated HSL values (hue=0, saturation=0%):
+ *   background: hsl(0, 0%, 5%)   — matches --background
+ *   surface:    hsl(0, 0%, 7%)   — matches --card
+ *   muted:      hsl(0, 0%, 10%)  — matches --muted
+ *   border:     hsl(0, 0%, 13%)  — matches --border
+ *   foreground: hsl(0, 0%, 87%)  — matches --foreground
+ *   muted-fg:   hsl(0, 0%, 48%) — matches --muted-foreground
  */
 const centralEditorTheme = EditorView.theme(
   {
     "&": {
-      backgroundColor: "hsl(224, 71%, 4%)",
-      color: "hsl(213, 31%, 91%)",
+      backgroundColor: "hsl(0, 0%, 5%)",
+      color: "hsl(0, 0%, 87%)",
       fontSize: "12px",
-      fontFamily:
-        '"JetBrains Mono", ui-monospace, SFMono-Regular, monospace',
+      fontFamily: '"JetBrains Mono", ui-monospace, SFMono-Regular, monospace',
     },
     ".cm-content": {
-      caretColor: "hsl(213, 31%, 91%)",
+      caretColor: "hsl(0, 0%, 87%)",
       padding: "8px 0",
     },
     ".cm-cursor, .cm-dropCursor": {
-      borderLeftColor: "hsl(213, 31%, 91%)",
+      borderLeftColor: "hsl(0, 0%, 87%)",
     },
     "&.cm-focused .cm-selectionBackground, .cm-selectionBackground": {
-      backgroundColor: "hsl(223, 47%, 18%)",
+      backgroundColor: "hsl(0, 0%, 18%)",
     },
     ".cm-activeLine": {
-      backgroundColor: "hsl(223, 47%, 8%)",
+      backgroundColor: "hsl(0, 0%, 8%)",
     },
     ".cm-gutters": {
-      backgroundColor: "hsl(224, 71%, 4%)",
-      color: "hsl(215, 20%, 35%)",
+      backgroundColor: "hsl(0, 0%, 5%)",
+      color: "hsl(0, 0%, 30%)",
       border: "none",
-      borderRight: "1px solid hsl(216, 34%, 17%)",
+      borderRight: "1px solid hsl(0, 0%, 13%)",
     },
     ".cm-activeLineGutter": {
-      backgroundColor: "hsl(223, 47%, 8%)",
-      color: "hsl(215, 20%, 55%)",
+      backgroundColor: "hsl(0, 0%, 8%)",
+      color: "hsl(0, 0%, 48%)",
     },
     ".cm-lineNumbers .cm-gutterElement": {
       padding: "0 8px 0 16px",
       minWidth: "40px",
     },
     ".cm-foldPlaceholder": {
-      backgroundColor: "hsl(223, 47%, 11%)",
-      border: "1px solid hsl(216, 34%, 17%)",
-      color: "hsl(215, 20%, 55%)",
+      backgroundColor: "hsl(0, 0%, 10%)",
+      border: "1px solid hsl(0, 0%, 13%)",
+      color: "hsl(0, 0%, 48%)",
     },
     ".cm-tooltip": {
-      backgroundColor: "hsl(224, 71%, 6%)",
-      border: "1px solid hsl(216, 34%, 17%)",
+      backgroundColor: "hsl(0, 0%, 7%)",
+      border: "1px solid hsl(0, 0%, 13%)",
     },
     ".cm-panels": {
-      backgroundColor: "hsl(224, 71%, 6%)",
-      color: "hsl(213, 31%, 91%)",
+      backgroundColor: "hsl(0, 0%, 7%)",
+      color: "hsl(0, 0%, 87%)",
     },
     ".cm-scroller": {
       overflow: "auto",
@@ -70,29 +69,29 @@ const centralEditorTheme = EditorView.theme(
 
 const centralHighlightStyle = HighlightStyle.define([
   { tag: tags.keyword, color: "#c678dd" },
-  { tag: tags.operator, color: "#56b6c2" },
+  { tag: tags.operator, color: "#b5a58a" },
   { tag: tags.special(tags.variableName), color: "#e06c75" },
   { tag: tags.typeName, color: "#e5c07b" },
   { tag: tags.atom, color: "#d19a66" },
   { tag: tags.number, color: "#d19a66" },
-  { tag: tags.definition(tags.variableName), color: "#61afef" },
+  { tag: tags.definition(tags.variableName), color: "#d4a276" },
   { tag: tags.string, color: "#98c379" },
-  { tag: tags.special(tags.string), color: "#56b6c2" },
+  { tag: tags.special(tags.string), color: "#b5a58a" },
   { tag: tags.comment, color: "#5c6370", fontStyle: "italic" },
   { tag: tags.variableName, color: "#e06c75" },
   { tag: tags.tagName, color: "#e06c75" },
-  { tag: tags.propertyName, color: "#61afef" },
+  { tag: tags.propertyName, color: "#d4a276" },
   { tag: tags.attributeName, color: "#d19a66" },
   { tag: tags.className, color: "#e5c07b" },
   { tag: tags.labelName, color: "#e06c75" },
   { tag: tags.namespace, color: "#e5c07b" },
   { tag: tags.macroName, color: "#e06c75" },
-  { tag: tags.literal, color: "#56b6c2" },
+  { tag: tags.literal, color: "#b5a58a" },
   { tag: tags.bool, color: "#d19a66" },
   { tag: tags.null, color: "#d19a66" },
   { tag: tags.regexp, color: "#98c379" },
-  { tag: tags.escape, color: "#56b6c2" },
-  { tag: tags.link, color: "#61afef", textDecoration: "underline" },
+  { tag: tags.escape, color: "#b5a58a" },
+  { tag: tags.link, color: "#d4a276", textDecoration: "underline" },
   { tag: tags.heading, color: "#e06c75", fontWeight: "bold" },
   { tag: tags.emphasis, fontStyle: "italic" },
   { tag: tags.strong, fontWeight: "bold" },

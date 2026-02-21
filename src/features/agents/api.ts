@@ -100,7 +100,8 @@ async function updateSessionStatus(
 ): Promise<Result<void, string>> {
   try {
     const db = getDb();
-    const ended = endedAt ?? (status !== "running" ? new Date().toISOString() : null);
+    const ended =
+      endedAt ?? (status !== "running" ? new Date().toISOString() : null);
 
     await db.execute(
       `UPDATE agent_sessions SET status = $1, ended_at = $2 WHERE id = $3`,
@@ -219,6 +220,20 @@ async function markInterruptedSessions(): Promise<Result<number, string>> {
   }
 }
 
+/** Delete a session and all its messages from the database */
+async function deleteSession(
+  sessionId: string,
+): Promise<Result<void, string>> {
+  try {
+    const db = getDb();
+    await db.execute(`DELETE FROM messages WHERE session_id = $1`, [sessionId]);
+    await db.execute(`DELETE FROM agent_sessions WHERE id = $1`, [sessionId]);
+    return ok(undefined);
+  } catch (e) {
+    return err(`Failed to delete session: ${String(e)}`);
+  }
+}
+
 export {
   createSession,
   updateSessionStatus,
@@ -227,4 +242,5 @@ export {
   getMessages,
   getAllSessions,
   markInterruptedSessions,
+  deleteSession,
 };

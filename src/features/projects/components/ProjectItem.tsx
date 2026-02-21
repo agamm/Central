@@ -1,5 +1,11 @@
 import { useState, useCallback, type ReactNode } from "react";
-import { Folder, ChevronRight, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import {
+  Folder,
+  ChevronRight,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,7 +74,9 @@ function ProjectItem({
         role="button"
         tabIndex={0}
         onClick={handleClick}
-        onKeyDown={(e) => { if (e.key === "Enter") handleClick(); }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") handleClick();
+        }}
         className={cn(
           "group flex items-center gap-1 rounded px-2 py-1 text-sm",
           "cursor-pointer hover:bg-accent/60",
@@ -86,21 +94,29 @@ function ProjectItem({
         {isEditing ? (
           <Input
             value={editName}
-            onChange={(e) => { setEditName(e.target.value); }}
+            onChange={(e) => {
+              setEditName(e.target.value);
+            }}
             onBlur={handleConfirmRename}
             onKeyDown={handleKeyDown}
             className="h-6 px-1 py-0 text-sm"
             autoFocus
-            onClick={(e) => { e.stopPropagation(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
           />
         ) : (
-          <span className="flex-1 truncate text-foreground/85">{project.name}</span>
+          <span className="flex-1 truncate text-foreground/85">
+            {project.name}
+          </span>
         )}
 
         {!isEditing && (
           <DropdownMenu>
             <DropdownMenuTrigger
-              onClick={(e) => { e.stopPropagation(); }}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
               className="invisible rounded p-0.5 hover:bg-muted group-hover:visible"
             >
               <MoreHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
@@ -111,7 +127,9 @@ function ProjectItem({
                 Rename
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => { onDelete(project.id); }}
+                onClick={() => {
+                  onDelete(project.id);
+                }}
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="h-3.5 w-3.5" />
@@ -122,9 +140,7 @@ function ProjectItem({
         )}
       </div>
 
-      {isExpanded && children && (
-        <div className="pb-1">{children}</div>
-      )}
+      {isExpanded && children && <div className="pb-1">{children}</div>}
     </div>
   );
 }

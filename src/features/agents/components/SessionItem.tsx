@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StatusBadge } from "./StatusBadge";
 import type { AgentSession } from "@/core/types";
@@ -8,6 +8,7 @@ interface SessionItemProps {
   readonly session: AgentSession;
   readonly isActive: boolean;
   readonly onSelect: (sessionId: string) => void;
+  readonly onDelete?: (sessionId: string) => void;
 }
 
 function truncatePrompt(prompt: string | null, maxLength: number): string {
@@ -32,7 +33,7 @@ function formatRelativeTime(dateString: string): string {
   return `${diffDays}d`;
 }
 
-function SessionItem({ session, isActive, onSelect }: SessionItemProps) {
+function SessionItem({ session, isActive, onSelect, onDelete }: SessionItemProps) {
   const handleClick = useCallback(() => {
     onSelect(session.id);
   }, [onSelect, session.id]);
@@ -42,6 +43,14 @@ function SessionItem({ session, isActive, onSelect }: SessionItemProps) {
       if (e.key === "Enter") onSelect(session.id);
     },
     [onSelect, session.id],
+  );
+
+  const handleDelete = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onDelete?.(session.id);
+    },
+    [onDelete, session.id],
   );
 
   return (
@@ -64,6 +73,15 @@ function SessionItem({ session, isActive, onSelect }: SessionItemProps) {
         {formatRelativeTime(session.createdAt)}
       </span>
       <StatusBadge status={session.status} />
+      {onDelete && (
+        <button
+          onClick={handleDelete}
+          className="invisible rounded p-0.5 hover:bg-destructive/20 group-hover:visible"
+          aria-label="Delete session"
+        >
+          <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+        </button>
+      )}
     </div>
   );
 }

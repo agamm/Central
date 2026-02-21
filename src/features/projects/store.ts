@@ -31,8 +31,12 @@ const useProjectStore = create<ProjectStore>()((set, get) => ({
     const result = await projectApi.listProjects();
 
     result.match(
-      (projects) => { set({ projects, loading: false }); },
-      (error) => { set({ error, loading: false }); },
+      (projects) => {
+        set({ projects, loading: false });
+      },
+      (error) => {
+        set({ error, loading: false });
+      },
     );
   },
 

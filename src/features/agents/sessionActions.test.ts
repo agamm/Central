@@ -11,6 +11,11 @@ vi.mock("./api", () => ({
   updateSessionStatus: vi.fn(),
 }));
 
+// Mock debugLog so it doesn't call invoke("debug_log")
+vi.mock("@/shared/debugLog", () => ({
+  debugLog: vi.fn(),
+}));
+
 async function getApi(): Promise<typeof import("./api")> {
   return import("./api");
 }
@@ -66,6 +71,7 @@ describe("sessionActions", () => {
       expect(actions.switchSession).toHaveBeenCalledWith("new-session-id");
       expect(actions.addMessage).toHaveBeenCalled();
       expect(invoke).toHaveBeenCalledWith("start_agent_session", {
+        sessionId: "new-session-id",
         projectPath: "/tmp/project",
         prompt: "Write a test",
         model: null,
@@ -146,7 +152,7 @@ describe("sessionActions", () => {
       vi.mocked(api.updateSessionStatus).mockResolvedValue(ok(undefined));
       vi.mocked(invoke).mockResolvedValue(undefined);
 
-      await sendFollowUp("s1", "follow up", actions);
+      await sendFollowUp("s1", "/tmp/project", "follow up", actions);
 
       expect(actions.addMessage).toHaveBeenCalled();
       expect(actions.updateStatus).toHaveBeenCalledWith("s1", "running");
@@ -156,7 +162,7 @@ describe("sessionActions", () => {
       });
     });
 
-    it("marks session as failed when invoke errors", async () => {
+    it("falls back to start_agent_session when send fails (stale session)", async () => {
       const api = await getApi();
       const actions = createMockActions();
 
@@ -173,13 +179,53 @@ describe("sessionActions", () => {
         }),
       );
       vi.mocked(api.updateSessionStatus).mockResolvedValue(ok(undefined));
-      vi.mocked(invoke).mockRejectedValue(new Error("session not found"));
 
-      await sendFollowUp("s1", "msg", actions);
+      vi.mocked(invoke)
+        .mockRejectedValueOnce(new Error("No worker found"))
+        .mockResolvedValueOnce("s1");
+
+      await sendFollowUp("s1", "/tmp/project", "msg", actions);
+
+      expect(invoke).toHaveBeenCalledWith("send_agent_message", {
+        sessionId: "s1",
+        message: "msg",
+      });
+      expect(invoke).toHaveBeenCalledWith("start_agent_session", {
+        sessionId: "s1",
+        projectPath: "/tmp/project",
+        prompt: "msg",
+        model: null,
+        resumeSessionId: null,
+      });
+    });
+
+    it("marks session as failed when both send and start fail", async () => {
+      const api = await getApi();
+      const actions = createMockActions();
+
+      vi.mocked(api.addMessage).mockResolvedValue(
+        ok({
+          id: "m1",
+          sessionId: "s1",
+          role: "user" as const,
+          content: "msg",
+          thinking: null,
+          toolCalls: null,
+          usage: null,
+          timestamp: new Date().toISOString(),
+        }),
+      );
+      vi.mocked(api.updateSessionStatus).mockResolvedValue(ok(undefined));
+
+      vi.mocked(invoke)
+        .mockRejectedValueOnce(new Error("No worker found"))
+        .mockRejectedValueOnce(new Error("sidecar crash"));
+
+      await sendFollowUp("s1", "/tmp/project", "msg", actions);
 
       expect(actions.updateStatus).toHaveBeenCalledWith("s1", "failed");
       expect(actions.setError).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to send message"),
+        expect.stringContaining("Failed to start agent"),
       );
     });
   });

@@ -9,10 +9,7 @@ import {
 
 import { cn } from "@/lib/utils";
 
-function ResizablePanelGroup({
-  className,
-  ...props
-}: GroupProps) {
+function ResizablePanelGroup({ className, ...props }: GroupProps) {
   return (
     <Group
       className={cn(
@@ -38,7 +35,7 @@ function ResizableHandle({
       className={cn(
         "relative flex w-px items-center justify-center bg-border/50",
         "after:absolute after:inset-y-0 after:left-1/2 after:w-2 after:-translate-x-1/2",
-        "hover:bg-border transition-colors duration-150",
+        "transition-colors duration-150 hover:bg-border",
         "focus-visible:outline-none",
         "data-[orientation=vertical]:h-px data-[orientation=vertical]:w-full",
         "data-[orientation=vertical]:after:left-0 data-[orientation=vertical]:after:h-2",

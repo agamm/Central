@@ -18,8 +18,7 @@ function FileTree({ projectPath }: FileTreeProps) {
   const loadTree = useFilesStore((s) => s.loadTree);
   const loadGitStatus = useFilesStore((s) => s.loadGitStatus);
   const toggleDir = useFilesStore((s) => s.toggleDir);
-  const selectFile = useFilesStore((s) => s.selectFile);
-  const selectDiff = useFilesStore((s) => s.selectDiff);
+  const openFileInCenter = useFilesStore((s) => s.openFileInCenter);
 
   useEffect(() => {
     void loadTree(projectPath);
@@ -28,16 +27,9 @@ function FileTree({ projectPath }: FileTreeProps) {
 
   const handleSelectFile = useCallback(
     (filePath: string) => {
-      const changedFile = gitStatus?.changed_files.find(
-        (f) => f.path === filePath,
-      );
-      if (changedFile) {
-        void selectDiff(projectPath, filePath);
-      } else {
-        void selectFile(projectPath, filePath);
-      }
+      void openFileInCenter(projectPath, filePath);
     },
-    [projectPath, gitStatus, selectFile, selectDiff],
+    [projectPath, openFileInCenter],
   );
 
   const handleRefresh = useCallback(() => {
@@ -105,9 +97,7 @@ function FileTreeHeader({
         onClick={onRefresh}
         disabled={loading}
       >
-        <RefreshCw
-          className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}
-        />
+        <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
       </button>
     </div>
   );
@@ -139,12 +129,8 @@ function ChangedFilesSummary({ gitStatus }: ChangedFilesSummaryProps) {
       {modified > 0 ? (
         <span className="text-yellow-400">{modified}M</span>
       ) : null}
-      {added > 0 ? (
-        <span className="text-green-400">{added}A</span>
-      ) : null}
-      {deleted > 0 ? (
-        <span className="text-red-400">{deleted}D</span>
-      ) : null}
+      {added > 0 ? <span className="text-green-400">{added}A</span> : null}
+      {deleted > 0 ? <span className="text-red-400">{deleted}D</span> : null}
     </div>
   );
 }

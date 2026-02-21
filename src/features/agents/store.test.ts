@@ -9,6 +9,9 @@ function resetStore(): void {
     messagesBySession: new Map(),
     messageQueue: [],
     scrollPositionBySession: new Map(),
+    sessionStartedAt: new Map(),
+    sessionElapsedMs: new Map(),
+    sdkSessionIds: new Map(),
     loading: false,
     error: null,
   });
@@ -123,12 +126,12 @@ describe("AgentStore", () => {
       store.addMessage("s1", msg1);
       store.addMessage("s2", msg2);
 
-      expect(
-        useAgentStore.getState().messagesBySession.get("s1"),
-      ).toHaveLength(1);
-      expect(
-        useAgentStore.getState().messagesBySession.get("s2"),
-      ).toHaveLength(1);
+      expect(useAgentStore.getState().messagesBySession.get("s1")).toHaveLength(
+        1,
+      );
+      expect(useAgentStore.getState().messagesBySession.get("s2")).toHaveLength(
+        1,
+      );
     });
   });
 
@@ -269,9 +272,9 @@ describe("AgentStore", () => {
       expect(state.sessions.has(session.id)).toBe(false);
       expect(state.messagesBySession.has(session.id)).toBe(false);
       expect(state.scrollPositionBySession.has(session.id)).toBe(false);
-      expect(
-        state.messageQueue.some((m) => m.sessionId === session.id),
-      ).toBe(false);
+      expect(state.messageQueue.some((m) => m.sessionId === session.id)).toBe(
+        false,
+      );
     });
 
     it("clears activeSessionId if it matches the deleted session", () => {

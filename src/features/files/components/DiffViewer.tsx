@@ -1,5 +1,7 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { X } from "lucide-react";
 import type { FileDiff, DiffLine, DiffHunk } from "../types";
+import { useFilesStore } from "../store";
 
 interface DiffViewerProps {
   readonly diffs: readonly FileDiff[];
@@ -40,6 +42,7 @@ interface DiffHeaderProps {
 
 function DiffHeader({ filePath }: DiffHeaderProps) {
   const fileName = filePath.split("/").pop() ?? filePath;
+  const closeFileViewer = useFilesStore((s) => s.closeFileViewer);
 
   return (
     <div className="flex items-center border-b border-border px-3 py-1">
@@ -50,6 +53,14 @@ function DiffHeader({ filePath }: DiffHeaderProps) {
       <span className="ml-2 truncate text-[10px] text-muted-foreground/50">
         {filePath}
       </span>
+      <button
+        type="button"
+        className="ml-auto rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+        onClick={closeFileViewer}
+        title="Close diff viewer"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 }
@@ -61,7 +72,7 @@ interface HunkViewProps {
 function HunkView({ hunk }: HunkViewProps) {
   return (
     <div className="border-b border-border/50">
-      <div className="bg-muted/50 px-3 py-0.5 text-[10px] text-blue-400">
+      <div className="bg-muted/50 px-3 py-0.5 text-[10px] text-muted-foreground">
         {hunk.header}
       </div>
       {hunk.lines.map((line, i) => (
@@ -121,9 +132,7 @@ function lineTextColor(origin: string): string {
 
 function DiffLineView({ line }: DiffLineViewProps) {
   return (
-    <div
-      className={`flex min-h-[18px] ${lineBackground(line.origin)}`}
-    >
+    <div className={`flex min-h-[18px] ${lineBackground(line.origin)}`}>
       <span className="w-10 shrink-0 select-none px-1 text-right text-muted-foreground/50">
         {line.old_lineno ?? ""}
       </span>
@@ -135,7 +144,9 @@ function DiffLineView({ line }: DiffLineViewProps) {
       >
         {linePrefix(line.origin)}
       </span>
-      <span className={`flex-1 whitespace-pre px-1 ${lineTextColor(line.origin)}`}>
+      <span
+        className={`flex-1 whitespace-pre px-1 ${lineTextColor(line.origin)}`}
+      >
         {line.content}
       </span>
     </div>

@@ -2,8 +2,10 @@ import { useRef, useEffect } from "react";
 import { EditorView, lineNumbers } from "@codemirror/view";
 import { EditorState } from "@codemirror/state";
 import { Compartment } from "@codemirror/state";
+import { X } from "lucide-react";
 import { centralTheme } from "./editorTheme";
 import { loadLanguage } from "./languageSupport";
+import { useFilesStore } from "../store";
 
 interface FileViewerProps {
   readonly content: string;
@@ -12,9 +14,7 @@ interface FileViewerProps {
 
 const languageCompartment = new Compartment();
 
-function createEditorState(
-  content: string,
-): EditorState {
+function createEditorState(content: string): EditorState {
   return EditorState.create({
     doc: content,
     extensions: [
@@ -72,15 +72,22 @@ interface FileViewerHeaderProps {
 
 function FileViewerHeader({ filePath }: FileViewerHeaderProps) {
   const fileName = filePath.split("/").pop() ?? filePath;
+  const closeFileViewer = useFilesStore((s) => s.closeFileViewer);
 
   return (
     <div className="flex items-center border-b border-border px-3 py-1">
-      <span className="truncate text-xs text-muted-foreground">
-        {fileName}
-      </span>
+      <span className="truncate text-xs text-muted-foreground">{fileName}</span>
       <span className="ml-2 truncate text-[10px] text-muted-foreground/50">
         {filePath}
       </span>
+      <button
+        type="button"
+        className="ml-auto rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+        onClick={closeFileViewer}
+        title="Close file viewer"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 }

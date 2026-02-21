@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ProjectItem } from "./ProjectItem";
 import { EmptyProjectState } from "./EmptyProjectState";
@@ -6,6 +7,7 @@ import { AgentList } from "@/features/agents/components/AgentList";
 import { useProjectStore } from "../store";
 import { useAgentStore } from "@/features/agents/store";
 import * as agentApi from "@/features/agents/api";
+import { debugLog } from "@/shared/debugLog";
 
 interface ProjectListProps {
   readonly onAddProject: () => void;
@@ -20,6 +22,7 @@ function ProjectList({ onAddProject }: ProjectListProps) {
   const switchSession = useAgentStore((s) => s.switchSession);
   const setMessages = useAgentStore((s) => s.setMessages);
   const messagesBySession = useAgentStore((s) => s.messagesBySession);
+  const clearSessionData = useAgentStore((s) => s.clearSessionData);
 
   const handleSelect = useCallback(
     (id: string) => {
@@ -55,6 +58,28 @@ function ProjectList({ onAddProject }: ProjectListProps) {
     [selectProject, switchSession, messagesBySession, setMessages],
   );
 
+  const handleNewChat = useCallback(() => {
+    // Clear active session so ChatPane shows empty state with prompt input
+    switchSession(null);
+  }, [switchSession]);
+
+  const handleSessionDelete = useCallback(
+    (sessionId: string) => {
+      // Try to kill the worker if one exists (ignore errors for stale sessions)
+      void invoke("abort_agent_session", { sessionId }).catch(() => {});
+      // Delete from DB
+      void agentApi.deleteSession(sessionId).then((result) => {
+        result.match(
+          () => debugLog("REACT", `Session ${sessionId} deleted from DB`),
+          (e) => debugLog("REACT", `Failed to delete session ${sessionId}: ${e}`),
+        );
+      });
+      // Clear from store (switches away if this was the active session)
+      clearSessionData(sessionId);
+    },
+    [clearSessionData],
+  );
+
   if (projects.length === 0) {
     return <EmptyProjectState onAddProject={onAddProject} />;
   }
@@ -75,6 +100,8 @@ function ProjectList({ onAddProject }: ProjectListProps) {
             <AgentList
               projectId={project.id}
               onSessionSelect={handleSessionSelect}
+              onSessionDelete={handleSessionDelete}
+              onNewChat={handleNewChat}
             />
           </ProjectItem>
         ))}
@@ -85,12 +112,19 @@ function ProjectList({ onAddProject }: ProjectListProps) {
 
 async function loadSessionMessages(
   sessionId: string,
-  setMessages: (sid: string, msgs: readonly import("@/core/types").Message[]) => void,
+  setMessages: (
+    sid: string,
+    msgs: readonly import("@/core/types").Message[],
+  ) => void,
 ): Promise<void> {
   const result = await agentApi.getMessages(sessionId);
   result.match(
-    (messages) => { setMessages(sessionId, messages); },
-    () => { /* Messages will load when events arrive */ },
+    (messages) => {
+      setMessages(sessionId, messages);
+    },
+    () => {
+      /* Messages will load when events arrive */
+    },
   );
 }
 

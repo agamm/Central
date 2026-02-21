@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,13 +9,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import { ProjectList } from "./ProjectList";
-import { AddProjectDialog } from "./AddProjectDialog";
 import { useProjectStore } from "../store";
-
-interface PendingProject {
-  readonly path: string;
-  readonly name: string;
-}
 
 function extractFolderName(folderPath: string): string {
   const segments = folderPath.replace(/\/+$/, "").split("/");
@@ -26,7 +20,6 @@ function ProjectSidebar() {
   const fetchProjects = useProjectStore((s) => s.fetchProjects);
   const addProject = useProjectStore((s) => s.addProject);
   const loading = useProjectStore((s) => s.loading);
-  const [pending, setPending] = useState<PendingProject | null>(null);
 
   useEffect(() => {
     void fetchProjects();
@@ -41,26 +34,15 @@ function ProjectSidebar() {
 
     if (typeof selected === "string") {
       const name = extractFolderName(selected);
-      setPending({ path: selected, name });
+      await addProject(selected, name);
     }
-  }, []);
-
-  const handleConfirmAdd = useCallback(
-    async (name: string) => {
-      if (pending) {
-        await addProject(pending.path, name);
-        setPending(null);
-      }
-    },
-    [pending, addProject],
-  );
-
-  const handleCancelAdd = useCallback(() => {
-    setPending(null);
-  }, []);
+  }, [addProject]);
 
   return (
-    <div className="flex h-full flex-col" style={{ backgroundColor: "hsl(0 0% 4%)" }}>
+    <div
+      className="flex h-full flex-col"
+      style={{ backgroundColor: "hsl(0 0% 4%)" }}
+    >
       <div className="flex items-center justify-between px-3 py-2">
         <h2 className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground/70">
           Projects
@@ -89,16 +71,6 @@ function ProjectSidebar() {
         </div>
       ) : (
         <ProjectList onAddProject={() => void handleOpenFolderPicker()} />
-      )}
-
-      {pending && (
-        <AddProjectDialog
-          open={true}
-          folderPath={pending.path}
-          defaultName={pending.name}
-          onConfirm={(name) => void handleConfirmAdd(name)}
-          onCancel={handleCancelAdd}
-        />
       )}
     </div>
   );

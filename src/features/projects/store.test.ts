@@ -86,9 +86,7 @@ describe("ProjectStore", () => {
 
       vi.mocked(api.addProject).mockResolvedValue(err("Duplicate path"));
 
-      const result = await useProjectStore
-        .getState()
-        .addProject("/dup", "Dup");
+      const result = await useProjectStore.getState().addProject("/dup", "Dup");
 
       expect(result).toBe(false);
       expect(useProjectStore.getState().error).toBe("Duplicate path");
@@ -113,9 +111,7 @@ describe("ProjectStore", () => {
 
     it("sets error on failure", async () => {
       const api = await getApi();
-      vi.mocked(api.renameProject).mockResolvedValue(
-        err("Project not found"),
-      );
+      vi.mocked(api.renameProject).mockResolvedValue(err("Project not found"));
 
       const result = await useProjectStore
         .getState()
@@ -137,9 +133,7 @@ describe("ProjectStore", () => {
 
       vi.mocked(api.deleteProject).mockResolvedValue(ok(undefined));
 
-      const result = await useProjectStore
-        .getState()
-        .deleteProject(project.id);
+      const result = await useProjectStore.getState().deleteProject(project.id);
 
       expect(result).toBe(true);
       const state = useProjectStore.getState();
@@ -167,13 +161,9 @@ describe("ProjectStore", () => {
 
     it("sets error on failure", async () => {
       const api = await getApi();
-      vi.mocked(api.deleteProject).mockResolvedValue(
-        err("Project not found"),
-      );
+      vi.mocked(api.deleteProject).mockResolvedValue(err("Project not found"));
 
-      const result = await useProjectStore
-        .getState()
-        .deleteProject("no-id");
+      const result = await useProjectStore.getState().deleteProject("no-id");
 
       expect(result).toBe(false);
       expect(useProjectStore.getState().error).toBe("Project not found");

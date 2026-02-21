@@ -17,10 +17,8 @@ const languageMap: Record<string, LanguageLoader> = {
     import("@codemirror/lang-javascript").then((m) =>
       m.javascript({ jsx: true, typescript: true }),
     ),
-  mjs: () =>
-    import("@codemirror/lang-javascript").then((m) => m.javascript()),
-  cjs: () =>
-    import("@codemirror/lang-javascript").then((m) => m.javascript()),
+  mjs: () => import("@codemirror/lang-javascript").then((m) => m.javascript()),
+  cjs: () => import("@codemirror/lang-javascript").then((m) => m.javascript()),
   rs: () => import("@codemirror/lang-rust").then((m) => m.rust()),
   css: () => import("@codemirror/lang-css").then((m) => m.css()),
   scss: () => import("@codemirror/lang-css").then((m) => m.css()),
@@ -28,8 +26,7 @@ const languageMap: Record<string, LanguageLoader> = {
   htm: () => import("@codemirror/lang-html").then((m) => m.html()),
   json: () => import("@codemirror/lang-json").then((m) => m.json()),
   md: () => import("@codemirror/lang-markdown").then((m) => m.markdown()),
-  markdown: () =>
-    import("@codemirror/lang-markdown").then((m) => m.markdown()),
+  markdown: () => import("@codemirror/lang-markdown").then((m) => m.markdown()),
   py: () => import("@codemirror/lang-python").then((m) => m.python()),
   toml: () => import("@codemirror/lang-json").then((m) => m.json()),
   yaml: () => import("@codemirror/lang-json").then((m) => m.json()),

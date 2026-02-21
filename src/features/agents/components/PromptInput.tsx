@@ -42,7 +42,9 @@ function PromptInput({
       <div className="flex items-end gap-2">
         <textarea
           value={value}
-          onChange={(e) => { setValue(e.target.value); }}
+          onChange={(e) => {
+            setValue(e.target.value);
+          }}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
@@ -50,9 +52,9 @@ function PromptInput({
           className={cn(
             "flex-1 resize-none rounded-lg border border-border/60 bg-muted/40 px-3 py-2",
             "text-sm text-foreground/90 placeholder:text-muted-foreground/50",
-            "focus:outline-none focus:border-border",
+            "focus:border-border focus:outline-none",
             "disabled:cursor-not-allowed disabled:opacity-40",
-            "min-h-[36px] max-h-[120px] select-text",
+            "max-h-[120px] min-h-[36px] select-text",
           )}
           style={{ fieldSizing: "content" } as React.CSSProperties}
         />
@@ -61,7 +63,7 @@ function PromptInput({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 shrink-0 text-red-400/80 hover:text-red-400 hover:bg-red-400/10"
+            className="h-8 w-8 shrink-0 text-red-400/80 hover:bg-red-400/10 hover:text-red-400"
             onClick={onAbort}
             title="Stop agent"
           >

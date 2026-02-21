@@ -28,7 +28,7 @@ function StatusBadge({ status, className }: StatusBadgeProps) {
     return (
       <Loader2
         className={cn(
-          "h-2.5 w-2.5 shrink-0 animate-spin text-blue-400/70",
+          "h-2.5 w-2.5 shrink-0 animate-spin text-emerald-400/70",
           className,
         )}
         aria-label={STATUS_LABELS[status]}

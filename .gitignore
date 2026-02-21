@@ -26,3 +26,6 @@ coverage/
 
 # Tauri
 src-tauri/WixTools/
+
+# A5C tooling artifacts
+.a5c/

@@ -17,23 +17,27 @@ interface FilesState {
   readonly loading: boolean;
   readonly error: string | null;
   readonly expandedDirs: ReadonlySet<string>;
+  readonly viewingFileInCenter: boolean;
+  readonly centerFilePath: string | null;
+  readonly centerFileContent: string | null;
+  readonly centerFileDiffs: readonly FileDiff[];
+  readonly centerViewMode: FileViewMode;
 }
 
 interface FilesActions {
   readonly loadTree: (projectPath: string) => Promise<void>;
   readonly loadGitStatus: (projectPath: string) => Promise<void>;
-  readonly selectFile: (
-    projectPath: string,
-    filePath: string,
-  ) => Promise<void>;
-  readonly selectDiff: (
-    projectPath: string,
-    filePath: string,
-  ) => Promise<void>;
+  readonly selectFile: (projectPath: string, filePath: string) => Promise<void>;
+  readonly selectDiff: (projectPath: string, filePath: string) => Promise<void>;
   readonly loadAllDiffs: (projectPath: string) => Promise<void>;
   readonly toggleDir: (dirPath: string) => void;
   readonly clearSelection: () => void;
   readonly refreshAll: (projectPath: string) => Promise<void>;
+  readonly openFileInCenter: (
+    projectPath: string,
+    filePath: string,
+  ) => Promise<void>;
+  readonly closeFileViewer: () => void;
 }
 
 type FilesStore = FilesState & FilesActions;
@@ -48,21 +52,34 @@ const useFilesStore = create<FilesStore>()((set, get) => ({
   loading: false,
   error: null,
   expandedDirs: new Set<string>(),
+  viewingFileInCenter: false,
+  centerFilePath: null,
+  centerFileContent: null,
+  centerFileDiffs: [],
+  centerViewMode: "content",
 
   loadTree: async (projectPath) => {
     set({ loading: true, error: null });
     const result = await filesApi.getFileTree(projectPath);
     result.match(
-      (tree) => { set({ tree, loading: false }); },
-      (error) => { set({ error, loading: false }); },
+      (tree) => {
+        set({ tree, loading: false });
+      },
+      (error) => {
+        set({ error, loading: false });
+      },
     );
   },
 
   loadGitStatus: async (projectPath) => {
     const result = await filesApi.getGitStatus(projectPath);
     result.match(
-      (gitStatus) => { set({ gitStatus }); },
-      () => { set({ gitStatus: null }); },
+      (gitStatus) => {
+        set({ gitStatus });
+      },
+      () => {
+        set({ gitStatus: null });
+      },
     );
   },
 
@@ -76,8 +93,12 @@ const useFilesStore = create<FilesStore>()((set, get) => ({
     });
     const result = await filesApi.getFileContent(projectPath, filePath);
     result.match(
-      (fileContent) => { set({ fileContent, loading: false }); },
-      (error) => { set({ error, loading: false }); },
+      (fileContent) => {
+        set({ fileContent, loading: false });
+      },
+      (error) => {
+        set({ error, loading: false });
+      },
     );
   },
 
@@ -91,16 +112,24 @@ const useFilesStore = create<FilesStore>()((set, get) => ({
     });
     const result = await filesApi.getDiff(projectPath, filePath);
     result.match(
-      (fileDiffs) => { set({ fileDiffs, loading: false }); },
-      (error) => { set({ error, loading: false }); },
+      (fileDiffs) => {
+        set({ fileDiffs, loading: false });
+      },
+      (error) => {
+        set({ error, loading: false });
+      },
     );
   },
 
   loadAllDiffs: async (projectPath) => {
     const result = await filesApi.getDiff(projectPath);
     result.match(
-      (fileDiffs) => { set({ fileDiffs }); },
-      () => { set({ fileDiffs: [] }); },
+      (fileDiffs) => {
+        set({ fileDiffs });
+      },
+      () => {
+        set({ fileDiffs: [] });
+      },
     );
   },
 
@@ -131,6 +160,61 @@ const useFilesStore = create<FilesStore>()((set, get) => ({
       store.loadTree(projectPath),
       store.loadGitStatus(projectPath),
     ]);
+  },
+
+  openFileInCenter: async (projectPath, filePath) => {
+    const gitStatus = get().gitStatus;
+    const changedFile = gitStatus?.changed_files.find(
+      (f) => f.path === filePath,
+    );
+
+    if (changedFile) {
+      set({
+        viewingFileInCenter: true,
+        centerFilePath: filePath,
+        centerFileContent: null,
+        centerFileDiffs: [],
+        centerViewMode: "diff",
+        selectedFilePath: filePath,
+      });
+      const result = await filesApi.getDiff(projectPath, filePath);
+      result.match(
+        (diffs) => {
+          set({ centerFileDiffs: diffs });
+        },
+        () => {
+          set({ centerFileDiffs: [] });
+        },
+      );
+    } else {
+      set({
+        viewingFileInCenter: true,
+        centerFilePath: filePath,
+        centerFileContent: null,
+        centerFileDiffs: [],
+        centerViewMode: "content",
+        selectedFilePath: filePath,
+      });
+      const result = await filesApi.getFileContent(projectPath, filePath);
+      result.match(
+        (content) => {
+          set({ centerFileContent: content });
+        },
+        () => {
+          set({ centerFileContent: null });
+        },
+      );
+    }
+  },
+
+  closeFileViewer: () => {
+    set({
+      viewingFileInCenter: false,
+      centerFilePath: null,
+      centerFileContent: null,
+      centerFileDiffs: [],
+      centerViewMode: "content",
+    });
   },
 }));
 

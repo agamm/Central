@@ -35,10 +35,7 @@ function notifySessionCompleted(prompt: string | null): void {
 
 function notifySessionFailed(prompt: string | null, error: string): void {
   const truncated = truncateForNotification(prompt);
-  void sendAgentNotification(
-    "Agent Failed",
-    `${truncated} - ${error}`,
-  );
+  void sendAgentNotification("Agent Failed", `${truncated} - ${error}`);
 }
 
 function truncateForNotification(text: string | null): string {

@@ -1,12 +1,17 @@
 import { useEffect, useRef, useCallback } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Timer } from "lucide-react";
 import { MessageBubble } from "./MessageBubble";
+import { formatElapsedSeconds } from "../formatElapsed";
 import type { ChatMessage } from "../types";
 
 interface MessageListProps {
   readonly messages: readonly ChatMessage[];
   readonly initialScrollPosition: number;
   readonly onScrollPositionChange: (position: number) => void;
+  readonly isRunning: boolean;
+  readonly liveElapsedSeconds: number;
+  readonly finalElapsedMs: number | null;
 }
 
 /**
@@ -18,6 +23,9 @@ function MessageList({
   messages,
   initialScrollPosition,
   onScrollPositionChange,
+  isRunning,
+  liveElapsedSeconds,
+  finalElapsedMs,
 }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -61,6 +69,10 @@ function MessageList({
 
   if (messages.length === 0) return null;
 
+  // Find the index of the last assistant message for attaching final elapsed
+  const lastAssistantIdx = findLastAssistantIndex(messages);
+  const showFinalElapsed = !isRunning && finalElapsedMs !== null;
+
   return (
     <ScrollArea
       className="flex-1 px-4"
@@ -68,13 +80,37 @@ function MessageList({
       onScrollCapture={handleScroll}
     >
       <div className="flex flex-col gap-3 py-4">
-        {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} />
+        {messages.map((msg, idx) => (
+          <MessageBubble
+            key={msg.id}
+            message={msg}
+            elapsedMs={
+              showFinalElapsed && idx === lastAssistantIdx
+                ? finalElapsedMs
+                : undefined
+            }
+          />
         ))}
+
+        {isRunning && liveElapsedSeconds > 0 && (
+          <div className="flex items-center gap-1.5 px-1 py-1 text-xs text-muted-foreground">
+            <Timer className="h-3 w-3 animate-pulse" />
+            <span>{formatElapsedSeconds(liveElapsedSeconds)} elapsed</span>
+          </div>
+        )}
+
         <div ref={bottomRef} />
       </div>
     </ScrollArea>
   );
+}
+
+function findLastAssistantIndex(messages: readonly ChatMessage[]): number {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const msg = messages[i];
+    if (msg !== undefined && msg.role === "assistant") return i;
+  }
+  return -1;
 }
 
 export { MessageList };

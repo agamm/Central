@@ -2,6 +2,7 @@ use tauri::Manager;
 use tauri_plugin_sql::{Builder as SqlBuilder, Migration, MigrationKind};
 
 mod commands;
+mod debug_log;
 mod sidecar;
 
 fn create_migrations() -> Vec<Migration> {
@@ -23,11 +24,6 @@ fn cleanup_on_exit(app_handle: &tauri::AppHandle) {
             manager.shutdown();
         }
     }
-
-    // Kill all PTY sessions
-    if let Some(pty) = app_handle.try_state::<commands::terminal::PtyHandle>() {
-        commands::terminal::shutdown_all_ptys(&pty);
-    }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -44,13 +40,14 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
+            debug_log::init_log_path();
+            debug_log::log("RUST", "Tauri app starting up");
+
             let handle = app.handle().clone();
             let sidecar_handle = sidecar::create_sidecar_handle(handle);
             app.manage(sidecar_handle);
 
-            let pty_handle = commands::terminal::create_pty_handle();
-            app.manage(pty_handle);
-
+            debug_log::log("RUST", "Sidecar handle created and managed");
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -64,15 +61,14 @@ pub fn run() {
             commands::agents::start_agent_session,
             commands::agents::send_agent_message,
             commands::agents::abort_agent_session,
+            commands::agents::end_agent_session,
+            commands::agents::respond_tool_approval,
             commands::agents::list_agent_sessions,
             commands::files::tree::get_file_tree,
             commands::files::status::get_git_status,
             commands::files::status::get_file_content,
             commands::files::diff::get_diff,
-            commands::terminal::pty_spawn,
-            commands::terminal::pty_write,
-            commands::terminal::pty_resize,
-            commands::terminal::pty_kill,
+            debug_log::debug_log,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Central");

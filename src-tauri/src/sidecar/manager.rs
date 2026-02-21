@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::HashMap;
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Child, Command, Stdio};
 use std::sync::{Arc, Mutex};
@@ -6,11 +6,41 @@ use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Emitter};
 
 use super::types::{AgentEventPayload, SidecarCommand, SidecarEvent};
+use crate::debug_log;
 
-/// Manages the Node.js sidecar process lifecycle
+/// One worker process per agent session
+struct SessionWorker {
+    child: Child,
+}
+
+impl SessionWorker {
+    /// Send a JSON-line command to this worker's stdin
+    fn send(&mut self, json: &str) -> Result<(), String> {
+        let stdin = self.child.stdin.as_mut().ok_or_else(|| {
+            "Worker stdin not available".to_string()
+        })?;
+
+        stdin
+            .write_all(format!("{json}\n").as_bytes())
+            .map_err(|e| format!("Failed to write to worker stdin: {e}"))?;
+
+        stdin
+            .flush()
+            .map_err(|e| format!("Failed to flush worker stdin: {e}"))?;
+
+        Ok(())
+    }
+
+    /// Kill the worker process
+    fn kill(&mut self) {
+        let _ = self.child.kill();
+        let _ = self.child.wait();
+    }
+}
+
+/// Manages per-session Node.js worker processes
 pub struct SidecarManager {
-    child: Option<Child>,
-    active_sessions: HashSet<String>,
+    workers: HashMap<String, SessionWorker>,
     app_handle: AppHandle,
 }
 
@@ -25,115 +55,134 @@ pub fn create_sidecar_handle(app_handle: AppHandle) -> SidecarHandle {
 impl SidecarManager {
     fn new(app_handle: AppHandle) -> Self {
         Self {
-            child: None,
-            active_sessions: HashSet::new(),
+            workers: HashMap::new(),
             app_handle,
         }
     }
 
-    /// Spawn the Node.js sidecar if not already running
-    pub fn ensure_running(&mut self) -> Result<(), String> {
-        if self.is_running() {
-            return Ok(());
+    /// Spawn a new worker for this session and send the start_session command
+    pub fn start_session(&mut self, command: &SidecarCommand) -> Result<(), String> {
+        let session_id = match command {
+            SidecarCommand::StartSession { session_id, .. } => session_id.clone(),
+            _ => return Err("Expected StartSession command".to_string()),
+        };
+
+        if self.workers.contains_key(&session_id) {
+            return Err(format!("Session {session_id} already has a running worker"));
         }
-        self.spawn()
-    }
 
-    /// Check if the sidecar process is alive
-    fn is_running(&mut self) -> bool {
-        if let Some(ref mut child) = self.child {
-            // try_wait returns None if still running
-            matches!(child.try_wait(), Ok(None))
-        } else {
-            false
-        }
-    }
+        let worker_path = resolve_worker_path()?;
+        let sidecar_dir = std::path::Path::new(&worker_path)
+            .parent()
+            .and_then(|p| p.parent())
+            .ok_or_else(|| "Cannot resolve sidecar directory".to_string())?;
 
-    /// Spawn the sidecar process
-    fn spawn(&mut self) -> Result<(), String> {
-        let sidecar_path = resolve_sidecar_path()
-            .map_err(|e| format!("Failed to resolve sidecar path: {e}"))?;
+        debug_log::log("SIDECAR", &format!("Spawning worker for session {session_id}"));
+        debug_log::log("SIDECAR", &format!("Worker path: {worker_path}"));
 
-        let child = Command::new("node")
+        let mut child = Command::new("node")
             .arg("--import")
             .arg("tsx")
-            .arg(&sidecar_path)
+            .arg(&worker_path)
+            .current_dir(sidecar_dir)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .spawn()
-            .map_err(|e| format!("Failed to spawn sidecar: {e}"))?;
+            .map_err(|e| {
+                let msg = format!("Failed to spawn worker for {session_id}: {e}");
+                debug_log::log("SIDECAR", &msg);
+                msg
+            })?;
 
-        self.child = Some(child);
-        self.start_reader_thread();
+        let pid = child.id();
+        debug_log::log("SIDECAR", &format!("Worker spawned for {session_id}, PID: {pid}"));
+
+        // Start stdout reader thread
+        if let Some(stdout) = child.stdout.take() {
+            let app_handle = self.app_handle.clone();
+            let sid = session_id.clone();
+            std::thread::spawn(move || {
+                debug_log::log("SIDECAR", &format!("[{sid}] stdout reader started"));
+                read_worker_output(stdout, &app_handle, &sid);
+                debug_log::log("SIDECAR", &format!("[{sid}] stdout reader ended"));
+            });
+        }
+
+        // Start stderr reader thread
+        if let Some(stderr) = child.stderr.take() {
+            let sid = session_id.clone();
+            std::thread::spawn(move || {
+                let reader = BufReader::new(stderr);
+                for line in reader.lines() {
+                    match line {
+                        Ok(l) if !l.trim().is_empty() => {
+                            debug_log::log("SIDECAR-STDERR", &format!("[{sid}] {l}"));
+                        }
+                        Err(_) => break,
+                        _ => {}
+                    }
+                }
+            });
+        }
+
+        let mut worker = SessionWorker { child };
+
+        // Send the start_session command
+        let json = serde_json::to_string(command)
+            .map_err(|e| format!("Failed to serialize command: {e}"))?;
+        debug_log::log("SIDECAR-CMD", &format!("[{session_id}] {json}"));
+        worker.send(&json)?;
+
+        self.workers.insert(session_id, worker);
         Ok(())
     }
 
-    /// Start a background thread to read stdout events from the sidecar
-    fn start_reader_thread(&mut self) {
-        let stdout = self
-            .child
-            .as_mut()
-            .and_then(|c| c.stdout.take());
+    /// Send a command to a specific session's worker (session ID extracted from command)
+    pub fn send_command(&mut self, command: &SidecarCommand) -> Result<(), String> {
+        let session_id = command_session_id(command)
+            .ok_or_else(|| "Command has no session ID".to_string())?;
 
-        let Some(stdout) = stdout else {
-            return;
-        };
-
-        let app_handle = self.app_handle.clone();
-
-        std::thread::spawn(move || {
-            read_sidecar_output(stdout, &app_handle);
-        });
+        self.send_to_session(&session_id, command)
     }
 
-    /// Send a command to the sidecar via stdin
-    pub fn send_command(&mut self, command: &SidecarCommand) -> Result<(), String> {
-        self.ensure_running()?;
-
-        let stdin = self
-            .child
-            .as_mut()
-            .and_then(|c| c.stdin.as_mut())
-            .ok_or_else(|| "Sidecar stdin not available".to_string())?;
+    /// Send a command to a specific session's worker by explicit session ID
+    pub fn send_to_session(&mut self, session_id: &str, command: &SidecarCommand) -> Result<(), String> {
+        let worker = self.workers.get_mut(session_id).ok_or_else(|| {
+            let msg = format!("No worker found for session {session_id}");
+            debug_log::log("SIDECAR", &msg);
+            msg
+        })?;
 
         let json = serde_json::to_string(command)
             .map_err(|e| format!("Failed to serialize command: {e}"))?;
 
-        stdin
-            .write_all(format!("{json}\n").as_bytes())
-            .map_err(|e| format!("Failed to write to sidecar stdin: {e}"))?;
-
-        stdin
-            .flush()
-            .map_err(|e| format!("Failed to flush sidecar stdin: {e}"))?;
-
+        debug_log::log("SIDECAR-CMD", &format!("[{session_id}] {json}"));
+        worker.send(&json)?;
+        debug_log::log("SIDECAR", &format!("[{session_id}] command sent OK"));
         Ok(())
     }
 
-    /// Track a session as active
-    pub fn register_session(&mut self, session_id: &str) {
-        self.active_sessions.insert(session_id.to_string());
-    }
-
-    /// Remove a session from active tracking
-    pub fn unregister_session(&mut self, session_id: &str) {
-        self.active_sessions.remove(session_id);
+    /// Remove a session's worker (kills the process)
+    pub fn remove_session(&mut self, session_id: &str) {
+        if let Some(mut worker) = self.workers.remove(session_id) {
+            debug_log::log("SIDECAR", &format!("Killing worker for session {session_id}"));
+            worker.kill();
+        }
     }
 
     /// Get list of active session IDs
     pub fn active_session_ids(&self) -> Vec<String> {
-        self.active_sessions.iter().cloned().collect()
+        self.workers.keys().cloned().collect()
     }
 
-    /// Kill the sidecar process and clean up
+    /// Kill all worker processes and clean up
     pub fn shutdown(&mut self) {
-        if let Some(ref mut child) = self.child {
-            let _ = child.kill();
-            let _ = child.wait();
+        debug_log::log("SIDECAR", &format!("Shutting down {} workers", self.workers.len()));
+        for (sid, mut worker) in self.workers.drain() {
+            debug_log::log("SIDECAR", &format!("Killing worker for session {sid}"));
+            worker.kill();
         }
-        self.child = None;
-        self.active_sessions.clear();
     }
 }
 
@@ -143,14 +192,28 @@ impl Drop for SidecarManager {
     }
 }
 
-/// Read JSON-line events from sidecar stdout and emit via Tauri events
-fn read_sidecar_output(stdout: impl std::io::Read, app_handle: &AppHandle) {
+/// Extract session_id from a SidecarCommand
+fn command_session_id(command: &SidecarCommand) -> Option<String> {
+    match command {
+        SidecarCommand::StartSession { session_id, .. } => Some(session_id.clone()),
+        SidecarCommand::SendMessage { session_id, .. } => Some(session_id.clone()),
+        SidecarCommand::AbortSession { session_id, .. } => Some(session_id.clone()),
+        SidecarCommand::EndSession { session_id, .. } => Some(session_id.clone()),
+        SidecarCommand::ToolApprovalResponse { .. } => None,
+    }
+}
+
+/// Read JSON-line events from a worker's stdout and emit via Tauri events
+fn read_worker_output(stdout: impl std::io::Read, app_handle: &AppHandle, session_id: &str) {
     let reader = BufReader::new(stdout);
 
     for line in reader.lines() {
         let line = match line {
             Ok(l) => l,
-            Err(_) => break,
+            Err(e) => {
+                debug_log::log("SIDECAR", &format!("[{session_id}] stdout read error: {e}"));
+                break;
+            }
         };
 
         let trimmed = line.trim();
@@ -158,26 +221,31 @@ fn read_sidecar_output(stdout: impl std::io::Read, app_handle: &AppHandle) {
             continue;
         }
 
+        debug_log::log("SIDECAR-STDOUT", &format!("[{session_id}] {trimmed}"));
+
         match serde_json::from_str::<SidecarEvent>(trimmed) {
             Ok(event) => {
                 let payload = AgentEventPayload { event };
-                let _ = app_handle.emit("agent-event", &payload);
+                match app_handle.emit("agent-event", &payload) {
+                    Ok(_) => debug_log::log("SIDECAR", &format!("[{session_id}] event emitted OK")),
+                    Err(e) => debug_log::log("SIDECAR", &format!("[{session_id}] EMIT ERROR: {e}")),
+                }
             }
             Err(e) => {
-                eprintln!("Failed to parse sidecar event: {e} — line: {trimmed}");
+                debug_log::log("SIDECAR", &format!("[{session_id}] PARSE ERROR: {e} — {trimmed}"));
             }
         }
     }
 }
 
-/// Resolve the path to the sidecar entry script
-fn resolve_sidecar_path() -> Result<String, String> {
-    // In development, the sidecar is at project_root/sidecar/src/index.ts
-    // In production, it would be compiled and bundled
+/// Resolve the path to the session-worker entry script
+fn resolve_worker_path() -> Result<String, String> {
+    // In development: project_root/sidecar/src/session-worker.ts
+    // Rust CWD is src-tauri/, so parent is project_root
     let dev_path = std::env::current_dir()
         .map_err(|e| e.to_string())?
         .parent()
-        .map(|p| p.join("sidecar").join("src").join("index.ts"))
+        .map(|p| p.join("sidecar").join("src").join("session-worker.ts"))
         .ok_or_else(|| "Cannot resolve parent directory".to_string())?;
 
     if dev_path.exists() {
@@ -187,11 +255,11 @@ fn resolve_sidecar_path() -> Result<String, String> {
             .ok_or_else(|| "Invalid path encoding".to_string());
     }
 
-    // Fallback: try relative to executable
+    // Fallback: relative to executable
     let exe_dir = std::env::current_exe()
         .map_err(|e| e.to_string())?
         .parent()
-        .map(|p| p.join("sidecar").join("src").join("index.ts"))
+        .map(|p| p.join("sidecar").join("src").join("session-worker.ts"))
         .ok_or_else(|| "Cannot resolve exe directory".to_string())?;
 
     if exe_dir.exists() {
@@ -202,7 +270,7 @@ fn resolve_sidecar_path() -> Result<String, String> {
     }
 
     Err(format!(
-        "Sidecar not found at {:?} or {:?}",
+        "Worker not found at {:?} or {:?}",
         dev_path, exe_dir
     ))
 }

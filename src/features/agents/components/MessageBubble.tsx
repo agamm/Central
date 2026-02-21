@@ -1,11 +1,14 @@
+import { Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThinkingBlock } from "./ThinkingBlock";
 import { ToolCallBlock } from "./ToolCallBlock";
+import { formatElapsedMs } from "../formatElapsed";
 import type { ToolCallInfo } from "./ToolCallBlock";
 import type { ChatMessage } from "../types";
 
 interface MessageBubbleProps {
   readonly message: ChatMessage;
+  readonly elapsedMs?: number;
 }
 
 function parseToolCalls(raw: string | null): ToolCallInfo[] {
@@ -31,28 +34,23 @@ function formatTimestamp(iso: string): string {
   }
 }
 
-function MessageBubble({ message }: MessageBubbleProps) {
+function MessageBubble({ message, elapsedMs }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const toolCalls = parseToolCalls(message.toolCalls);
   const timeStr = formatTimestamp(message.timestamp);
 
   return (
     <div
-      className={cn(
-        "flex w-full",
-        isUser ? "justify-end" : "justify-start",
-      )}
+      className={cn("flex w-full", isUser ? "justify-end" : "justify-start")}
     >
       <div
         className={cn(
           "max-w-[85%] rounded-lg px-3 py-2",
-          isUser
-            ? "bg-accent/50 text-foreground/90"
-            : "text-foreground/85",
+          isUser ? "bg-accent/50 text-foreground/90" : "text-foreground/85",
         )}
       >
         {message.content && (
-          <div className="text-sm whitespace-pre-wrap break-words select-text leading-relaxed">
+          <div className="select-text whitespace-pre-wrap break-words text-sm leading-relaxed">
             {message.content}
           </div>
         )}
@@ -61,16 +59,20 @@ function MessageBubble({ message }: MessageBubbleProps) {
 
         {toolCalls.length > 0 && <ToolCallBlock toolCalls={toolCalls} />}
 
-        {timeStr && (
-          <div
-            className={cn(
-              "mt-1 text-[10px] text-muted-foreground",
-              isUser ? "text-right" : "text-left",
-            )}
-          >
-            {timeStr}
-          </div>
-        )}
+        <div
+          className={cn(
+            "mt-1 flex items-center gap-2 text-[10px] text-muted-foreground",
+            isUser ? "justify-end" : "justify-start",
+          )}
+        >
+          {timeStr && <span>{timeStr}</span>}
+          {elapsedMs !== undefined && elapsedMs > 0 && (
+            <span className="flex items-center gap-0.5">
+              <Timer className="h-2.5 w-2.5" />
+              {formatElapsedMs(elapsedMs)}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

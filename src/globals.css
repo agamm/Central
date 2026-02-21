@@ -39,12 +39,6 @@
     --input: 0 0% 11%;
     --ring: 0 0% 40%;
 
-    --chart-1: 220 60% 50%;
-    --chart-2: 160 50% 42%;
-    --chart-3: 30 70% 50%;
-    --chart-4: 280 55% 55%;
-    --chart-5: 340 65% 50%;
-
     --sidebar-background: 0 0% 4%;
     --sidebar-foreground: 0 0% 87%;
     --sidebar-primary: 0 0% 87%;
@@ -63,7 +57,11 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family:
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      sans-serif;
     font-size: 13px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -76,8 +74,9 @@
   code,
   pre,
   .font-mono {
-    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono",
-      Menlo, Consolas, monospace;
+    font-family:
+      "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+      Consolas, monospace;
     font-size: 12px;
   }
 
@@ -88,8 +87,11 @@
   input,
   textarea,
   select {
-    transition: background-color 150ms ease, color 150ms ease,
-      border-color 150ms ease, opacity 150ms ease;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease,
+      border-color 150ms ease,
+      opacity 150ms ease;
   }
 }
 

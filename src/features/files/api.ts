@@ -1,10 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { ok, err, type Result } from "neverthrow";
-import type {
-  FileTreeEntry,
-  GitStatusInfo,
-  FileDiff,
-} from "./types";
+import type { FileTreeEntry, GitStatusInfo, FileDiff } from "./types";
 
 async function getFileTree(
   projectPath: string,

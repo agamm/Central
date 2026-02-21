@@ -2,6 +2,7 @@ import { useCallback, useMemo } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { useProjectStore } from "@/features/projects/store";
 import { useAgentStore } from "../store";
+import { useElapsedTime } from "../hooks/useElapsedTime";
 import * as agentApi from "../api";
 import { startNewSession, sendFollowUp } from "../sessionActions";
 import { MessageList } from "./MessageList";
@@ -33,11 +34,23 @@ function ChatPane() {
   const saveScrollPosition = useAgentStore((s) => s.saveScrollPosition);
   const getScrollPosition = useAgentStore((s) => s.getScrollPosition);
 
+  const sessionStartedAt = useAgentStore((s) => s.sessionStartedAt);
+  const sessionElapsedMs = useAgentStore((s) => s.sessionElapsedMs);
+  const sdkSessionIds = useAgentStore((s) => s.sdkSessionIds);
+
   const selectedProject = projects.find((p) => p.id === selectedProjectId);
   const activeSession = activeSessionId
     ? sessions.get(activeSessionId)
     : undefined;
   const isRunning = activeSession?.status === "running";
+
+  const startedAt = activeSessionId
+    ? (sessionStartedAt.get(activeSessionId) ?? null)
+    : null;
+  const finalElapsedMs = activeSessionId
+    ? (sessionElapsedMs.get(activeSessionId) ?? null)
+    : null;
+  const liveElapsedSeconds = useElapsedTime(startedAt, isRunning);
 
   // Only derive messages for the active session
   const messages: readonly ChatMessage[] = activeSessionId
@@ -61,7 +74,12 @@ function ChatPane() {
       if (!selectedProjectId || !selectedProject) return;
 
       if (!activeSessionId || !activeSession) {
-        await startNewSession(selectedProjectId, selectedProject.path, content, actions);
+        await startNewSession(
+          selectedProjectId,
+          selectedProject.path,
+          content,
+          actions,
+        );
         return;
       }
 
@@ -70,9 +88,20 @@ function ChatPane() {
         return;
       }
 
-      await sendFollowUp(activeSessionId, content, actions);
+      const resumeSdkId = sdkSessionIds.get(activeSessionId)
+        ?? activeSession?.sdkSessionId;
+      await sendFollowUp(activeSessionId, selectedProject.path, content, actions, resumeSdkId);
     },
-    [selectedProjectId, selectedProject, activeSessionId, activeSession, isRunning, actions, queueMessage],
+    [
+      selectedProjectId,
+      selectedProject,
+      activeSessionId,
+      activeSession,
+      isRunning,
+      actions,
+      queueMessage,
+      sdkSessionIds,
+    ],
   );
 
   const handleAbort = useCallback(async () => {
@@ -105,6 +134,9 @@ function ChatPane() {
           messages={messages}
           initialScrollPosition={scrollPosition}
           onScrollPositionChange={handleScrollChange}
+          isRunning={isRunning}
+          liveElapsedSeconds={liveElapsedSeconds}
+          finalElapsedMs={finalElapsedMs}
         />
       ) : (
         <ChatEmptyState projectName={selectedProject?.name} />

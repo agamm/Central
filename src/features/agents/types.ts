@@ -6,8 +6,7 @@ interface AgentEventPayload {
 }
 
 type SidecarEvent =
-  | { type: "ready"; message: string }
-  | { type: "session_started"; sessionId: string }
+  | { type: "session_started"; sessionId: string; sdkSessionId: string }
   | {
       type: "message";
       sessionId: string;
@@ -29,7 +28,27 @@ type SidecarEvent =
       toolName: string;
       output: string;
     }
-  | { type: "session_completed"; sessionId: string }
+  | {
+      type: "tool_approval_request";
+      sessionId: string;
+      requestId: string;
+      toolName: string;
+      input: Record<string, unknown>;
+      suggestions?: unknown[];
+    }
+  | {
+      type: "tool_progress";
+      sessionId: string;
+      toolName: string;
+      elapsedSeconds: number;
+    }
+  | {
+      type: "session_completed";
+      sessionId: string;
+      sdkSessionId: string;
+      totalCostUsd?: number;
+      durationMs?: number;
+    }
   | { type: "session_failed"; sessionId: string; error: string }
   | { type: "error"; message: string };
 

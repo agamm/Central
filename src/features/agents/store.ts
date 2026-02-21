@@ -21,6 +21,10 @@ interface AgentState {
   readonly messagesBySession: ReadonlyMap<string, readonly ChatMessage[]>;
   readonly messageQueue: readonly QueuedMessage[];
   readonly scrollPositionBySession: ReadonlyMap<string, number>;
+  readonly sessionStartedAt: ReadonlyMap<string, string>;
+  readonly sessionElapsedMs: ReadonlyMap<string, number>;
+  /** Maps our sessionId → SDK's internal session ID (for resume) */
+  readonly sdkSessionIds: ReadonlyMap<string, string>;
   readonly loading: boolean;
   readonly error: string | null;
 }
@@ -37,15 +41,15 @@ interface AgentActions {
     sessionId: string,
     messages: readonly ChatMessage[],
   ) => void;
-  readonly queueMessage: (
-    sessionId: string,
-    content: string,
-  ) => QueuedMessage;
+  readonly queueMessage: (sessionId: string, content: string) => QueuedMessage;
   readonly dequeueMessage: (sessionId: string) => QueuedMessage | undefined;
   readonly cancelQueuedMessage: (messageId: string) => void;
   readonly editQueuedMessage: (messageId: string, content: string) => void;
   readonly saveScrollPosition: (sessionId: string, position: number) => void;
   readonly getScrollPosition: (sessionId: string) => number;
+  readonly setSessionStartedAt: (sessionId: string, timestamp: string) => void;
+  readonly setSessionElapsed: (sessionId: string, ms: number) => void;
+  readonly setSdkSessionId: (sessionId: string, sdkSessionId: string) => void;
   readonly setLoading: (loading: boolean) => void;
   readonly setError: (error: string | null) => void;
   readonly clearSessionData: (sessionId: string) => void;
@@ -59,6 +63,9 @@ const useAgentStore = create<AgentStore>()((set, get) => ({
   messagesBySession: new Map(),
   messageQueue: [],
   scrollPositionBySession: new Map(),
+  sessionStartedAt: new Map(),
+  sessionElapsedMs: new Map(),
+  sdkSessionIds: new Map(),
   loading: false,
   error: null,
 
@@ -140,6 +147,24 @@ const useAgentStore = create<AgentStore>()((set, get) => ({
     return get().scrollPositionBySession.get(sessionId) ?? 0;
   },
 
+  setSessionStartedAt: (sessionId, timestamp) => {
+    const startedMap = new Map(get().sessionStartedAt);
+    startedMap.set(sessionId, timestamp);
+    set({ sessionStartedAt: startedMap });
+  },
+
+  setSessionElapsed: (sessionId, ms) => {
+    const elapsedMap = new Map(get().sessionElapsedMs);
+    elapsedMap.set(sessionId, ms);
+    set({ sessionElapsedMs: elapsedMap });
+  },
+
+  setSdkSessionId: (sessionId, sdkSessionId) => {
+    const sdkMap = new Map(get().sdkSessionIds);
+    sdkMap.set(sessionId, sdkSessionId);
+    set({ sdkSessionIds: sdkMap });
+  },
+
   setLoading: (loading) => {
     set({ loading });
   },
@@ -158,9 +183,16 @@ const useAgentStore = create<AgentStore>()((set, get) => ({
     const scrollMap = new Map(get().scrollPositionBySession);
     scrollMap.delete(sessionId);
 
-    const queue = get().messageQueue.filter(
-      (m) => m.sessionId !== sessionId,
-    );
+    const startedMap = new Map(get().sessionStartedAt);
+    startedMap.delete(sessionId);
+
+    const elapsedMap = new Map(get().sessionElapsedMs);
+    elapsedMap.delete(sessionId);
+
+    const sdkMap = new Map(get().sdkSessionIds);
+    sdkMap.delete(sessionId);
+
+    const queue = get().messageQueue.filter((m) => m.sessionId !== sessionId);
 
     const activeId = get().activeSessionId;
     set({
@@ -168,6 +200,9 @@ const useAgentStore = create<AgentStore>()((set, get) => ({
       messagesBySession: msgMap,
       messageQueue: queue,
       scrollPositionBySession: scrollMap,
+      sessionStartedAt: startedMap,
+      sessionElapsedMs: elapsedMap,
+      sdkSessionIds: sdkMap,
       activeSessionId: activeId === sessionId ? null : activeId,
     });
   },

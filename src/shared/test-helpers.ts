@@ -11,9 +11,7 @@ function createMockProject(overrides?: Partial<Project>): Project {
   };
 }
 
-function createMockSession(
-  overrides?: Partial<AgentSession>,
-): AgentSession {
+function createMockSession(overrides?: Partial<AgentSession>): AgentSession {
   return {
     id: crypto.randomUUID(),
     projectId: crypto.randomUUID(),

@@ -26,7 +26,7 @@ function gitStatusColor(status: GitFileStatus | null): string {
     case "deleted":
       return "text-red-400/80";
     case "renamed":
-      return "text-blue-400/80";
+      return "text-purple-400/80";
     case "conflicted":
       return "text-orange-400/80";
     default:
@@ -43,7 +43,7 @@ function gitStatusDot(status: GitFileStatus | null): string | null {
     case "deleted":
       return "bg-red-400/70";
     case "renamed":
-      return "bg-blue-400/70";
+      return "bg-purple-400/70";
     case "conflicted":
       return "bg-orange-400/70";
     default:
@@ -87,20 +87,18 @@ function FileTreeNode({
         isSelected ? "bg-accent/60" : ""
       }`}
       style={{ paddingLeft }}
-      onClick={() => { onSelectFile(entry.path); }}
+      onClick={() => {
+        onSelectFile(entry.path);
+      }}
     >
       <File
         className={`h-3 w-3 shrink-0 ${gitStatusColor(entry.git_status)}`}
       />
-      <span
-        className={`truncate ${gitStatusColor(entry.git_status)}`}
-      >
+      <span className={`truncate ${gitStatusColor(entry.git_status)}`}>
         {entry.name}
       </span>
       {dotColor ? (
-        <span
-          className={`ml-auto h-1 w-1 shrink-0 rounded-full ${dotColor}`}
-        />
+        <span className={`ml-auto h-1 w-1 shrink-0 rounded-full ${dotColor}`} />
       ) : null}
     </button>
   );
@@ -131,7 +129,9 @@ function DirectoryNode({
         type="button"
         className="flex w-full items-center gap-1 py-px pr-2 text-left text-xs hover:bg-accent/40"
         style={{ paddingLeft }}
-        onClick={() => { onToggleDir(entry.path); }}
+        onClick={() => {
+          onToggleDir(entry.path);
+        }}
       >
         <Chevron className="h-2.5 w-2.5 shrink-0 text-muted-foreground/60" />
         <FolderIcon className="h-3 w-3 shrink-0 text-muted-foreground/70" />
