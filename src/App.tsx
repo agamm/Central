@@ -16,6 +16,7 @@ import { PaneErrorBoundary } from "@/components/PaneErrorBoundary";
 import { useBootstrap } from "@/hooks/useBootstrap";
 import { useAgentTimeout } from "@/hooks/useAgentTimeout";
 import { BootstrapLoading } from "@/components/BootstrapLoading";
+import { SettingsPane, useSettingsStore } from "@/features/settings";
 
 function CenterPane() {
   const viewingFileInCenter = useFilesStore((s) => s.viewingFileInCenter);
@@ -43,8 +44,39 @@ function CenterPane() {
   return <ChatPane />;
 }
 
+function MainLayout() {
+  return (
+    <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
+      <ResizablePanelGroup orientation="horizontal" className="h-full">
+        <ResizablePanel defaultSize={20} minSize={15}>
+          <PaneErrorBoundary paneName="Sidebar">
+            <ProjectSidebar />
+          </PaneErrorBoundary>
+        </ResizablePanel>
+
+        <ResizableHandle />
+
+        <ResizablePanel defaultSize={50} minSize={25}>
+          <PaneErrorBoundary paneName="Center">
+            <CenterPane />
+          </PaneErrorBoundary>
+        </ResizablePanel>
+
+        <ResizableHandle />
+
+        <ResizablePanel defaultSize={30} minSize={20}>
+          <PaneErrorBoundary paneName="Files">
+            <FilesPanel />
+          </PaneErrorBoundary>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
+  );
+}
+
 function App() {
   const { loading } = useBootstrap();
+  const showSettings = useSettingsStore((s) => s.showSettings);
   useAgentEvents();
   useAgentTimeout();
 
@@ -52,33 +84,13 @@ function App() {
     return <BootstrapLoading />;
   }
 
+  if (showSettings) {
+    return <SettingsPane />;
+  }
+
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
-        <ResizablePanelGroup orientation="horizontal" className="h-full">
-          <ResizablePanel defaultSize={20} minSize={15}>
-            <PaneErrorBoundary paneName="Sidebar">
-              <ProjectSidebar />
-            </PaneErrorBoundary>
-          </ResizablePanel>
-
-          <ResizableHandle />
-
-          <ResizablePanel defaultSize={50} minSize={25}>
-            <PaneErrorBoundary paneName="Center">
-              <CenterPane />
-            </PaneErrorBoundary>
-          </ResizablePanel>
-
-          <ResizableHandle />
-
-          <ResizablePanel defaultSize={30} minSize={20}>
-            <PaneErrorBoundary paneName="Files">
-              <FilesPanel />
-            </PaneErrorBoundary>
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      </div>
+      <MainLayout />
     </TooltipProvider>
   );
 }

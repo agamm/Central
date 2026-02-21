@@ -67,7 +67,10 @@ pub fn run() {
             commands::files::tree::get_file_tree,
             commands::files::status::get_git_status,
             commands::files::status::get_file_content,
+            commands::files::status::write_file,
             commands::files::diff::get_diff,
+            commands::settings::get_setting,
+            commands::settings::set_setting,
             debug_log::debug_log,
         ])
         .run(tauri::generate_context!())
