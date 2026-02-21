@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Send, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,7 @@ interface PromptInputProps {
   readonly isRunning: boolean;
   readonly disabled: boolean;
   readonly placeholder?: string;
+  readonly sessionId?: string;
 }
 
 function PromptInput({
@@ -17,8 +18,17 @@ function PromptInput({
   isRunning,
   disabled,
   placeholder = "Send a message...",
+  sessionId,
 }: PromptInputProps) {
   const [value, setValue] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-focus when session changes (new chat created) or on mount
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus();
+    });
+  }, [sessionId]);
 
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
@@ -41,6 +51,7 @@ function PromptInput({
     <div className="border-t border-border/50 px-4 py-3">
       <div className="flex items-end gap-2">
         <textarea
+          ref={textareaRef}
           value={value}
           onChange={(e) => {
             setValue(e.target.value);

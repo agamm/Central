@@ -1,6 +1,9 @@
 import { create } from "zustand";
+import { invoke } from "@tauri-apps/api/core";
 import type { Project } from "@/core/types";
 import * as projectApi from "./api";
+
+const SELECTED_PROJECT_KEY = "selected_project_id";
 
 interface ProjectState {
   readonly projects: readonly Project[];
@@ -15,6 +18,7 @@ interface ProjectActions {
   readonly renameProject: (id: string, name: string) => Promise<boolean>;
   readonly deleteProject: (id: string) => Promise<boolean>;
   readonly selectProject: (id: string | null) => void;
+  readonly restoreSelection: () => Promise<void>;
   readonly clearError: () => void;
 }
 
@@ -48,6 +52,7 @@ const useProjectStore = create<ProjectStore>()((set, get) => ({
       (project) => {
         const current = get().projects;
         set({ projects: [project, ...current], selectedProjectId: project.id });
+        invoke("set_setting", { key: SELECTED_PROJECT_KEY, value: project.id }).catch(() => {});
         return true;
       },
       (error) => {
@@ -99,6 +104,21 @@ const useProjectStore = create<ProjectStore>()((set, get) => ({
 
   selectProject: (id) => {
     set({ selectedProjectId: id });
+    if (id) {
+      invoke("set_setting", { key: SELECTED_PROJECT_KEY, value: id }).catch(() => {});
+    }
+  },
+
+  restoreSelection: async () => {
+    const savedId = await invoke<string | null>("get_setting", { key: SELECTED_PROJECT_KEY })
+      .catch(() => null);
+    if (!savedId) return;
+
+    // Only restore if the project still exists
+    const projects = get().projects;
+    if (projects.some((p) => p.id === savedId)) {
+      set({ selectedProjectId: savedId });
+    }
   },
 
   clearError: () => {

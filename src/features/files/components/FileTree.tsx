@@ -3,7 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { RefreshCw } from "lucide-react";
 import { useFilesStore } from "../store";
 import { FileTreeNode } from "./FileTreeNode";
-import type { GitFileStatus } from "../types";
+
 
 interface FileTreeProps {
   readonly projectPath: string;
@@ -65,7 +65,6 @@ function FileTree({ projectPath }: FileTreeProps) {
           ) : null}
         </div>
       </ScrollArea>
-      {gitStatus ? <ChangedFilesSummary gitStatus={gitStatus} /> : null}
     </div>
   );
 }
@@ -99,38 +98,6 @@ function FileTreeHeader({
       >
         <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
       </button>
-    </div>
-  );
-}
-
-interface ChangedFilesSummaryProps {
-  readonly gitStatus: {
-    readonly changed_files: readonly {
-      readonly status: string;
-    }[];
-  };
-}
-
-function ChangedFilesSummary({ gitStatus }: ChangedFilesSummaryProps) {
-  const added = gitStatus.changed_files.filter(
-    (f) => (f.status as GitFileStatus) === "added",
-  ).length;
-  const modified = gitStatus.changed_files.filter(
-    (f) => (f.status as GitFileStatus) === "modified",
-  ).length;
-  const deleted = gitStatus.changed_files.filter(
-    (f) => (f.status as GitFileStatus) === "deleted",
-  ).length;
-
-  if (added === 0 && modified === 0 && deleted === 0) return null;
-
-  return (
-    <div className="flex items-center gap-3 border-t border-border px-3 py-1.5 text-[10px]">
-      {modified > 0 ? (
-        <span className="text-yellow-400">{modified}M</span>
-      ) : null}
-      {added > 0 ? <span className="text-green-400">{added}A</span> : null}
-      {deleted > 0 ? <span className="text-red-400">{deleted}D</span> : null}
     </div>
   );
 }

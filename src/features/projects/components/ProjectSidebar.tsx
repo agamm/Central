@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -10,6 +10,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ProjectList } from "./ProjectList";
 import { useProjectStore } from "../store";
+import { useSettingsStore } from "@/features/settings/store";
 
 function extractFolderName(folderPath: string): string {
   const segments = folderPath.replace(/\/+$/, "").split("/");
@@ -20,6 +21,7 @@ function ProjectSidebar() {
   const fetchProjects = useProjectStore((s) => s.fetchProjects);
   const addProject = useProjectStore((s) => s.addProject);
   const loading = useProjectStore((s) => s.loading);
+  const toggleSettings = useSettingsStore((s) => s.toggleSettings);
 
   useEffect(() => {
     void fetchProjects();
@@ -72,6 +74,24 @@ function ProjectSidebar() {
       ) : (
         <ProjectList onAddProject={() => void handleOpenFolderPicker()} />
       )}
+
+      <Separator className="opacity-50" />
+
+      <div className="px-3 py-2">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={toggleSettings}
+            >
+              <Settings className="h-3.5 w-3.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">Settings</TooltipContent>
+        </Tooltip>
+      </div>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { EmptyProjectState } from "./EmptyProjectState";
 import { AgentList } from "@/features/agents/components/AgentList";
 import { useProjectStore } from "../store";
 import { useAgentStore } from "@/features/agents/store";
+import { useFilesStore } from "@/features/files/store";
 import * as agentApi from "@/features/agents/api";
 
 interface ProjectListProps {
@@ -22,6 +23,7 @@ function ProjectList({ onAddProject }: ProjectListProps) {
   const setMessages = useAgentStore((s) => s.setMessages);
   const messagesBySession = useAgentStore((s) => s.messagesBySession);
   const deleteSession = useAgentStore((s) => s.deleteSession);
+  const closeFileViewer = useFilesStore((s) => s.closeFileViewer);
 
   const handleSelect = useCallback(
     (id: string) => {
@@ -48,13 +50,14 @@ function ProjectList({ onAddProject }: ProjectListProps) {
     (sessionId: string, projectId: string) => {
       selectProject(projectId);
       switchSession(sessionId);
+      closeFileViewer();
 
       // Lazy-load messages if not already in store
       if (!messagesBySession.has(sessionId)) {
         void loadSessionMessages(sessionId, setMessages);
       }
     },
-    [selectProject, switchSession, messagesBySession, setMessages],
+    [selectProject, switchSession, closeFileViewer, messagesBySession, setMessages],
   );
 
   const handleNewChat = useCallback(() => {

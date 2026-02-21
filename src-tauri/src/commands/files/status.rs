@@ -42,6 +42,39 @@ pub fn get_file_content(
         .map_err(|e| format!("Failed to read file: {e}"))
 }
 
+#[tauri::command]
+pub fn write_file(
+    project_path: String,
+    file_path: String,
+    content: String,
+) -> Result<(), String> {
+    let full = Path::new(&project_path).join(&file_path);
+
+    // Refuse to write outside the project directory
+    let canonical_project = Path::new(&project_path)
+        .canonicalize()
+        .map_err(|e| format!("Invalid project path: {e}"))?;
+    let parent = full
+        .parent()
+        .ok_or_else(|| "Invalid file path".to_string())?;
+    // Ensure parent directory exists before canonicalizing
+    if !parent.exists() {
+        return Err(format!("Parent directory does not exist: {}", parent.display()));
+    }
+    let canonical_full = full
+        .parent()
+        .unwrap()
+        .canonicalize()
+        .map_err(|e| format!("Invalid path: {e}"))?
+        .join(full.file_name().ok_or("Invalid file name")?);
+    if !canonical_full.starts_with(&canonical_project) {
+        return Err("Cannot write outside project directory".to_string());
+    }
+
+    std::fs::write(&full, content)
+        .map_err(|e| format!("Failed to write file: {e}"))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -129,6 +162,46 @@ mod tests {
         );
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("File not found"));
+
+        std::fs::remove_dir_all(&temp).unwrap();
+    }
+
+    #[test]
+    fn write_file_creates_and_writes() {
+        let temp = std::env::temp_dir().join(format!(
+            "central_write_test_{}",
+            uuid::Uuid::new_v4()
+        ));
+        std::fs::create_dir_all(&temp).unwrap();
+        std::fs::write(temp.join("test.txt"), "original").unwrap();
+
+        let result = write_file(
+            temp.to_string_lossy().to_string(),
+            "test.txt".to_string(),
+            "updated content".to_string(),
+        );
+        assert!(result.is_ok());
+
+        let content = std::fs::read_to_string(temp.join("test.txt")).unwrap();
+        assert_eq!(content, "updated content");
+
+        std::fs::remove_dir_all(&temp).unwrap();
+    }
+
+    #[test]
+    fn write_file_rejects_path_traversal() {
+        let temp = std::env::temp_dir().join(format!(
+            "central_write_traversal_{}",
+            uuid::Uuid::new_v4()
+        ));
+        std::fs::create_dir_all(&temp).unwrap();
+
+        let result = write_file(
+            temp.to_string_lossy().to_string(),
+            "../../../etc/passwd".to_string(),
+            "malicious".to_string(),
+        );
+        assert!(result.is_err());
 
         std::fs::remove_dir_all(&temp).unwrap();
     }

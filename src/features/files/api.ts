@@ -58,4 +58,21 @@ async function getDiff(
   }
 }
 
-export { getFileTree, getGitStatus, getFileContent, getDiff };
+async function writeFile(
+  projectPath: string,
+  filePath: string,
+  content: string,
+): Promise<Result<undefined, string>> {
+  try {
+    await invoke<null>("write_file", {
+      projectPath,
+      filePath,
+      content,
+    });
+    return ok(undefined);
+  } catch (e) {
+    return err(`Failed to write file: ${String(e)}`);
+  }
+}
+
+export { getFileTree, getGitStatus, getFileContent, getDiff, writeFile };

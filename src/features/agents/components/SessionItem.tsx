@@ -60,23 +60,23 @@ function SessionItem({ session, isActive, onSelect, onDelete }: SessionItemProps
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       className={cn(
-        "group flex items-center gap-2 rounded px-2 py-1 text-xs",
+        "group flex items-center gap-1.5 overflow-hidden rounded px-2 py-1 text-xs",
         "cursor-pointer hover:bg-accent/50",
         isActive && "bg-accent/70",
       )}
     >
-      <MessageSquare className="h-3 w-3 shrink-0 text-muted-foreground" />
-      <span className="flex-1 truncate text-muted-foreground">
-        {truncatePrompt(session.prompt, 40)}
+      <MessageSquare className="h-3 w-3 shrink-0 text-muted-foreground/60" />
+      <span className="min-w-0 flex-1 truncate text-muted-foreground">
+        {truncatePrompt(session.prompt, 30)}
       </span>
-      <span className="shrink-0 text-[10px] text-muted-foreground/60">
+      <span className="shrink-0 text-[9px] text-muted-foreground/40">
         {formatRelativeTime(session.createdAt)}
       </span>
-      <StatusBadge status={session.status} />
+      <StatusBadge status={session.status} className="shrink-0" />
       {onDelete && (
         <button
           onClick={handleDelete}
-          className="invisible rounded p-0.5 hover:bg-destructive/20 group-hover:visible"
+          className="shrink-0 rounded p-0.5 opacity-0 hover:bg-destructive/20 group-hover:opacity-100"
           aria-label="Delete session"
         >
           <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
