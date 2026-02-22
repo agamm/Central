@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { Shield, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,12 +26,14 @@ interface ApprovalItemProps {
 function ApprovalItem({ approval }: ApprovalItemProps) {
   const [expanded, setExpanded] = useState(false);
   const [responding, setResponding] = useState(false);
+  const respondingRef = useRef(false);
   const removePendingApproval = useAgentStore((s) => s.removePendingApproval);
   const setError = useAgentStore((s) => s.setError);
 
   const respond = useCallback(
-    async (allowed: boolean) => {
-      if (responding) return;
+    async (allowed: boolean, permissions?: unknown) => {
+      if (respondingRef.current) return;
+      respondingRef.current = true;
       setResponding(true);
       debugLog("APPROVAL-UI", `Sending ${allowed ? "approve" : "deny"}: req=${approval.requestId} tool=${approval.toolName}`);
       try {
@@ -39,7 +41,7 @@ function ApprovalItem({ approval }: ApprovalItemProps) {
           sessionId: approval.sessionId,
           requestId: approval.requestId,
           allowed,
-          updatedPermissions: null,
+          updatedPermissions: permissions ?? null,
         });
         removePendingApproval(approval.requestId);
         debugLog("APPROVAL-UI", `Success: req=${approval.requestId}`);
@@ -47,10 +49,12 @@ function ApprovalItem({ approval }: ApprovalItemProps) {
         const msg = `Tool approval failed: ${String(e)}`;
         setError(msg);
         debugLog("APPROVAL-UI", `Error: ${msg}`);
+      } finally {
+        respondingRef.current = false;
         setResponding(false);
       }
     },
-    [approval, removePendingApproval, setError, responding],
+    [approval, removePendingApproval, setError],
   );
 
   const handleApprove = useCallback(
@@ -59,6 +63,14 @@ function ApprovalItem({ approval }: ApprovalItemProps) {
       void respond(true);
     },
     [respond],
+  );
+
+  const handleAlwaysAllow = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      void respond(true, approval.suggestions);
+    },
+    [respond, approval.suggestions],
   );
 
   const handleDeny = useCallback(
@@ -121,6 +133,16 @@ function ApprovalItem({ approval }: ApprovalItemProps) {
         >
           {responding ? "Sending..." : "Approve"}
         </Button>
+        {approval.suggestions && approval.suggestions.length > 0 && (
+          <Button
+            size="sm"
+            onClick={handleAlwaysAllow}
+            disabled={responding}
+            className="h-6 bg-blue-700 px-3 text-[11px] text-white hover:bg-blue-600"
+          >
+            Always Allow
+          </Button>
+        )}
       </div>
     </div>
   );

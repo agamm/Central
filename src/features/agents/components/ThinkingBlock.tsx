@@ -4,10 +4,14 @@ import { cn } from "@/lib/utils";
 
 interface ThinkingBlockProps {
   readonly thinking: string;
+  readonly isStreaming?: boolean;
 }
 
-function ThinkingBlock({ thinking }: ThinkingBlockProps) {
+function ThinkingBlock({ thinking, isStreaming }: ThinkingBlockProps) {
   const [expanded, setExpanded] = useState(false);
+
+  // Auto-expand while streaming
+  const isExpanded = isStreaming || expanded;
 
   return (
     <button
@@ -21,13 +25,13 @@ function ThinkingBlock({ thinking }: ThinkingBlockProps) {
         <ChevronRight
           className={cn(
             "h-3 w-3 transition-transform duration-100",
-            expanded && "rotate-90",
+            isExpanded && "rotate-90",
           )}
         />
-        <Brain className="h-3 w-3" />
+        <Brain className={cn("h-3 w-3", isStreaming && "animate-pulse")} />
         <span>Thinking</span>
       </div>
-      {expanded && (
+      {isExpanded && (
         <div className="ml-5 mt-1.5 select-text whitespace-pre-wrap rounded border border-border/40 bg-muted/30 px-3 py-2 font-mono text-xs text-muted-foreground/80">
           {thinking}
         </div>

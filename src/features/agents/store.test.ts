@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ok, err } from "neverthrow";
 import { useAgentStore } from "./store";
+import { useSessionStore } from "./stores/sessionStore";
+import { useMessageStore } from "./stores/messageStore";
+import { useUIStore } from "./stores/uiStore";
 import { createMockSession, createMockMessage } from "@/shared/test-helpers";
 
 vi.mock("./api", () => ({
@@ -18,17 +21,25 @@ vi.mock("@/shared/debugLog", () => ({
 }));
 
 function resetStore(): void {
-  useAgentStore.setState({
+  useSessionStore.setState({
     sessions: new Map(),
     activeSessionId: null,
-    messagesBySession: new Map(),
-    messageQueue: [],
-    scrollPositionBySession: new Map(),
+    sdkSessionIds: new Map(),
     sessionStartedAt: new Map(),
     sessionElapsedMs: new Map(),
-    sdkSessionIds: new Map(),
+    sessionTokenUsage: new Map(),
     loading: false,
     error: null,
+  });
+  useMessageStore.setState({
+    messagesBySession: new Map(),
+    messageQueue: [],
+    streamingMessages: new Map(),
+    bufferedToolCalls: new Map(),
+  });
+  useUIStore.setState({
+    scrollPositionBySession: new Map(),
+    pendingApprovals: new Map(),
   });
 }
 
@@ -406,21 +417,18 @@ describe("AgentStore", () => {
   });
 
   describe("hydrate", () => {
-    it("loads sessions and messages from SQLite", async () => {
+    it("loads sessions from SQLite", async () => {
       const api = await import("./api");
       const session = createMockSession({ id: "s1" });
-      const msg = createMockMessage({ id: "m1", sessionId: "s1", content: "hello" });
 
       vi.mocked(api.markInterruptedSessions).mockResolvedValue(ok(0));
       vi.mocked(api.getAllSessions).mockResolvedValue(ok([session]));
-      vi.mocked(api.getMessages).mockResolvedValue(ok([msg]));
 
       await useAgentStore.getState().hydrate();
 
       const state = useAgentStore.getState();
       expect(state.sessions.size).toBe(1);
       expect(state.activeSessionId).toBe("s1");
-      expect(state.messagesBySession.get("s1")).toHaveLength(1);
       expect(state.loading).toBe(false);
     });
 
@@ -667,19 +675,20 @@ describe("AgentStore", () => {
       expect(state.sessions.size).toBe(0);
     });
 
-    it("hydrate with messages load failure still loads sessions", async () => {
+    it("hydrateMessages loads messages for a session", async () => {
       const api = await import("./api");
       const session = createMockSession({ id: "s1" });
+      const msg = createMockMessage({ id: "m1", sessionId: "s1", content: "hello" });
       vi.mocked(api.markInterruptedSessions).mockResolvedValue(ok(0));
       vi.mocked(api.getAllSessions).mockResolvedValue(ok([session]));
-      vi.mocked(api.getMessages).mockResolvedValue(err("corrupt messages"));
+      vi.mocked(api.getMessages).mockResolvedValue(ok([msg]));
 
       await useAgentStore.getState().hydrate();
+      await useMessageStore.getState().hydrateMessages("s1");
 
-      const state = useAgentStore.getState();
-      expect(state.sessions.size).toBe(1);
-      expect(state.activeSessionId).toBe("s1");
-      expect(state.messagesBySession.has("s1")).toBe(false);
+      const messages = useAgentStore.getState().messagesBySession.get("s1");
+      expect(messages).toHaveLength(1);
+      expect(messages?.[0]?.content).toBe("hello");
     });
   });
 

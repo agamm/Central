@@ -1,5 +1,7 @@
 import { useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { useAgentStore } from "@/features/agents/store";
+import { useSessionStore, useMessageStore } from "@/features/agents/stores";
 import { useProjectStore } from "@/features/projects/store";
 
 interface BootstrapState {
@@ -18,8 +20,15 @@ function useBootstrap(): BootstrapState {
 
   useEffect(() => {
     const boot = async () => {
-      // Hydrate agents (sessions, messages)
-      await useAgentStore.getState().hydrate();
+      // Truncate debug log for clean state on each frontend load
+      await invoke("debug_log", { source: "BOOTSTRAP", message: "TRUNCATE" }).catch(() => {});
+
+      // Hydrate sessions, then load messages for the active session
+      await useSessionStore.getState().hydrate();
+      const restoredId = useSessionStore.getState().activeSessionId;
+      if (restoredId) {
+        await useMessageStore.getState().hydrateMessages(restoredId);
+      }
 
       // Fetch projects, then restore the last selected project
       await useProjectStore.getState().fetchProjects();

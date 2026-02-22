@@ -80,11 +80,21 @@ impl SidecarManager {
         debug_log::log("SIDECAR", &format!("Spawning worker for session {session_id}"));
         debug_log::log("SIDECAR", &format!("Worker path: {worker_path}"));
 
-        let mut child = Command::new("node")
-            .arg("--import")
+        let ca_certs = resolve_ca_certs();
+
+        let mut cmd = Command::new("node");
+        cmd.arg("--import")
             .arg("tsx")
             .arg(&worker_path)
-            .current_dir(sidecar_dir)
+            .current_dir(sidecar_dir);
+
+        // Ensure Node.js can verify TLS certs (macOS system bundle)
+        // See https://github.com/anthropics/claude-code/issues/4053
+        if let Some(ref certs) = ca_certs {
+            cmd.env("NODE_EXTRA_CA_CERTS", certs);
+        }
+
+        let mut child = cmd
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
@@ -236,6 +246,30 @@ fn read_worker_output(stdout: impl std::io::Read, app_handle: &AppHandle, sessio
             }
         }
     }
+}
+
+/// Resolve the CA certificate bundle path for Node.js TLS.
+/// Checks the user's env first, then falls back to well-known system paths.
+fn resolve_ca_certs() -> Option<String> {
+    // Respect user's explicit setting
+    if let Ok(val) = std::env::var("NODE_EXTRA_CA_CERTS") {
+        if !val.is_empty() {
+            return Some(val);
+        }
+    }
+
+    // macOS system bundle, then common Linux paths
+    let candidates = [
+        "/etc/ssl/cert.pem",
+        "/etc/ssl/certs/ca-certificates.crt",
+        "/etc/pki/tls/certs/ca-bundle.crt",
+    ];
+    for path in &candidates {
+        if std::path::Path::new(path).exists() {
+            return Some(path.to_string());
+        }
+    }
+    None
 }
 
 /// Resolve the path to the session-worker entry script

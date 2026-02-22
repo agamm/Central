@@ -1,9 +1,9 @@
 import "@testing-library/jest-dom/vitest";
 import { vi } from "vitest";
 
-// Mock @tauri-apps/api/core (invoke)
+// Mock @tauri-apps/api/core (invoke returns a Promise)
 vi.mock("@tauri-apps/api/core", () => ({
-  invoke: vi.fn(),
+  invoke: vi.fn(() => Promise.resolve(undefined)),
 }));
 
 // Mock @tauri-apps/api/event (listen)

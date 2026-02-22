@@ -87,6 +87,16 @@ pub enum SidecarEvent {
         #[serde(skip_serializing_if = "Option::is_none")]
         suggestions: Option<serde_json::Value>,
     },
+    ContentDelta {
+        #[serde(rename = "sessionId")]
+        session_id: String,
+        delta: String,
+    },
+    ThinkingDelta {
+        #[serde(rename = "sessionId")]
+        session_id: String,
+        delta: String,
+    },
     ToolProgress {
         #[serde(rename = "sessionId")]
         session_id: String,
@@ -393,6 +403,32 @@ mod tests {
                 assert_eq!(tool_name, "write_file");
             }
             _ => panic!("Expected ToolApprovalRequest event"),
+        }
+    }
+
+    #[test]
+    fn deserialize_content_delta_event() {
+        let json = r#"{"type":"content_delta","sessionId":"s1","delta":"Hello "}"#;
+        let event: SidecarEvent = serde_json::from_str(json).unwrap();
+        match event {
+            SidecarEvent::ContentDelta { session_id, delta } => {
+                assert_eq!(session_id, "s1");
+                assert_eq!(delta, "Hello ");
+            }
+            _ => panic!("Expected ContentDelta event"),
+        }
+    }
+
+    #[test]
+    fn deserialize_thinking_delta_event() {
+        let json = r#"{"type":"thinking_delta","sessionId":"s1","delta":"Let me "}"#;
+        let event: SidecarEvent = serde_json::from_str(json).unwrap();
+        match event {
+            SidecarEvent::ThinkingDelta { session_id, delta } => {
+                assert_eq!(session_id, "s1");
+                assert_eq!(delta, "Let me ");
+            }
+            _ => panic!("Expected ThinkingDelta event"),
         }
     }
 

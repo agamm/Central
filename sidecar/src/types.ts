@@ -54,6 +54,8 @@ type SidecarEvent =
       /** SDK-suggested permission updates the UI can offer as "remember" options */
       suggestions?: PermissionUpdateInfo[];
     }
+  | { type: "content_delta"; sessionId: string; delta: string }
+  | { type: "thinking_delta"; sessionId: string; delta: string }
   | { type: "tool_progress"; sessionId: string; toolName: string; elapsedSeconds: number }
   | {
       type: "session_completed";

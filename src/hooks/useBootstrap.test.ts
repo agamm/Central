@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ok, err } from "neverthrow";
 import { useAgentStore } from "@/features/agents/store";
+import { useSessionStore } from "@/features/agents/stores/sessionStore";
+import { useMessageStore } from "@/features/agents/stores/messageStore";
+import { useUIStore } from "@/features/agents/stores/uiStore";
 import { createMockSession, createMockMessage } from "@/shared/test-helpers";
 
 vi.mock("@/features/agents/api", () => ({
@@ -21,22 +24,34 @@ async function getApi(): Promise<typeof import("@/features/agents/api")> {
 }
 
 function resetStore(): void {
-  useAgentStore.setState({
+  useSessionStore.setState({
     sessions: new Map(),
     activeSessionId: null,
-    messagesBySession: new Map(),
-    messageQueue: [],
-    scrollPositionBySession: new Map(),
+    sdkSessionIds: new Map(),
     sessionStartedAt: new Map(),
     sessionElapsedMs: new Map(),
-    sdkSessionIds: new Map(),
+    sessionTokenUsage: new Map(),
     loading: false,
     error: null,
+  });
+  useMessageStore.setState({
+    messagesBySession: new Map(),
+    messageQueue: [],
+    streamingMessages: new Map(),
+    bufferedToolCalls: new Map(),
+  });
+  useUIStore.setState({
+    scrollPositionBySession: new Map(),
+    pendingApprovals: new Map(),
   });
 }
 
 async function restoreSessionsForTest(): Promise<void> {
-  await useAgentStore.getState().hydrate();
+  await useSessionStore.getState().hydrate();
+  const restoredId = useSessionStore.getState().activeSessionId;
+  if (restoredId) {
+    await useMessageStore.getState().hydrateMessages(restoredId);
+  }
 }
 
 describe("Session restore (bootstrap logic)", () => {

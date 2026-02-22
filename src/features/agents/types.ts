@@ -36,6 +36,8 @@ type SidecarEvent =
       input: Record<string, unknown>;
       suggestions?: unknown[];
     }
+  | { type: "content_delta"; sessionId: string; delta: string }
+  | { type: "thinking_delta"; sessionId: string; delta: string }
   | {
       type: "tool_progress";
       sessionId: string;
@@ -51,6 +53,23 @@ type SidecarEvent =
     }
   | { type: "session_failed"; sessionId: string; error: string }
   | { type: "error"; message: string };
+
+/** SDK permission-update suggestion returned with canUseTool */
+interface PermissionUpdateSuggestion {
+  readonly type: string;
+  readonly destination: string;
+  readonly rules?: readonly { toolName: string; ruleContent?: string }[];
+  readonly behavior?: string;
+}
+
+/** A pending tool approval request from the sidecar worker */
+interface ToolApprovalRequest {
+  readonly requestId: string;
+  readonly sessionId: string;
+  readonly toolName: string;
+  readonly input: Record<string, unknown>;
+  readonly suggestions?: readonly PermissionUpdateSuggestion[];
+}
 
 /** A queued message waiting to be sent when agent completes */
 interface QueuedMessage {
@@ -68,6 +87,8 @@ interface ChatMessage extends Message {
 export type {
   AgentEventPayload,
   SidecarEvent,
+  ToolApprovalRequest,
+  PermissionUpdateSuggestion,
   QueuedMessage,
   ChatMessage,
   AgentSession,

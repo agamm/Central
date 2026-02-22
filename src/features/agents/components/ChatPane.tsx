@@ -1,159 +1,56 @@
-import { useCallback, useMemo } from "react";
-import { invoke } from "@tauri-apps/api/core";
-import { useProjectStore } from "@/features/projects/store";
-import { useAgentStore } from "../store";
-import { useElapsedTime } from "../hooks/useElapsedTime";
-import { startNewSession, sendFollowUp } from "../sessionActions";
+import { useMessageStore } from "../stores/messageStore";
+import { useChatSession } from "../hooks/useChatSession";
+import { useChatActions } from "../hooks/useChatActions";
 import { MessageList } from "./MessageList";
 import { MessageQueue } from "./MessageQueue";
 import { PromptInput } from "./PromptInput";
 import { ChatEmptyState } from "./ChatEmptyState";
-import type { ChatMessage } from "../types";
+import { ToolApprovalDialog } from "./ToolApprovalDialog";
 
-/**
- * Performance: Each selector pulls only the data it needs. The messages
- * derivation (messagesBySession.get) only triggers re-render when the
- * active session's messages change — not when other agents' messages update.
- */
 function ChatPane() {
-  const selectedProjectId = useProjectStore((s) => s.selectedProjectId);
-  const projects = useProjectStore((s) => s.projects);
-  const activeSessionId = useAgentStore((s) => s.activeSessionId);
-  const sessions = useAgentStore((s) => s.sessions);
-  const messagesBySession = useAgentStore((s) => s.messagesBySession);
-  const messageQueue = useAgentStore((s) => s.messageQueue);
-  const createSession = useAgentStore((s) => s.createSession);
-  const addMessage = useAgentStore((s) => s.addMessage);
-  const updateStatus = useAgentStore((s) => s.updateSessionStatus);
-  const queueMessage = useAgentStore((s) => s.queueMessage);
-  const cancelQueued = useAgentStore((s) => s.cancelQueuedMessage);
-  const editQueued = useAgentStore((s) => s.editQueuedMessage);
-  const setError = useAgentStore((s) => s.setError);
-  const saveScrollPosition = useAgentStore((s) => s.saveScrollPosition);
-  const getScrollPosition = useAgentStore((s) => s.getScrollPosition);
+  const session = useChatSession();
+  const { handleSubmit, handleAbort, handleScrollChange } = useChatActions(session);
+  const cancelQueued = useMessageStore((s) => s.cancelQueuedMessage);
+  const editQueued = useMessageStore((s) => s.editQueuedMessage);
 
-  const sessionStartedAt = useAgentStore((s) => s.sessionStartedAt);
-  const sessionElapsedMs = useAgentStore((s) => s.sessionElapsedMs);
-  const sdkSessionIds = useAgentStore((s) => s.sdkSessionIds);
-
-  const selectedProject = projects.find((p) => p.id === selectedProjectId);
-  const activeSession = activeSessionId
-    ? sessions.get(activeSessionId)
-    : undefined;
-  const isRunning = activeSession?.status === "running";
-
-  const startedAt = activeSessionId
-    ? (sessionStartedAt.get(activeSessionId) ?? null)
-    : null;
-  const finalElapsedMs = activeSessionId
-    ? (sessionElapsedMs.get(activeSessionId) ?? null)
-    : null;
-  const liveElapsedSeconds = useElapsedTime(startedAt, isRunning);
-
-  // Only derive messages for the active session
-  const messages: readonly ChatMessage[] = activeSessionId
-    ? (messagesBySession.get(activeSessionId) ?? [])
-    : [];
-  const sessionQueue = activeSessionId
-    ? messageQueue.filter((m) => m.sessionId === activeSessionId)
-    : [];
-
-  const scrollPosition = activeSessionId
-    ? getScrollPosition(activeSessionId)
-    : 0;
-
-  const actions = useMemo(
-    () => ({ createSession, addMessage, updateStatus, setError }),
-    [createSession, addMessage, updateStatus, setError],
-  );
-
-  const handleSubmit = useCallback(
-    async (content: string) => {
-      if (!selectedProjectId || !selectedProject) return;
-
-      if (!activeSessionId || !activeSession) {
-        await startNewSession(
-          selectedProjectId,
-          selectedProject.path,
-          content,
-          actions,
-        );
-        return;
-      }
-
-      if (isRunning) {
-        queueMessage(activeSessionId, content);
-        return;
-      }
-
-      const resumeSdkId = sdkSessionIds.get(activeSessionId)
-        ?? activeSession.sdkSessionId;
-      await sendFollowUp(activeSessionId, selectedProject.path, content, actions, resumeSdkId);
-    },
-    [
-      selectedProjectId,
-      selectedProject,
-      activeSessionId,
-      activeSession,
-      isRunning,
-      actions,
-      queueMessage,
-      sdkSessionIds,
-    ],
-  );
-
-  const handleAbort = useCallback(async () => {
-    if (!activeSessionId) return;
-
-    try {
-      await invoke("abort_agent_session", { sessionId: activeSessionId });
-      updateStatus(activeSessionId, "aborted");
-    } catch (e) {
-      setError(`Failed to abort: ${String(e)}`);
-    }
-  }, [activeSessionId, updateStatus, setError]);
-
-  const handleScrollChange = useCallback(
-    (position: number) => {
-      if (activeSessionId) {
-        saveScrollPosition(activeSessionId, position);
-      }
-    },
-    [activeSessionId, saveScrollPosition],
-  );
-
-  const hasMessages = messages.length > 0;
+  const hasMessages = session.messages.length > 0;
 
   return (
     <div className="flex h-full flex-col bg-background">
       {hasMessages ? (
         <MessageList
-          messages={messages}
-          initialScrollPosition={scrollPosition}
+          messages={session.messages}
+          initialScrollPosition={session.scrollPosition}
           onScrollPositionChange={handleScrollChange}
-          isRunning={isRunning}
-          liveElapsedSeconds={liveElapsedSeconds}
-          finalElapsedMs={finalElapsedMs}
+          isRunning={session.isRunning}
+          liveElapsedSeconds={session.liveElapsedSeconds}
+          finalElapsedMs={session.finalElapsedMs}
+          tokenUsage={session.tokenUsage}
         />
       ) : (
-        <ChatEmptyState projectName={selectedProject?.name} />
+        <ChatEmptyState projectName={session.selectedProject?.name} />
       )}
 
-      {sessionQueue.length > 0 && (
+      {session.sessionQueue.length > 0 && (
         <MessageQueue
-          messages={sessionQueue}
+          messages={session.sessionQueue}
           onCancel={cancelQueued}
           onEdit={editQueued}
         />
       )}
 
+      {session.hasPendingApprovals && session.activeSessionId && (
+        <ToolApprovalDialog sessionId={session.activeSessionId} />
+      )}
+
       <PromptInput
         onSubmit={(msg) => void handleSubmit(msg)}
         onAbort={() => void handleAbort()}
-        isRunning={isRunning}
-        disabled={!selectedProjectId}
+        isRunning={session.isRunning}
+        disabled={!session.selectedProjectId}
+        sessionId={session.activeSessionId ?? undefined}
         placeholder={
-          isRunning
+          session.isRunning
             ? "Message will be queued..."
             : "Send a message to start an agent..."
         }

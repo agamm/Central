@@ -48,8 +48,24 @@ pub fn log(source: &str, message: &str) {
     }
 }
 
+/// Truncate and reinitialize the log file
+pub fn truncate_log() {
+    if let Ok(f) = std::fs::File::create(LOG_PATH) {
+        if let Some(mutex) = LOG_FILE.get() {
+            if let Ok(mut guard) = mutex.lock() {
+                *guard = f;
+            }
+        }
+    }
+    log("RUST", "=== Central Debug Log Truncated ===");
+}
+
 /// Tauri command so the React frontend can write to the same log file
 #[tauri::command]
 pub fn debug_log(source: String, message: String) {
+    if message == "TRUNCATE" {
+        truncate_log();
+        return;
+    }
     log(&source, &message);
 }
