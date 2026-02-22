@@ -48,7 +48,7 @@ function MainLayout() {
   return (
     <div className="h-screen w-screen overflow-hidden bg-background text-foreground">
       <ResizablePanelGroup orientation="horizontal" className="h-full">
-        <ResizablePanel defaultSize={20} minSize={15}>
+        <ResizablePanel defaultSize={20} minSize={15} style={{ minWidth: 200 }}>
           <PaneErrorBoundary paneName="Sidebar">
             <ProjectSidebar />
           </PaneErrorBoundary>

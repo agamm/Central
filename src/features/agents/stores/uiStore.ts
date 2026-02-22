@@ -4,6 +4,7 @@ import type { ToolApprovalRequest } from "../types";
 interface UIState {
   readonly scrollPositionBySession: ReadonlyMap<string, number>;
   readonly pendingApprovals: ReadonlyMap<string, ToolApprovalRequest>;
+  readonly promptFocusTrigger: number;
 }
 
 interface UIActions {
@@ -11,6 +12,7 @@ interface UIActions {
   readonly getScrollPosition: (sessionId: string) => number;
   readonly addPendingApproval: (req: ToolApprovalRequest) => void;
   readonly removePendingApproval: (requestId: string) => void;
+  readonly triggerPromptFocus: () => void;
   readonly clearUI: (sessionId: string) => void;
 }
 
@@ -19,6 +21,7 @@ type UIStore = UIState & UIActions;
 const useUIStore = create<UIStore>()((set, get) => ({
   scrollPositionBySession: new Map(),
   pendingApprovals: new Map(),
+  promptFocusTrigger: 0,
 
   saveScrollPosition: (sessionId, position) => {
     const m = new Map(get().scrollPositionBySession);
@@ -34,6 +37,10 @@ const useUIStore = create<UIStore>()((set, get) => ({
     const m = new Map(get().pendingApprovals);
     m.set(req.requestId, req);
     set({ pendingApprovals: m });
+  },
+
+  triggerPromptFocus: () => {
+    set({ promptFocusTrigger: get().promptFocusTrigger + 1 });
   },
 
   removePendingApproval: (requestId) => {

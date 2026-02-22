@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from "react";
-import { Plus } from "lucide-react";
 import { useAgentStore } from "../store";
 import * as agentApi from "../api";
 import { SessionItem } from "./SessionItem";
@@ -9,10 +8,9 @@ interface AgentListProps {
   readonly projectId: string;
   readonly onSessionSelect: (sessionId: string, projectId: string) => void;
   readonly onSessionDelete?: (sessionId: string) => void;
-  readonly onNewChat?: () => void;
 }
 
-function AgentList({ projectId, onSessionSelect, onSessionDelete, onNewChat }: AgentListProps) {
+function AgentList({ projectId, onSessionSelect, onSessionDelete }: AgentListProps) {
   const [projectSessions, setProjectSessions] = useState<
     readonly AgentSession[]
   >([]);
@@ -73,15 +71,6 @@ function AgentList({ projectId, onSessionSelect, onSessionDelete, onNewChat }: A
           onDelete={handleDelete}
         />
       ))}
-      {onNewChat && (
-        <button
-          onClick={onNewChat}
-          className="flex items-center gap-2 rounded px-2 py-1 text-xs text-muted-foreground/60 hover:bg-accent/50 hover:text-muted-foreground"
-        >
-          <Plus className="h-3 w-3" />
-          <span>New Chat</span>
-        </button>
-      )}
     </div>
   );
 }

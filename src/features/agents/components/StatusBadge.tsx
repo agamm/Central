@@ -8,6 +8,7 @@ interface StatusBadgeProps {
 }
 
 const STATUS_DOT_STYLES: Record<AgentStatus, string> = {
+  idle: "bg-zinc-500/40",
   running: "",
   completed: "bg-emerald-500/70",
   failed: "bg-red-500/70",
@@ -16,6 +17,7 @@ const STATUS_DOT_STYLES: Record<AgentStatus, string> = {
 };
 
 const STATUS_LABELS: Record<AgentStatus, string> = {
+  idle: "New",
   running: "Running",
   completed: "Completed",
   failed: "Failed",

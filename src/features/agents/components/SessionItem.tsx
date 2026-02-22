@@ -62,11 +62,11 @@ function SessionItem({ session, isActive, onSelect, onDelete }: SessionItemProps
       className={cn(
         "group flex items-center gap-1.5 overflow-hidden rounded px-2 py-1 text-xs",
         "cursor-pointer hover:bg-accent/50",
-        isActive && "bg-accent/70",
+        isActive && "bg-accent text-foreground",
       )}
     >
-      <MessageSquare className="h-3 w-3 shrink-0 text-muted-foreground/60" />
-      <span className="min-w-0 flex-1 truncate text-muted-foreground">
+      <MessageSquare className={cn("h-3 w-3 shrink-0", isActive ? "text-foreground/70" : "text-muted-foreground/60")} />
+      <span className={cn("min-w-0 flex-1 truncate", isActive ? "text-foreground/90" : "text-muted-foreground")}>
         {truncatePrompt(session.prompt, 30)}
       </span>
       <span className="shrink-0 text-[9px] text-muted-foreground/40">

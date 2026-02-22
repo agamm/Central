@@ -5,6 +5,7 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
+  Plus,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -23,6 +24,7 @@ interface ProjectItemProps {
   readonly onSelect: (id: string) => void;
   readonly onRename: (id: string, name: string) => void;
   readonly onDelete: (id: string) => void;
+  readonly onNewChat?: (projectId: string) => void;
   readonly children?: ReactNode;
 }
 
@@ -33,6 +35,7 @@ function ProjectItem({
   onSelect,
   onRename,
   onDelete,
+  onNewChat,
   children,
 }: ProjectItemProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -57,6 +60,14 @@ function ProjectItem({
     setIsEditing(false);
   }, [editName, project.id, project.name, onRename]);
 
+  const handleNewChatClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onNewChat?.(project.id);
+    },
+    [onNewChat, project.id],
+  );
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === "Enter") {
@@ -79,8 +90,7 @@ function ProjectItem({
         }}
         className={cn(
           "group flex items-center gap-1 rounded px-2 py-1 text-sm",
-          "cursor-pointer hover:bg-accent/60",
-          isSelected && "bg-accent/80",
+          "cursor-pointer",
         )}
       >
         <ChevronRight
@@ -111,13 +121,23 @@ function ProjectItem({
           </span>
         )}
 
+        {!isEditing && onNewChat && (
+          <button
+            onClick={handleNewChatClick}
+            className="shrink-0 rounded p-0.5 hover:bg-accent"
+            aria-label="New chat"
+          >
+            <Plus className="h-3.5 w-3.5 text-muted-foreground" />
+          </button>
+        )}
+
         {!isEditing && (
           <DropdownMenu>
             <DropdownMenuTrigger
               onClick={(e) => {
                 e.stopPropagation();
               }}
-              className="invisible rounded p-0.5 hover:bg-muted group-hover:visible"
+              className="rounded p-0.5 hover:bg-muted"
             >
               <MoreHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
             </DropdownMenuTrigger>

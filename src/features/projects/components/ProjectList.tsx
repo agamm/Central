@@ -6,6 +6,8 @@ import { EmptyProjectState } from "./EmptyProjectState";
 import { AgentList } from "@/features/agents/components/AgentList";
 import { useProjectStore } from "../store";
 import { useAgentStore } from "@/features/agents/store";
+import { useSessionStore } from "@/features/agents/stores/sessionStore";
+import { useUIStore } from "@/features/agents/stores/uiStore";
 import { useFilesStore } from "@/features/files/store";
 import * as agentApi from "@/features/agents/api";
 
@@ -23,7 +25,9 @@ function ProjectList({ onAddProject }: ProjectListProps) {
   const setMessages = useAgentStore((s) => s.setMessages);
   const messagesBySession = useAgentStore((s) => s.messagesBySession);
   const deleteSession = useAgentStore((s) => s.deleteSession);
+  const createIdleSession = useSessionStore((s) => s.createIdleSession);
   const closeFileViewer = useFilesStore((s) => s.closeFileViewer);
+  const triggerPromptFocus = useUIStore((s) => s.triggerPromptFocus);
 
   const handleSelect = useCallback(
     (id: string) => {
@@ -60,10 +64,16 @@ function ProjectList({ onAddProject }: ProjectListProps) {
     [selectProject, switchSession, closeFileViewer, messagesBySession, setMessages],
   );
 
-  const handleNewChat = useCallback(() => {
-    // Clear active session so ChatPane shows empty state with prompt input
-    switchSession(null);
-  }, [switchSession]);
+  const handleNewChat = useCallback(
+    (projectId: string) => {
+      selectProject(projectId);
+      closeFileViewer();
+      void createIdleSession(projectId).then(() => {
+        triggerPromptFocus();
+      });
+    },
+    [selectProject, closeFileViewer, createIdleSession, triggerPromptFocus],
+  );
 
   const handleSessionDelete = useCallback(
     (sessionId: string) => {
@@ -91,12 +101,12 @@ function ProjectList({ onAddProject }: ProjectListProps) {
             onSelect={handleSelect}
             onRename={handleRename}
             onDelete={handleDelete}
+            onNewChat={handleNewChat}
           >
             <AgentList
               projectId={project.id}
               onSessionSelect={handleSessionSelect}
               onSessionDelete={handleSessionDelete}
-              onNewChat={handleNewChat}
             />
           </ProjectItem>
         ))}

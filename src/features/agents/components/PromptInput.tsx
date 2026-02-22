@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Send, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useUIStore } from "../stores/uiStore";
 
 /** Per-session message history for up-arrow recall */
 const historyBySession = new Map<string, string[]>();
@@ -42,12 +43,14 @@ function PromptInput({
   const historyIndexRef = useRef(-1);
   const draftRef = useRef("");
 
-  // Auto-focus when session changes (new chat created) or on mount
+  const promptFocusTrigger = useUIStore((s) => s.promptFocusTrigger);
+
+  // Auto-focus when session changes (new chat created) or on explicit trigger
   useEffect(() => {
     requestAnimationFrame(() => {
       textareaRef.current?.focus();
     });
-  }, [sessionId]);
+  }, [sessionId, promptFocusTrigger]);
 
   // Reset history index when session changes
   useEffect(() => {

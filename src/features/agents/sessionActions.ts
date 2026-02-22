@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { debugLog } from "@/shared/debugLog";
+import * as agentApi from "./api";
 import type { AgentSession, AgentStatus, ChatMessage } from "./types";
 
 function createUserMessage(sessionId: string, content: string): ChatMessage {
@@ -94,5 +95,41 @@ async function sendFollowUp(
   }
 }
 
-export { startNewSession, sendFollowUp };
+interface IdleSessionActions {
+  readonly addMessage: (sid: string, msg: ChatMessage) => void;
+  readonly updateStatus: (sid: string, status: AgentStatus) => void;
+  readonly updatePrompt: (sid: string, prompt: string) => void;
+  readonly setError: (e: string) => void;
+}
+
+async function startIdleSession(
+  sessionId: string,
+  projectPath: string,
+  content: string,
+  actions: IdleSessionActions,
+): Promise<void> {
+  debugLog("REACT", `startIdleSession: sessionId=${sessionId}, path=${projectPath}`);
+
+  // Update prompt in DB + store and set status to running
+  await agentApi.updateSessionPrompt(sessionId, content);
+  actions.updatePrompt(sessionId, content);
+  actions.updateStatus(sessionId, "running");
+  addUserMessage(sessionId, content, actions.addMessage);
+
+  try {
+    debugLog("REACT", `Invoking start_agent_session for idle: sid=${sessionId}`);
+    await invoke("start_agent_session", {
+      sessionId,
+      projectPath,
+      prompt: content,
+      model: null,
+    });
+  } catch (e) {
+    debugLog("REACT", `start_agent_session FAILED: ${String(e)}`);
+    actions.updateStatus(sessionId, "failed");
+    actions.setError(`Failed to start agent: ${String(e)}`);
+  }
+}
+
+export { startNewSession, sendFollowUp, startIdleSession };
 export type { SessionActions };

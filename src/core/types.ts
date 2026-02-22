@@ -1,5 +1,6 @@
-/** Agent session status lifecycle: running -> completed | failed | aborted | interrupted */
+/** Agent session status lifecycle: idle -> running -> completed | failed | aborted | interrupted */
 type AgentStatus =
+  | "idle"
   | "running"
   | "completed"
   | "failed"

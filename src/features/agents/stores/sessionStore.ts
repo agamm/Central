@@ -20,6 +20,7 @@ interface SessionState {
 interface SessionActions {
   readonly setSession: (session: AgentSession) => void;
   readonly updateSessionStatus: (sessionId: string, status: AgentStatus) => void;
+  readonly updateSessionPrompt: (sessionId: string, prompt: string) => void;
   readonly switchSession: (sessionId: string | null) => void;
   readonly setSessionStartedAt: (sessionId: string, timestamp: string) => void;
   readonly setSessionElapsed: (sessionId: string, ms: number) => void;
@@ -28,6 +29,7 @@ interface SessionActions {
   readonly setLoading: (loading: boolean) => void;
   readonly setError: (error: string | null) => void;
   readonly createSession: (projectId: string, prompt: string, model: string | null) => Promise<AgentSession | null>;
+  readonly createIdleSession: (projectId: string) => Promise<AgentSession | null>;
   readonly hydrate: () => Promise<void>;
   readonly clearSession: (sessionId: string) => void;
 }
@@ -65,6 +67,14 @@ const useSessionStore = create<SessionStore>()((set, get) => ({
     agentApi
       .updateSessionStatus(sessionId, status, endedAt ?? undefined)
       .catch((e: unknown) => { persistError("updateSessionStatus", e); });
+  },
+
+  updateSessionPrompt: (sessionId, prompt) => {
+    const sessions = new Map(get().sessions);
+    const existing = sessions.get(sessionId);
+    if (!existing) return;
+    sessions.set(sessionId, { ...existing, prompt });
+    set({ sessions });
   },
 
   switchSession: (sessionId) => {
@@ -107,6 +117,19 @@ const useSessionStore = create<SessionStore>()((set, get) => ({
 
   createSession: async (projectId, prompt, model) => {
     const result = await agentApi.createSession(projectId, prompt, model);
+    if (result.isErr()) {
+      set({ error: result.error });
+      return null;
+    }
+    const session = result.value;
+    const sessions = new Map(get().sessions);
+    sessions.set(session.id, session);
+    set({ sessions, activeSessionId: session.id });
+    return session;
+  },
+
+  createIdleSession: async (projectId) => {
+    const result = await agentApi.createIdleSession(projectId);
     if (result.isErr()) {
       set({ error: result.error });
       return null;

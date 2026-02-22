@@ -3,7 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { useSessionStore } from "../stores/sessionStore";
 import { useMessageStore } from "../stores/messageStore";
 import { useUIStore } from "../stores/uiStore";
-import { startNewSession, sendFollowUp } from "../sessionActions";
+import { startNewSession, sendFollowUp, startIdleSession } from "../sessionActions";
 import type { ChatSessionData } from "./useChatSession";
 
 type SessionActions = Pick<ChatSessionData, "selectedProjectId" | "selectedProject" | "activeSessionId" | "activeSession" | "isRunning" | "sdkSessionIds">;
@@ -12,13 +12,14 @@ function useChatActions(session: SessionActions) {
   const createSession = useSessionStore((s) => s.createSession);
   const addMessage = useMessageStore((s) => s.addMessage);
   const updateStatus = useSessionStore((s) => s.updateSessionStatus);
+  const updatePrompt = useSessionStore((s) => s.updateSessionPrompt);
   const setError = useSessionStore((s) => s.setError);
   const queueMessage = useMessageStore((s) => s.queueMessage);
   const saveScrollPosition = useUIStore((s) => s.saveScrollPosition);
 
   const actions = useMemo(
-    () => ({ createSession, addMessage, updateStatus, setError }),
-    [createSession, addMessage, updateStatus, setError],
+    () => ({ createSession, addMessage, updateStatus, updatePrompt, setError }),
+    [createSession, addMessage, updateStatus, updatePrompt, setError],
   );
 
   const handleSubmit = useCallback(
@@ -27,6 +28,11 @@ function useChatActions(session: SessionActions) {
 
       if (!session.activeSessionId || !session.activeSession) {
         await startNewSession(session.selectedProjectId, session.selectedProject.path, content, actions);
+        return;
+      }
+
+      if (session.activeSession.status === "idle") {
+        await startIdleSession(session.activeSessionId, session.selectedProject.path, content, actions);
         return;
       }
 

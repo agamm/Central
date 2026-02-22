@@ -93,6 +93,52 @@ async function createSession(
   }
 }
 
+async function createIdleSession(
+  projectId: string,
+): Promise<Result<AgentSession, string>> {
+  try {
+    const db = getDb();
+    const id = generateId();
+    const createdAt = new Date().toISOString();
+    const status: AgentStatus = "idle";
+
+    await db.execute(
+      `INSERT INTO agent_sessions (id, project_id, status, prompt, model, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [id, projectId, status, null, null, createdAt],
+    );
+
+    return ok({
+      id,
+      projectId,
+      status,
+      prompt: null,
+      model: null,
+      sdkSessionId: null,
+      createdAt,
+      endedAt: null,
+    });
+  } catch (e) {
+    return err(`Failed to create idle session: ${String(e)}`);
+  }
+}
+
+async function updateSessionPrompt(
+  sessionId: string,
+  prompt: string,
+): Promise<Result<void, string>> {
+  try {
+    const db = getDb();
+    await db.execute(
+      `UPDATE agent_sessions SET prompt = $1 WHERE id = $2`,
+      [prompt, sessionId],
+    );
+    return ok(undefined);
+  } catch (e) {
+    return err(`Failed to update session prompt: ${String(e)}`);
+  }
+}
+
 async function updateSessionStatus(
   sessionId: string,
   status: AgentStatus,
@@ -236,6 +282,8 @@ async function deleteSession(
 
 export {
   createSession,
+  createIdleSession,
+  updateSessionPrompt,
   updateSessionStatus,
   listSessions,
   addMessage,
