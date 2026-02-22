@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { MessageSquare, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StatusBadge } from "./StatusBadge";
+import { useUIStore } from "../stores/uiStore";
 import type { AgentSession } from "@/core/types";
 
 interface SessionItemProps {
@@ -34,6 +35,14 @@ function formatRelativeTime(dateString: string): string {
 }
 
 function SessionItem({ session, isActive, onSelect, onDelete }: SessionItemProps) {
+  const pendingApprovals = useUIStore((s) => s.pendingApprovals);
+  const unreadSessions = useUIStore((s) => s.unreadSessions);
+
+  const hasApproval = Array.from(pendingApprovals.values()).some(
+    (req) => req.sessionId === session.id,
+  );
+  const isUnread = session.status === "completed" && unreadSessions.has(session.id);
+
   const handleClick = useCallback(() => {
     onSelect(session.id);
   }, [onSelect, session.id]);
@@ -72,7 +81,12 @@ function SessionItem({ session, isActive, onSelect, onDelete }: SessionItemProps
       <span className="shrink-0 text-[9px] text-muted-foreground/40">
         {formatRelativeTime(session.createdAt)}
       </span>
-      <StatusBadge status={session.status} className="shrink-0" />
+      <StatusBadge
+        status={session.status}
+        hasApproval={hasApproval}
+        isUnread={isUnread}
+        className="shrink-0"
+      />
       {onDelete && (
         <button
           onClick={handleDelete}

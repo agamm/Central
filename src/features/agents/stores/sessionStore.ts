@@ -3,6 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import * as agentApi from "../api";
 import { debugLog } from "@/shared/debugLog";
 import type { AgentSession, AgentStatus } from "../types";
+import { useUIStore } from "./uiStore";
 
 const ACTIVE_SESSION_KEY = "active_session_id";
 
@@ -81,6 +82,7 @@ const useSessionStore = create<SessionStore>()((set, get) => ({
     set({ activeSessionId: sessionId });
     if (sessionId) {
       invoke("set_setting", { key: ACTIVE_SESSION_KEY, value: sessionId }).catch(() => {});
+      useUIStore.getState().markSessionRead(sessionId);
     }
   },
 

@@ -68,6 +68,10 @@ async function handleSessionCompleted(sessionId: string): Promise<void> {
     sessStore.setSessionStartedAt(sessionId, new Date().toISOString());
   } else {
     sessStore.updateSessionStatus(sessionId, "completed");
+    // Only mark unread if user isn't already viewing this session
+    if (useSessionStore.getState().activeSessionId !== sessionId) {
+      useUIStore.getState().markSessionUnread(sessionId);
+    }
   }
 
   const session = useSessionStore.getState().sessions.get(sessionId);

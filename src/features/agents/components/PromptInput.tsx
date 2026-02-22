@@ -3,21 +3,26 @@ import { Send, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "../stores/uiStore";
+import * as agentApi from "../api";
 
-/** Per-session message history for up-arrow recall */
-const historyBySession = new Map<string, string[]>();
-const MAX_HISTORY = 50;
+/** Global message history — loaded from DB on first mount, appended on submit */
+let globalHistory: string[] = [];
+let historyLoaded = false;
 
-function pushHistory(sessionId: string, message: string): void {
-  const history = historyBySession.get(sessionId) ?? [];
-  if (history[history.length - 1] === message) return;
-  history.push(message);
-  if (history.length > MAX_HISTORY) history.shift();
-  historyBySession.set(sessionId, history);
+async function loadHistory(): Promise<void> {
+  if (historyLoaded) return;
+  historyLoaded = true;
+  const result = await agentApi.getRecentUserMessages(100);
+  if (result.isOk()) {
+    // DB returns most-recent-first; reverse so index 0 = oldest, last = newest
+    globalHistory = result.value.reverse();
+  }
 }
 
-function getHistory(sessionId: string): readonly string[] {
-  return historyBySession.get(sessionId) ?? [];
+function pushHistory(message: string): void {
+  if (globalHistory[globalHistory.length - 1] === message) return;
+  globalHistory.push(message);
+  if (globalHistory.length > 100) globalHistory.shift();
 }
 
 interface PromptInputProps {
@@ -58,15 +63,20 @@ function PromptInput({
     draftRef.current = "";
   }, [sessionId]);
 
+  // Load global history from DB on first mount
+  useEffect(() => {
+    void loadHistory();
+  }, []);
+
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
     if (trimmed.length === 0) return;
-    if (sessionId) pushHistory(sessionId, trimmed);
+    pushHistory(trimmed);
     historyIndexRef.current = -1;
     draftRef.current = "";
     onSubmit(trimmed);
     setValue("");
-  }, [value, onSubmit, sessionId]);
+  }, [value, onSubmit]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -76,40 +86,34 @@ function PromptInput({
         return;
       }
 
-      if (!sessionId) return;
-
-      // Only handle up/down arrow when cursor is at position 0 (start of input)
       const textarea = e.currentTarget;
       const atStart = textarea.selectionStart === 0 && textarea.selectionEnd === 0;
 
       if (e.key === "ArrowUp" && atStart) {
-        const history = getHistory(sessionId);
-        if (history.length === 0) return;
-
+        if (globalHistory.length === 0) return;
         e.preventDefault();
 
         if (historyIndexRef.current === -1) {
           draftRef.current = value;
-          historyIndexRef.current = history.length - 1;
+          historyIndexRef.current = globalHistory.length - 1;
         } else if (historyIndexRef.current > 0) {
           historyIndexRef.current -= 1;
         }
 
-        setValue(history[historyIndexRef.current] ?? "");
+        setValue(globalHistory[historyIndexRef.current] ?? "");
       } else if (e.key === "ArrowDown" && historyIndexRef.current >= 0) {
-        const history = getHistory(sessionId);
         e.preventDefault();
 
-        if (historyIndexRef.current < history.length - 1) {
+        if (historyIndexRef.current < globalHistory.length - 1) {
           historyIndexRef.current += 1;
-          setValue(history[historyIndexRef.current] ?? "");
+          setValue(globalHistory[historyIndexRef.current] ?? "");
         } else {
           historyIndexRef.current = -1;
           setValue(draftRef.current);
         }
       }
     },
-    [handleSubmit, sessionId, value],
+    [handleSubmit, value],
   );
 
   const handleChange = useCallback(

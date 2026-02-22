@@ -232,6 +232,25 @@ async function getMessages(
   }
 }
 
+/** Fetch recent distinct user messages for input history (global, deduped, most recent first) */
+async function getRecentUserMessages(
+  limit: number = 100,
+): Promise<Result<string[], string>> {
+  try {
+    const db = getDb();
+    const rows = await db.select<{ content: string }[]>(
+      `SELECT DISTINCT content FROM messages
+       WHERE role = 'user' AND content IS NOT NULL
+       ORDER BY timestamp DESC
+       LIMIT $1`,
+      [limit],
+    );
+    return ok(rows.map((r) => r.content));
+  } catch (e) {
+    return err(`Failed to get user message history: ${String(e)}`);
+  }
+}
+
 /** Fetch all sessions across all projects, ordered by most recent first */
 async function getAllSessions(): Promise<Result<AgentSession[], string>> {
   try {
@@ -288,6 +307,7 @@ export {
   listSessions,
   addMessage,
   getMessages,
+  getRecentUserMessages,
   getAllSessions,
   markInterruptedSessions,
   deleteSession,

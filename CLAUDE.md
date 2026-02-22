@@ -46,6 +46,13 @@ macOS desktop app for orchestrating parallel Claude Code agents. Tauri v2 + Reac
 - `maxBudgetUsd` for cost control per session
 - SDK session IDs captured for future session resume support
 
+### Data Layer
+- **SQLite** via `@tauri-apps/plugin-sql` — single DB `sqlite:central.db`
+- Schema in `src-tauri/migrations/` — tables: `projects`, `agent_sessions`, `messages`, `app_settings`
+- TS API layer: `src/features/agents/api.ts`, `src/features/projects/api.ts` — `Database.get(DB_NAME)` pattern
+- All queries use `neverthrow` Result types. Migrations run automatically on app start.
+- KV store for app settings via `app_settings` table
+
 ### Other
 - Tauri Rust backend: git ops (git2-rs), sidecar process management
 - IPC: Tauri events for streaming, invoke() for request/response
