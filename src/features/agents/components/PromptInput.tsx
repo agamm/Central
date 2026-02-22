@@ -3,6 +3,22 @@ import { Send, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+/** Per-session message history for up-arrow recall */
+const historyBySession = new Map<string, string[]>();
+const MAX_HISTORY = 50;
+
+function pushHistory(sessionId: string, message: string): void {
+  const history = historyBySession.get(sessionId) ?? [];
+  if (history[history.length - 1] === message) return;
+  history.push(message);
+  if (history.length > MAX_HISTORY) history.shift();
+  historyBySession.set(sessionId, history);
+}
+
+function getHistory(sessionId: string): readonly string[] {
+  return historyBySession.get(sessionId) ?? [];
+}
+
 interface PromptInputProps {
   readonly onSubmit: (message: string) => void;
   readonly onAbort: () => void;
@@ -22,6 +38,9 @@ function PromptInput({
 }: PromptInputProps) {
   const [value, setValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // -1 = not browsing history, 0+ = index from end of history array
+  const historyIndexRef = useRef(-1);
+  const draftRef = useRef("");
 
   // Auto-focus when session changes (new chat created) or on mount
   useEffect(() => {
@@ -30,21 +49,74 @@ function PromptInput({
     });
   }, [sessionId]);
 
+  // Reset history index when session changes
+  useEffect(() => {
+    historyIndexRef.current = -1;
+    draftRef.current = "";
+  }, [sessionId]);
+
   const handleSubmit = useCallback(() => {
     const trimmed = value.trim();
     if (trimmed.length === 0) return;
+    if (sessionId) pushHistory(sessionId, trimmed);
+    historyIndexRef.current = -1;
+    draftRef.current = "";
     onSubmit(trimmed);
     setValue("");
-  }, [value, onSubmit]);
+  }, [value, onSubmit, sessionId]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         handleSubmit();
+        return;
+      }
+
+      if (!sessionId) return;
+
+      // Only handle up/down arrow when cursor is at position 0 (start of input)
+      const textarea = e.currentTarget;
+      const atStart = textarea.selectionStart === 0 && textarea.selectionEnd === 0;
+
+      if (e.key === "ArrowUp" && atStart) {
+        const history = getHistory(sessionId);
+        if (history.length === 0) return;
+
+        e.preventDefault();
+
+        if (historyIndexRef.current === -1) {
+          draftRef.current = value;
+          historyIndexRef.current = history.length - 1;
+        } else if (historyIndexRef.current > 0) {
+          historyIndexRef.current -= 1;
+        }
+
+        setValue(history[historyIndexRef.current] ?? "");
+      } else if (e.key === "ArrowDown" && historyIndexRef.current >= 0) {
+        const history = getHistory(sessionId);
+        e.preventDefault();
+
+        if (historyIndexRef.current < history.length - 1) {
+          historyIndexRef.current += 1;
+          setValue(history[historyIndexRef.current] ?? "");
+        } else {
+          historyIndexRef.current = -1;
+          setValue(draftRef.current);
+        }
       }
     },
-    [handleSubmit],
+    [handleSubmit, sessionId, value],
+  );
+
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setValue(e.target.value);
+      // If user types while browsing history, exit history mode
+      historyIndexRef.current = -1;
+      draftRef.current = "";
+    },
+    [],
   );
 
   return (
@@ -53,9 +125,7 @@ function PromptInput({
         <textarea
           ref={textareaRef}
           value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
-          }}
+          onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}

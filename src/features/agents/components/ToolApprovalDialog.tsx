@@ -2,6 +2,12 @@ import { useState, useCallback, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { Shield, ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAgentStore } from "../store";
 import { debugLog } from "@/shared/debugLog";
 import type { ToolApprovalRequest } from "../types";
@@ -65,13 +71,9 @@ function ApprovalItem({ approval }: ApprovalItemProps) {
     [respond],
   );
 
-  const handleAlwaysAllow = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      void respond(true, approval.suggestions);
-    },
-    [respond, approval.suggestions],
-  );
+  const handleAlwaysAllow = useCallback(() => {
+    void respond(true, approval.suggestions);
+  }, [respond, approval.suggestions]);
 
   const handleDeny = useCallback(
     (e: React.MouseEvent) => {
@@ -81,7 +83,12 @@ function ApprovalItem({ approval }: ApprovalItemProps) {
     [respond],
   );
 
-  const toggleExpanded = useCallback(() => { setExpanded((v) => !v); }, []);
+  const toggleExpanded = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpanded((v) => !v);
+  }, []);
+
+  const hasAlwaysAllow = approval.suggestions && approval.suggestions.length > 0;
 
   return (
     <div className="flex flex-col gap-1.5 rounded-md border border-border/50 bg-muted/30 p-2.5">
@@ -125,22 +132,42 @@ function ApprovalItem({ approval }: ApprovalItemProps) {
         >
           Deny
         </Button>
-        <Button
-          size="sm"
-          onClick={handleApprove}
-          disabled={responding}
-          className="h-6 bg-emerald-700 px-3 text-[11px] text-white hover:bg-emerald-600"
-        >
-          {responding ? "Sending..." : "Approve"}
-        </Button>
-        {approval.suggestions && approval.suggestions.length > 0 && (
+        {hasAlwaysAllow ? (
+          <div className="flex items-center">
+            <Button
+              size="sm"
+              onClick={handleApprove}
+              disabled={responding}
+              className="h-6 rounded-r-none border-r border-emerald-600/50 bg-emerald-700 px-3 text-[11px] text-white hover:bg-emerald-600"
+            >
+              {responding ? "Sending..." : "Approve"}
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  disabled={responding}
+                  aria-label="More approval options"
+                  className="h-6 rounded-l-none bg-emerald-700 px-1.5 text-[11px] text-white hover:bg-emerald-600"
+                >
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[120px]">
+                <DropdownMenuItem onSelect={handleAlwaysAllow}>
+                  Always Allow
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ) : (
           <Button
             size="sm"
-            onClick={handleAlwaysAllow}
+            onClick={handleApprove}
             disabled={responding}
-            className="h-6 bg-blue-700 px-3 text-[11px] text-white hover:bg-blue-600"
+            className="h-6 bg-emerald-700 px-3 text-[11px] text-white hover:bg-emerald-600"
           >
-            Always Allow
+            {responding ? "Sending..." : "Approve"}
           </Button>
         )}
       </div>

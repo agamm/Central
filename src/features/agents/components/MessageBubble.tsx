@@ -135,7 +135,7 @@ function MessageBubble({ message, elapsedMs }: MessageBubbleProps) {
             : <AssistantMessageContent content={message.content} isStreaming={isStreaming} />
         )}
 
-        {isStreaming && !message.content && (
+        {isStreaming && !message.content && toolCalls.length === 0 && (
           <span className="inline-block h-4 w-0.5 animate-pulse bg-foreground/60" />
         )}
 
