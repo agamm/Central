@@ -30,7 +30,7 @@ interface ProjectItemProps {
 
 function ProjectItem({
   project,
-  isSelected,
+  isSelected: _isSelected,
   isExpanded,
   onSelect,
   onRename,

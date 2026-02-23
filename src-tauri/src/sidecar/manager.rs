@@ -86,7 +86,10 @@ impl SidecarManager {
         cmd.arg("--import")
             .arg("tsx")
             .arg(&worker_path)
-            .current_dir(sidecar_dir);
+            .current_dir(sidecar_dir)
+            // Unset CLAUDECODE to prevent SDK from refusing to start inside
+            // a Claude Code session (common during development)
+            .env_remove("CLAUDECODE");
 
         // Ensure Node.js can verify TLS certs (macOS system bundle)
         // See https://github.com/anthropics/claude-code/issues/4053
@@ -274,37 +277,45 @@ fn resolve_ca_certs() -> Option<String> {
 
 /// Resolve the path to the session-worker entry script
 fn resolve_worker_path() -> Result<String, String> {
-    // In development: project_root/sidecar/src/session-worker.ts
-    // Rust CWD is src-tauri/, so parent is project_root
-    let dev_path = std::env::current_dir()
-        .map_err(|e| e.to_string())?
-        .parent()
-        .map(|p| p.join("sidecar").join("src").join("session-worker.ts"))
-        .ok_or_else(|| "Cannot resolve parent directory".to_string())?;
+    let worker_rel = std::path::Path::new("sidecar")
+        .join("src")
+        .join("session-worker.ts");
 
-    if dev_path.exists() {
-        return dev_path
-            .to_str()
-            .map(|s| s.to_string())
-            .ok_or_else(|| "Invalid path encoding".to_string());
+    // Strategy 1: CWD is src-tauri/, parent is project_root (tauri dev)
+    if let Ok(cwd) = std::env::current_dir() {
+        if let Some(parent) = cwd.parent() {
+            let candidate = parent.join(&worker_rel);
+            if candidate.exists() {
+                return path_to_string(&candidate);
+            }
+        }
     }
 
-    // Fallback: relative to executable
-    let exe_dir = std::env::current_exe()
-        .map_err(|e| e.to_string())?
-        .parent()
-        .map(|p| p.join("sidecar").join("src").join("session-worker.ts"))
-        .ok_or_else(|| "Cannot resolve exe directory".to_string())?;
-
-    if exe_dir.exists() {
-        return exe_dir
-            .to_str()
-            .map(|s| s.to_string())
-            .ok_or_else(|| "Invalid path encoding".to_string());
+    // Strategy 2: Walk up from executable to find the project root.
+    // Handles .app bundles where exe is at:
+    //   src-tauri/target/debug/bundle/macos/App.app/Contents/MacOS/binary
+    if let Ok(exe) = std::env::current_exe() {
+        let mut dir = exe.as_path();
+        // Walk up at most 10 levels looking for the sidecar directory
+        for _ in 0..10 {
+            match dir.parent() {
+                Some(parent) => {
+                    let candidate = parent.join(&worker_rel);
+                    if candidate.exists() {
+                        return path_to_string(&candidate);
+                    }
+                    dir = parent;
+                }
+                None => break,
+            }
+        }
     }
 
-    Err(format!(
-        "Worker not found at {:?} or {:?}",
-        dev_path, exe_dir
-    ))
+    Err(format!("Worker not found (looked for {})", worker_rel.display()))
+}
+
+fn path_to_string(p: &std::path::Path) -> Result<String, String> {
+    p.to_str()
+        .map(|s| s.to_string())
+        .ok_or_else(|| "Invalid path encoding".to_string())
 }

@@ -1,5 +1,6 @@
 pub mod agents;
 pub mod files;
+pub mod notifications;
 pub mod settings;
 
 #[tauri::command]

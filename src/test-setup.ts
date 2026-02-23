@@ -12,13 +12,6 @@ vi.mock("@tauri-apps/api/event", () => ({
   emit: vi.fn(),
 }));
 
-// Mock @tauri-apps/plugin-notification
-vi.mock("@tauri-apps/plugin-notification", () => ({
-  isPermissionGranted: vi.fn(() => Promise.resolve(true)),
-  requestPermission: vi.fn(() => Promise.resolve("granted")),
-  sendNotification: vi.fn(),
-}));
-
 // Mock @tauri-apps/plugin-sql
 const mockExecute = vi.fn(() =>
   Promise.resolve({ rowsAffected: 1, lastInsertId: 0 }),

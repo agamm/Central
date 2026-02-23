@@ -3,6 +3,7 @@ use tauri_plugin_sql::{Builder as SqlBuilder, Migration, MigrationKind};
 
 mod commands;
 mod debug_log;
+mod notifications;
 mod sidecar;
 
 fn create_migrations() -> Vec<Migration> {
@@ -37,7 +38,6 @@ pub fn run() {
                 .build(),
         )
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             debug_log::init_log_path();
@@ -48,6 +48,11 @@ pub fn run() {
             app.manage(sidecar_handle);
 
             debug_log::log("RUST", "Sidecar handle created and managed");
+
+            if let Err(e) = notifications::init() {
+                debug_log::log("RUST", &format!("Notification init failed: {e}"));
+            }
+
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -71,6 +76,7 @@ pub fn run() {
             commands::files::diff::get_diff,
             commands::settings::get_setting,
             commands::settings::set_setting,
+            commands::notifications::send_native_notification,
             debug_log::debug_log,
         ])
         .run(tauri::generate_context!())
