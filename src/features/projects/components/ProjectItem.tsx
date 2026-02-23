@@ -6,6 +6,8 @@ import {
   Pencil,
   Trash2,
   Plus,
+  MessageSquare,
+  TerminalSquare,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -25,6 +27,7 @@ interface ProjectItemProps {
   readonly onRename: (id: string, name: string) => void;
   readonly onDelete: (id: string) => void;
   readonly onNewChat?: (projectId: string) => void;
+  readonly onNewTerminal?: (projectId: string) => void;
   readonly children?: ReactNode;
 }
 
@@ -36,6 +39,7 @@ function ProjectItem({
   onRename,
   onDelete,
   onNewChat,
+  onNewTerminal,
   children,
 }: ProjectItemProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -60,14 +64,6 @@ function ProjectItem({
     setIsEditing(false);
   }, [editName, project.id, project.name, onRename]);
 
-  const handleNewChatClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      onNewChat?.(project.id);
-    },
-    [onNewChat, project.id],
-  );
-
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === "Enter") {
@@ -91,6 +87,7 @@ function ProjectItem({
         className={cn(
           "group flex items-center gap-1 rounded px-2 py-1 text-sm",
           "cursor-pointer",
+          isExpanded && "border-l-2 border-l-foreground/30",
         )}
       >
         <ChevronRight
@@ -99,7 +96,7 @@ function ProjectItem({
             isExpanded && "rotate-90",
           )}
         />
-        <Folder className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
+        <Folder className={cn("h-3.5 w-3.5 shrink-0", isExpanded ? "text-foreground/70" : "text-muted-foreground/70")} />
 
         {isEditing ? (
           <Input
@@ -121,14 +118,40 @@ function ProjectItem({
           </span>
         )}
 
-        {!isEditing && onNewChat && (
-          <button
-            onClick={handleNewChatClick}
-            className="shrink-0 rounded p-0.5 hover:bg-accent"
-            aria-label="New chat"
-          >
-            <Plus className="h-3.5 w-3.5 text-muted-foreground" />
-          </button>
+        {!isEditing && (onNewChat || onNewTerminal) && (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              className="shrink-0 rounded p-0.5 hover:bg-accent"
+              aria-label="New session"
+            >
+              <Plus className="h-3.5 w-3.5 text-muted-foreground" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              {onNewChat && (
+                <DropdownMenuItem
+                  onSelect={() => {
+                    onNewChat(project.id);
+                  }}
+                >
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  New Chat
+                </DropdownMenuItem>
+              )}
+              {onNewTerminal && (
+                <DropdownMenuItem
+                  onSelect={() => {
+                    onNewTerminal(project.id);
+                  }}
+                >
+                  <TerminalSquare className="h-3.5 w-3.5" />
+                  New Terminal
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
         {!isEditing && (

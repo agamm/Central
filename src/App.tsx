@@ -12,11 +12,14 @@ import {
   DiffViewer,
   useFilesStore,
 } from "@/features/files";
+import { TerminalPane } from "@/features/terminal";
 import { PaneErrorBoundary } from "@/components/PaneErrorBoundary";
 import { useBootstrap } from "@/hooks/useBootstrap";
 import { useAgentTimeout } from "@/hooks/useAgentTimeout";
 import { BootstrapLoading } from "@/components/BootstrapLoading";
 import { SettingsPane, useSettingsStore } from "@/features/settings";
+import { useAgentStore } from "@/features/agents/store";
+import { useProjectStore } from "@/features/projects/store";
 
 function CenterPane() {
   const viewingFileInCenter = useFilesStore((s) => s.viewingFileInCenter);
@@ -24,6 +27,11 @@ function CenterPane() {
   const centerFileContent = useFilesStore((s) => s.centerFileContent);
   const centerFileDiffs = useFilesStore((s) => s.centerFileDiffs);
   const centerViewMode = useFilesStore((s) => s.centerViewMode);
+
+  const activeSessionId = useAgentStore((s) => s.activeSessionId);
+  const sessions = useAgentStore((s) => s.sessions);
+  const selectedProjectId = useProjectStore((s) => s.selectedProjectId);
+  const projects = useProjectStore((s) => s.projects);
 
   if (viewingFileInCenter && centerFilePath) {
     if (centerViewMode === "diff") {
@@ -39,6 +47,17 @@ function CenterPane() {
         <p className="text-xs text-muted-foreground">Loading...</p>
       </div>
     );
+  }
+
+  // Check if the active session is a terminal session
+  if (activeSessionId && selectedProjectId) {
+    const activeSession = sessions.get(activeSessionId);
+    if (activeSession?.sessionType === "terminal") {
+      const project = projects.find((p) => p.id === selectedProjectId);
+      if (project) {
+        return <TerminalPane sessionId={activeSessionId} cwd={project.path} />;
+      }
+    }
   }
 
   return <ChatPane />;

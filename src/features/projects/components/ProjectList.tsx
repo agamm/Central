@@ -25,6 +25,7 @@ function ProjectList({ onAddProject }: ProjectListProps) {
   const setMessages = useAgentStore((s) => s.setMessages);
   const messagesBySession = useAgentStore((s) => s.messagesBySession);
   const deleteSession = useAgentStore((s) => s.deleteSession);
+  const setSession = useAgentStore((s) => s.setSession);
   const createIdleSession = useSessionStore((s) => s.createIdleSession);
   const closeFileViewer = useFilesStore((s) => s.closeFileViewer);
   const triggerPromptFocus = useUIStore((s) => s.triggerPromptFocus);
@@ -75,10 +76,29 @@ function ProjectList({ onAddProject }: ProjectListProps) {
     [selectProject, closeFileViewer, createIdleSession, triggerPromptFocus],
   );
 
+  const handleNewTerminal = useCallback(
+    (projectId: string) => {
+      selectProject(projectId);
+      closeFileViewer();
+      void agentApi.createTerminalSession(projectId).then((result) => {
+        result.match(
+          (session) => {
+            setSession(session);
+            switchSession(session.id);
+          },
+          () => { /* error creating terminal session */ },
+        );
+      });
+    },
+    [selectProject, closeFileViewer, setSession, switchSession],
+  );
+
   const handleSessionDelete = useCallback(
     (sessionId: string) => {
       // Try to kill the worker if one exists (ignore errors for stale sessions)
       void invoke("abort_agent_session", { sessionId }).catch(() => {});
+      // Also try to close terminal if it's a PTY session
+      void invoke("close_terminal", { sessionId }).catch(() => {});
       // Clear from store + delete from DB
       deleteSession(sessionId);
     },
@@ -102,6 +122,7 @@ function ProjectList({ onAddProject }: ProjectListProps) {
             onRename={handleRename}
             onDelete={handleDelete}
             onNewChat={handleNewChat}
+            onNewTerminal={handleNewTerminal}
           >
             <AgentList
               projectId={project.id}
