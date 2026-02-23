@@ -1,4 +1,5 @@
 import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface MarkdownContentProps {
   readonly content: string;
@@ -8,6 +9,7 @@ function MarkdownContent({ content }: MarkdownContentProps) {
   return (
     <div className="select-text text-sm leading-relaxed prose-invert prose-sm max-w-none">
       <Markdown
+        remarkPlugins={[remarkGfm]}
         components={{
           // Style code blocks
           pre: ({ children }) => (
@@ -66,6 +68,21 @@ function MarkdownContent({ content }: MarkdownContentProps) {
             <blockquote className="my-1 border-l-2 border-muted-foreground/30 pl-3 text-muted-foreground">
               {children}
             </blockquote>
+          ),
+          // Tables (GFM)
+          table: ({ children }) => (
+            <div className="my-2 overflow-x-auto">
+              <table className="w-full border-collapse text-xs">{children}</table>
+            </div>
+          ),
+          thead: ({ children }) => (
+            <thead className="border-b border-muted-foreground/30">{children}</thead>
+          ),
+          th: ({ children }) => (
+            <th className="px-2 py-1 text-left font-semibold text-muted-foreground">{children}</th>
+          ),
+          td: ({ children }) => (
+            <td className="border-t border-muted-foreground/10 px-2 py-1">{children}</td>
           ),
         }}
       >
