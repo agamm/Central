@@ -38,12 +38,23 @@ function formatRelativeTime(dateString: string): string {
 function SessionItem({ session, isActive, onSelect, onDelete }: SessionItemProps) {
   const pendingApprovals = useUIStore((s) => s.pendingApprovals);
   const unreadSessions = useUIStore((s) => s.unreadSessions);
+  const terminalPhases = useUIStore((s) => s.terminalPhases);
 
   const hasApproval = Array.from(pendingApprovals.values()).some(
     (req) => req.sessionId === session.id,
   );
-  const isUnread = !isActive && unreadSessions.has(session.id);
   const isTerminal = session.sessionType === "terminal";
+  const terminalPhase = isTerminal ? terminalPhases.get(session.id) : undefined;
+
+  // Unified "isWorking" — works the same for chat and terminal
+  const isWorking = isTerminal
+    ? terminalPhase === "working"
+    : session.status === "running" && !hasApproval;
+
+  // Unread: terminal "done" phase OR generic unread set (for chat sessions)
+  const isUnread = !isActive && (
+    (isTerminal && terminalPhase === "done") || unreadSessions.has(session.id)
+  );
 
   const handleClick = useCallback(() => {
     onSelect(session.id);
@@ -82,9 +93,9 @@ function SessionItem({ session, isActive, onSelect, onDelete }: SessionItemProps
       </span>
       <StatusBadge
         status={session.status}
+        isWorking={isWorking}
         hasApproval={hasApproval}
         isUnread={isUnread}
-        isTerminal={isTerminal}
         className="shrink-0"
       />
       {onDelete && (

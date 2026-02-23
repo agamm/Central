@@ -82,7 +82,12 @@ const useSessionStore = create<SessionStore>()((set, get) => ({
     set({ activeSessionId: sessionId });
     if (sessionId) {
       invoke("set_setting", { key: ACTIVE_SESSION_KEY, value: sessionId }).catch(() => {});
-      useUIStore.getState().markSessionRead(sessionId);
+      const ui = useUIStore.getState();
+      ui.markSessionRead(sessionId);
+      // Clear terminal "done" phase when viewing the session
+      if (ui.terminalPhases.get(sessionId) === "done") {
+        ui.setTerminalPhase(sessionId, "idle");
+      }
     }
   },
 
@@ -164,9 +169,11 @@ const useSessionStore = create<SessionStore>()((set, get) => ({
 
     const savedSessionId = await invoke<string | null>("get_setting", { key: ACTIVE_SESSION_KEY })
       .catch(() => null);
-    const restoredId = savedSessionId && sessions.has(savedSessionId)
-      ? savedSessionId
-      : (sessionsResult.value[0]?.id ?? null);
+    // Don't restore terminal sessions as active — PTYs don't survive app restarts
+    const savedSession = savedSessionId ? sessions.get(savedSessionId) : undefined;
+    const canRestore = savedSession && savedSession.sessionType !== "terminal";
+    const fallbackId = sessionsResult.value.find((s) => s.sessionType !== "terminal")?.id ?? null;
+    const restoredId = canRestore ? savedSessionId : fallbackId;
 
     set({ sessions, activeSessionId: restoredId, loading: false });
   },

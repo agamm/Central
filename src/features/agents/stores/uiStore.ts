@@ -1,11 +1,14 @@
 import { create } from "zustand";
 import type { ToolApprovalRequest } from "../types";
 
+type TerminalPhase = "idle" | "working" | "done";
+
 interface UIState {
   readonly scrollPositionBySession: ReadonlyMap<string, number>;
   readonly pendingApprovals: ReadonlyMap<string, ToolApprovalRequest>;
   readonly promptFocusTrigger: number;
   readonly unreadSessions: ReadonlySet<string>;
+  readonly terminalPhases: ReadonlyMap<string, TerminalPhase>;
 }
 
 interface UIActions {
@@ -17,6 +20,7 @@ interface UIActions {
   readonly clearUI: (sessionId: string) => void;
   readonly markSessionRead: (sessionId: string) => void;
   readonly markSessionUnread: (sessionId: string) => void;
+  readonly setTerminalPhase: (sessionId: string, phase: TerminalPhase) => void;
 }
 
 type UIStore = UIState & UIActions;
@@ -26,6 +30,7 @@ const useUIStore = create<UIStore>()((set, get) => ({
   pendingApprovals: new Map(),
   promptFocusTrigger: 0,
   unreadSessions: new Set(),
+  terminalPhases: new Map(),
 
   saveScrollPosition: (sessionId, position) => {
     const m = new Map(get().scrollPositionBySession);
@@ -65,6 +70,12 @@ const useUIStore = create<UIStore>()((set, get) => ({
     set({ unreadSessions: s });
   },
 
+  setTerminalPhase: (sessionId, phase) => {
+    const m = new Map(get().terminalPhases);
+    m.set(sessionId, phase);
+    set({ terminalPhases: m });
+  },
+
   clearUI: (sessionId) => {
     const scrollMap = new Map(get().scrollPositionBySession);
     scrollMap.delete(sessionId);
@@ -77,9 +88,12 @@ const useUIStore = create<UIStore>()((set, get) => ({
     const readSet = new Set(get().unreadSessions);
     readSet.delete(sessionId);
 
-    set({ scrollPositionBySession: scrollMap, pendingApprovals: approvals, unreadSessions: readSet });
+    const phaseMap = new Map(get().terminalPhases);
+    phaseMap.delete(sessionId);
+
+    set({ scrollPositionBySession: scrollMap, pendingApprovals: approvals, unreadSessions: readSet, terminalPhases: phaseMap });
   },
 }));
 
 export { useUIStore };
-export type { UIStore, UIState, UIActions };
+export type { UIStore, UIState, UIActions, TerminalPhase };

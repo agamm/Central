@@ -10,6 +10,7 @@ import { useSessionStore } from "@/features/agents/stores/sessionStore";
 import { useUIStore } from "@/features/agents/stores/uiStore";
 import { useFilesStore } from "@/features/files/store";
 import * as agentApi from "@/features/agents/api";
+import { destroyCachedTerminal } from "@/features/terminal";
 
 interface ProjectListProps {
   readonly onAddProject: () => void;
@@ -97,8 +98,8 @@ function ProjectList({ onAddProject }: ProjectListProps) {
     (sessionId: string) => {
       // Try to kill the worker if one exists (ignore errors for stale sessions)
       void invoke("abort_agent_session", { sessionId }).catch(() => {});
-      // Also try to close terminal if it's a PTY session
-      void invoke("close_terminal", { sessionId }).catch(() => {});
+      // Destroy cached terminal + close PTY (no-op if not a terminal session)
+      destroyCachedTerminal(sessionId);
       // Clear from store + delete from DB
       deleteSession(sessionId);
     },

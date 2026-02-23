@@ -36,7 +36,7 @@ impl PtyManager {
         }
     }
 
-    /// Start a new PTY running `claude` CLI
+    /// Start a new PTY running `claude` CLI via the user's login shell
     pub fn start_terminal(
         &mut self,
         session_id: String,
@@ -45,8 +45,10 @@ impl PtyManager {
         cols: u16,
         channel: Channel<PtyEvent>,
     ) -> Result<(), String> {
+        // If session already exists, close the old one first (handles StrictMode re-mounts)
         if self.sessions.contains_key(&session_id) {
-            return Err(format!("PTY session already exists: {session_id}"));
+            debug_log::log("PTY", &format!("Replacing existing PTY session: {session_id}"));
+            self.close(&session_id);
         }
 
         let pty_system = native_pty_system();
@@ -62,13 +64,18 @@ impl PtyManager {
             .openpty(size)
             .map_err(|e| format!("Failed to open PTY: {e}"))?;
 
-        let mut cmd = CommandBuilder::new("claude");
+        // Spawn claude through the user's login shell so PATH is properly set up
+        let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/zsh".to_string());
+        debug_log::log("PTY", &format!("Using shell: {shell} for session {session_id}"));
+
+        let mut cmd = CommandBuilder::new(&shell);
+        cmd.args(&["-l", "-c", "claude"]);
         cmd.cwd(&cwd);
 
         let child = pair
             .slave
             .spawn_command(cmd)
-            .map_err(|e| format!("Failed to spawn claude: {e}"))?;
+            .map_err(|e| format!("Failed to spawn claude via {shell}: {e}"))?;
 
         // Drop slave — we only need the master side
         drop(pair.slave);
@@ -92,7 +99,7 @@ impl PtyManager {
             loop {
                 match reader.read(&mut buf) {
                     Ok(0) => {
-                        // EOF — process likely exited
+                        debug_log::log("PTY", &format!("EOF on reader for {sid}"));
                         let _ = channel.send(PtyEvent::Exit { code: 0 });
                         break;
                     }
@@ -104,6 +111,7 @@ impl PtyManager {
                         }
                     }
                     Err(e) => {
+                        debug_log::log("PTY", &format!("Read error for {sid}: {e}"));
                         let _ = channel.send(PtyEvent::Error {
                             message: format!("Read error: {e}"),
                         });

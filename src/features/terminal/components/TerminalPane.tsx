@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
@@ -9,20 +9,51 @@ import {
   closeTerminal,
 } from "../api";
 import type { PtyEvent } from "../api";
+import {
+  trackTerminalOutput,
+  trackTerminalExit,
+  cleanupTerminalTracker,
+} from "../terminalActivity";
 
-interface TerminalPaneProps {
-  readonly sessionId: string;
-  readonly cwd: string;
+const TERMINAL_THEME = {
+  background: "hsl(220, 5%, 5%)",
+  foreground: "hsl(220, 5%, 88%)",
+  cursor: "hsl(220, 5%, 70%)",
+  selectionBackground: "hsla(220, 5%, 40%, 0.3)",
+  black: "hsl(220, 5%, 8%)",
+  red: "#e06c75",
+  green: "#98c379",
+  yellow: "#e5c07b",
+  blue: "#61afef",
+  magenta: "#c678dd",
+  cyan: "#56b6c2",
+  white: "hsl(220, 5%, 80%)",
+  brightBlack: "hsl(220, 5%, 30%)",
+  brightRed: "#e06c75",
+  brightGreen: "#98c379",
+  brightYellow: "#e5c07b",
+  brightBlue: "#61afef",
+  brightMagenta: "#c678dd",
+  brightCyan: "#56b6c2",
+  brightWhite: "hsl(220, 5%, 95%)",
+} as const;
+
+// Module-level cache — survives StrictMode double-mount.
+
+interface CachedTerminal {
+  sessionId: string;
+  term: Terminal;
+  fit: FitAddon;
 }
 
-/** Base64 encode a string for PTY input */
+const terminalCache = new Map<string, CachedTerminal>();
+
 function toBase64(str: string): string {
   const bytes = new TextEncoder().encode(str);
   const binStr = Array.from(bytes, (b) => String.fromCodePoint(b)).join("");
   return btoa(binStr);
 }
 
-/** Decode base64 to Uint8Array for terminal output */
 function fromBase64(b64: string): Uint8Array {
   const binStr = atob(b64);
   const bytes = new Uint8Array(binStr.length);
@@ -32,108 +63,110 @@ function fromBase64(b64: string): Uint8Array {
   return bytes;
 }
 
+function handlePtyEvent(entry: CachedTerminal, event: PtyEvent): void {
+  switch (event.type) {
+    case "Output":
+      entry.term.write(fromBase64(event.data));
+      trackTerminalOutput(entry.sessionId);
+      break;
+    case "Exit":
+      entry.term.writeln(
+        `\r\n\x1b[90m[Process exited with code ${event.code}]\x1b[0m`,
+      );
+      trackTerminalExit(entry.sessionId);
+      break;
+    case "Error":
+      entry.term.writeln(
+        `\r\n\x1b[31m[Error: ${event.message}]\x1b[0m`,
+      );
+      break;
+  }
+}
+
+function destroyCachedTerminal(sessionId: string): void {
+  const entry = terminalCache.get(sessionId);
+  if (entry) {
+    entry.term.dispose();
+    terminalCache.delete(sessionId);
+  }
+  cleanupTerminalTracker(sessionId);
+  void closeTerminal(sessionId).catch(() => {});
+}
+
+interface TerminalPaneProps {
+  readonly sessionId: string;
+  readonly cwd: string;
+}
+
 function TerminalPane({ sessionId, cwd }: TerminalPaneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const termRef = useRef<Terminal | null>(null);
-  const fitRef = useRef<FitAddon | null>(null);
-  const startedRef = useRef(false);
-
-  const handleEvent = useCallback(
-    (event: PtyEvent) => {
-      const term = termRef.current;
-      if (!term) return;
-
-      switch (event.type) {
-        case "Output": {
-          const bytes = fromBase64(event.data);
-          term.write(bytes);
-          break;
-        }
-        case "Exit":
-          term.writeln(`\r\n\x1b[90m[Process exited with code ${event.code}]\x1b[0m`);
-          break;
-        case "Error":
-          term.writeln(`\r\n\x1b[31m[Error: ${event.message}]\x1b[0m`);
-          break;
-      }
-    },
-    [],
-  );
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || startedRef.current) return;
-    startedRef.current = true;
+    if (!container) return;
 
+    // StrictMode: reattach if already created
+    const cached = terminalCache.get(sessionId);
+    if (cached) {
+      if (cached.term.element && !container.contains(cached.term.element)) {
+        container.appendChild(cached.term.element);
+      }
+      requestAnimationFrame(() => {
+        cached.fit.fit();
+        void resizeTerminal(sessionId, cached.term.rows, cached.term.cols).catch(() => {});
+      });
+
+      const observer = new ResizeObserver(() => {
+        requestAnimationFrame(() => {
+          cached.fit.fit();
+          void resizeTerminal(sessionId, cached.term.rows, cached.term.cols).catch(() => {});
+        });
+      });
+      observer.observe(container);
+      return () => { observer.disconnect(); };
+    }
+
+    // --- First time: create terminal + start PTY ---
     const term = new Terminal({
       fontFamily: "'JetBrains Mono', 'SF Mono', Menlo, monospace",
       fontSize: 12,
       lineHeight: 1.4,
       cursorBlink: true,
       cursorStyle: "bar",
-      theme: {
-        background: "hsl(220, 5%, 5%)",
-        foreground: "hsl(220, 5%, 88%)",
-        cursor: "hsl(220, 5%, 70%)",
-        selectionBackground: "hsla(220, 5%, 40%, 0.3)",
-        black: "hsl(220, 5%, 8%)",
-        red: "#e06c75",
-        green: "#98c379",
-        yellow: "#e5c07b",
-        blue: "#61afef",
-        magenta: "#c678dd",
-        cyan: "#56b6c2",
-        white: "hsl(220, 5%, 80%)",
-        brightBlack: "hsl(220, 5%, 30%)",
-        brightRed: "#e06c75",
-        brightGreen: "#98c379",
-        brightYellow: "#e5c07b",
-        brightBlue: "#61afef",
-        brightMagenta: "#c678dd",
-        brightCyan: "#56b6c2",
-        brightWhite: "hsl(220, 5%, 95%)",
-      },
+      theme: TERMINAL_THEME,
     });
 
     const fit = new FitAddon();
     term.loadAddon(fit);
     term.open(container);
 
-    termRef.current = term;
-    fitRef.current = fit;
+    const entry: CachedTerminal = { sessionId, term, fit };
+    terminalCache.set(sessionId, entry);
 
-    // Initial fit
-    requestAnimationFrame(() => {
-      fit.fit();
-    });
-
-    const { rows, cols } = term;
-
-    // Wire up input: user keystrokes → base64 → PTY
+    // Keystrokes → PTY
     term.onData((data) => {
       void writeTerminalInput(sessionId, toBase64(data));
     });
 
-    // Start PTY
-    void startTerminal(sessionId, cwd, rows, cols, handleEvent);
+    // Fit + start PTY on next frame
+    requestAnimationFrame(() => {
+      fit.fit();
+      void startTerminal(sessionId, cwd, term.rows, term.cols, (event) => {
+        handlePtyEvent(entry, event);
+      });
+    });
 
-    // Observe container resizes
+    // Resize observer
     const observer = new ResizeObserver(() => {
       requestAnimationFrame(() => {
         fit.fit();
-        void resizeTerminal(sessionId, term.rows, term.cols);
+        void resizeTerminal(sessionId, term.rows, term.cols).catch(() => {});
       });
     });
     observer.observe(container);
 
-    return () => {
-      observer.disconnect();
-      term.dispose();
-      termRef.current = null;
-      fitRef.current = null;
-      void closeTerminal(sessionId);
-    };
-  }, [sessionId, cwd, handleEvent]);
+    return () => { observer.disconnect(); };
+  }, [sessionId, cwd]);
 
   return (
     <div
@@ -144,4 +177,4 @@ function TerminalPane({ sessionId, cwd }: TerminalPaneProps) {
   );
 }
 
-export { TerminalPane };
+export { TerminalPane, destroyCachedTerminal };
