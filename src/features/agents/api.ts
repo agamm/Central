@@ -1,6 +1,6 @@
 import Database from "@tauri-apps/plugin-sql";
 import { ok, err, type Result } from "neverthrow";
-import type { AgentSession, AgentStatus, Message } from "@/core/types";
+import type { AgentSession, AgentStatus, SessionType, Message } from "@/core/types";
 import { DB_NAME } from "@/core/constants";
 
 /** Raw row shape from SQLite for agent_sessions */
@@ -8,6 +8,7 @@ interface SessionRow {
   readonly id: string;
   readonly project_id: string;
   readonly status: string;
+  readonly session_type: string | null;
   readonly prompt: string | null;
   readonly model: string | null;
   readonly sdk_session_id: string | null;
@@ -32,6 +33,7 @@ function rowToSession(row: SessionRow): AgentSession {
     id: row.id,
     projectId: row.project_id,
     status: row.status as AgentStatus,
+    sessionType: (row.session_type ?? "chat") as SessionType,
     prompt: row.prompt,
     model: row.model,
     sdkSessionId: row.sdk_session_id,
@@ -73,15 +75,16 @@ async function createSession(
     const status: AgentStatus = "running";
 
     await db.execute(
-      `INSERT INTO agent_sessions (id, project_id, status, prompt, model, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [id, projectId, status, prompt, model, createdAt],
+      `INSERT INTO agent_sessions (id, project_id, status, session_type, prompt, model, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [id, projectId, status, "chat", prompt, model, createdAt],
     );
 
     return ok({
       id,
       projectId,
       status,
+      sessionType: "chat" as SessionType,
       prompt,
       model,
       sdkSessionId: null,
@@ -103,15 +106,16 @@ async function createIdleSession(
     const status: AgentStatus = "idle";
 
     await db.execute(
-      `INSERT INTO agent_sessions (id, project_id, status, prompt, model, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [id, projectId, status, null, null, createdAt],
+      `INSERT INTO agent_sessions (id, project_id, status, session_type, prompt, model, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [id, projectId, status, "chat", null, null, createdAt],
     );
 
     return ok({
       id,
       projectId,
       status,
+      sessionType: "chat" as SessionType,
       prompt: null,
       model: null,
       sdkSessionId: null,
@@ -120,6 +124,37 @@ async function createIdleSession(
     });
   } catch (e) {
     return err(`Failed to create idle session: ${String(e)}`);
+  }
+}
+
+async function createTerminalSession(
+  projectId: string,
+): Promise<Result<AgentSession, string>> {
+  try {
+    const db = getDb();
+    const id = generateId();
+    const createdAt = new Date().toISOString();
+    const status: AgentStatus = "running";
+
+    await db.execute(
+      `INSERT INTO agent_sessions (id, project_id, status, session_type, prompt, model, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [id, projectId, status, "terminal", null, null, createdAt],
+    );
+
+    return ok({
+      id,
+      projectId,
+      status,
+      sessionType: "terminal" as SessionType,
+      prompt: null,
+      model: null,
+      sdkSessionId: null,
+      createdAt,
+      endedAt: null,
+    });
+  } catch (e) {
+    return err(`Failed to create terminal session: ${String(e)}`);
   }
 }
 
@@ -166,7 +201,7 @@ async function listSessions(
   try {
     const db = getDb();
     const rows = await db.select<SessionRow[]>(
-      `SELECT id, project_id, status, prompt, model, sdk_session_id, created_at, ended_at
+      `SELECT id, project_id, status, session_type, prompt, model, sdk_session_id, created_at, ended_at
        FROM agent_sessions
        WHERE project_id = $1
        ORDER BY created_at DESC`,
@@ -256,7 +291,7 @@ async function getAllSessions(): Promise<Result<AgentSession[], string>> {
   try {
     const db = getDb();
     const rows = await db.select<SessionRow[]>(
-      `SELECT id, project_id, status, prompt, model, sdk_session_id, created_at, ended_at
+      `SELECT id, project_id, status, session_type, prompt, model, sdk_session_id, created_at, ended_at
        FROM agent_sessions
        ORDER BY created_at DESC`,
     );
@@ -302,6 +337,7 @@ async function deleteSession(
 export {
   createSession,
   createIdleSession,
+  createTerminalSession,
   updateSessionPrompt,
   updateSessionStatus,
   listSessions,

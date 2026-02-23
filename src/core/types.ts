@@ -7,6 +7,9 @@ type AgentStatus =
   | "aborted"
   | "interrupted";
 
+/** Session type: chat (SDK agent) or terminal (PTY) */
+type SessionType = "chat" | "terminal";
+
 /** Message role in agent conversation */
 type MessageRole = "user" | "assistant" | "system";
 
@@ -22,6 +25,7 @@ interface AgentSession {
   readonly id: string;
   readonly projectId: string;
   readonly status: AgentStatus;
+  readonly sessionType: SessionType;
   readonly prompt: string | null;
   readonly model: string | null;
   readonly sdkSessionId: string | null;
@@ -47,6 +51,7 @@ interface AppSetting {
 
 export type {
   AgentStatus,
+  SessionType,
   MessageRole,
   Project,
   AgentSession,

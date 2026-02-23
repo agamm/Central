@@ -2,6 +2,7 @@ pub mod agents;
 pub mod files;
 pub mod notifications;
 pub mod settings;
+pub mod terminal;
 
 #[tauri::command]
 pub fn greet(name: &str) -> String {

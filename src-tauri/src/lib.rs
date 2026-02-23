@@ -4,6 +4,7 @@ use tauri_plugin_sql::{Builder as SqlBuilder, Migration, MigrationKind};
 mod commands;
 mod debug_log;
 mod notifications;
+mod pty;
 mod sidecar;
 
 fn create_migrations() -> Vec<Migration> {
@@ -14,6 +15,12 @@ fn create_migrations() -> Vec<Migration> {
             sql: include_str!("../migrations/001_initial_schema.sql"),
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 2,
+            description: "add_session_type",
+            sql: include_str!("../migrations/002_add_session_type.sql"),
+            kind: MigrationKind::Up,
+        },
     ]
 }
 
@@ -22,6 +29,13 @@ fn cleanup_on_exit(app_handle: &tauri::AppHandle) {
     // Shut down the sidecar (kills the Node.js process + all agent sessions)
     if let Some(sidecar) = app_handle.try_state::<sidecar::SidecarHandle>() {
         if let Ok(mut manager) = sidecar.lock() {
+            manager.shutdown();
+        }
+    }
+
+    // Shut down all PTY sessions
+    if let Some(pty_handle) = app_handle.try_state::<pty::PtyHandle>() {
+        if let Ok(mut manager) = pty_handle.lock() {
             manager.shutdown();
         }
     }
@@ -47,7 +61,10 @@ pub fn run() {
             let sidecar_handle = sidecar::create_sidecar_handle(handle);
             app.manage(sidecar_handle);
 
-            debug_log::log("RUST", "Sidecar handle created and managed");
+            let pty_handle = pty::create_pty_handle();
+            app.manage(pty_handle);
+
+            debug_log::log("RUST", "Sidecar + PTY handles created and managed");
 
             if let Err(e) = notifications::init() {
                 debug_log::log("RUST", &format!("Notification init failed: {e}"));
@@ -77,6 +94,10 @@ pub fn run() {
             commands::settings::get_setting,
             commands::settings::set_setting,
             commands::notifications::send_native_notification,
+            commands::terminal::start_terminal,
+            commands::terminal::write_terminal_input,
+            commands::terminal::resize_terminal,
+            commands::terminal::close_terminal,
             debug_log::debug_log,
         ])
         .run(tauri::generate_context!())

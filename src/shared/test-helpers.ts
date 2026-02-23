@@ -16,6 +16,7 @@ function createMockSession(overrides?: Partial<AgentSession>): AgentSession {
     id: crypto.randomUUID(),
     projectId: crypto.randomUUID(),
     status: "running",
+    sessionType: "chat",
     prompt: "Write a test",
     model: null,
     sdkSessionId: null,
