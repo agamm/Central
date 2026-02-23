@@ -2,7 +2,7 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AgentStatus } from "@/core/types";
 
-type VisualStatus = "idle" | "working" | "awaiting_approval" | "unread" | "completed" | "failed" | "aborted" | "interrupted";
+type VisualStatus = "hidden" | "working" | "awaiting_approval" | "unread" | "failed";
 
 interface StatusBadgeProps {
   readonly status: AgentStatus;
@@ -18,42 +18,33 @@ function deriveVisualStatus(
   hasApproval: boolean,
   isUnread: boolean,
 ): VisualStatus {
-  // Priority: approval > working > unread > base status
   if (hasApproval) return "awaiting_approval";
   if (isWorking) return "working";
   if (isUnread) return "unread";
-  if (status === "running") return "idle"; // running but not working = idle at prompt
-  if (status === "completed") return "completed";
   if (status === "failed") return "failed";
-  if (status === "aborted") return "aborted";
-  if (status === "interrupted") return "interrupted";
-  return "idle";
+  return "hidden";
 }
 
 const STATUS_DOT_STYLES: Record<VisualStatus, string> = {
-  idle: "bg-zinc-500/40",
+  hidden: "",
   working: "",
-  completed: "bg-emerald-500/70",
   unread: "bg-blue-400 animate-pulse",
   failed: "bg-red-500/70",
-  aborted: "bg-zinc-500/60",
-  interrupted: "bg-amber-500/70",
   awaiting_approval: "bg-amber-400 animate-pulse",
 };
 
 const STATUS_LABELS: Record<VisualStatus, string> = {
-  idle: "Idle",
+  hidden: "",
   working: "Working",
-  completed: "Completed",
   unread: "New Activity",
   failed: "Failed",
-  aborted: "Aborted",
-  interrupted: "Interrupted",
   awaiting_approval: "Needs Approval",
 };
 
 function StatusBadge({ status, isWorking = false, hasApproval = false, isUnread = false, className }: StatusBadgeProps) {
   const visual = deriveVisualStatus(status, isWorking, hasApproval, isUnread);
+
+  if (visual === "hidden") return null;
 
   if (visual === "working") {
     return (

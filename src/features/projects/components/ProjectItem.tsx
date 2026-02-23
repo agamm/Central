@@ -7,8 +7,8 @@ import {
   Trash2,
   Plus,
   MessageSquare,
-  TerminalSquare,
 } from "lucide-react";
+import { ClaudeIcon } from "@/components/icons/ClaudeIcon";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -147,8 +147,8 @@ function ProjectItem({
                     onNewTerminal(project.id);
                   }}
                 >
-                  <TerminalSquare className="h-3.5 w-3.5" />
-                  New Terminal
+                  <ClaudeIcon className="h-3.5 w-3.5 text-[#d97757]" />
+                  New Claude Code
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>

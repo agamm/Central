@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ProjectItem } from "./ProjectItem";
@@ -31,11 +31,29 @@ function ProjectList({ onAddProject }: ProjectListProps) {
   const closeFileViewer = useFilesStore((s) => s.closeFileViewer);
   const triggerPromptFocus = useUIStore((s) => s.triggerPromptFocus);
 
+  const [collapsedProjects, setCollapsedProjects] = useState<ReadonlySet<string>>(new Set());
+
   const handleSelect = useCallback(
     (id: string) => {
-      selectProject(id);
+      if (selectedProjectId === id) {
+        // Toggle collapse for already-selected project
+        setCollapsedProjects((prev) => {
+          const next = new Set(prev);
+          if (next.has(id)) next.delete(id); else next.add(id);
+          return next;
+        });
+      } else {
+        selectProject(id);
+        // Ensure newly selected project is expanded
+        setCollapsedProjects((prev) => {
+          if (!prev.has(id)) return prev;
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+      }
     },
-    [selectProject],
+    [selectedProjectId, selectProject],
   );
 
   const handleRename = useCallback(
@@ -118,7 +136,7 @@ function ProjectList({ onAddProject }: ProjectListProps) {
             key={project.id}
             project={project}
             isSelected={selectedProjectId === project.id}
-            isExpanded={selectedProjectId === project.id}
+            isExpanded={selectedProjectId === project.id && !collapsedProjects.has(project.id)}
             onSelect={handleSelect}
             onRename={handleRename}
             onDelete={handleDelete}

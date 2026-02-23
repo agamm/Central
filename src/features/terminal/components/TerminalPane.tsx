@@ -172,7 +172,7 @@ function TerminalPane({ sessionId, cwd }: TerminalPaneProps) {
     <div
       ref={containerRef}
       className="h-full w-full bg-background"
-      style={{ padding: "4px 0 0 4px" }}
+      style={{ padding: "8px 8px 4px 8px" }}
     />
   );
 }
