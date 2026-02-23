@@ -11,6 +11,26 @@ interface ToolCallBlockProps {
   readonly toolCalls: readonly ToolCallInfo[];
 }
 
+function getToolSummary(tool: ToolCallInfo): string | null {
+  const input = tool.input;
+
+  const filePath = input.file_path ?? input.path;
+  if (typeof filePath === "string") {
+    const segments = filePath.split("/");
+    return segments[segments.length - 1] ?? filePath;
+  }
+
+  if (typeof input.command === "string") {
+    return input.command.length > 60 ? input.command.slice(0, 60) + "..." : input.command;
+  }
+
+  if (typeof input.pattern === "string") return input.pattern;
+  if (typeof input.query === "string") return input.query.length > 60 ? input.query.slice(0, 60) + "..." : input.query;
+  if (typeof input.description === "string") return input.description;
+
+  return null;
+}
+
 function SingleToolCall({ tool }: { readonly tool: ToolCallInfo }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -31,6 +51,9 @@ function SingleToolCall({ tool }: { readonly tool: ToolCallInfo }) {
         />
         <Wrench className="h-3 w-3" />
         <span className="font-mono">{tool.name}</span>
+        {!expanded && getToolSummary(tool) && (
+          <span className="truncate font-mono text-muted-foreground/40">{getToolSummary(tool)}</span>
+        )}
       </div>
       {expanded && (
         <div className="ml-5 mt-1.5 select-text overflow-x-auto whitespace-pre-wrap rounded border border-border/40 bg-muted/30 px-3 py-2 font-mono text-xs text-muted-foreground/80">
