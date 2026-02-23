@@ -13,7 +13,7 @@ function MarkdownContent({ content }: MarkdownContentProps) {
         components={{
           // Style code blocks
           pre: ({ children }) => (
-            <pre className="my-1.5 overflow-x-auto rounded bg-muted/50 p-2 text-xs">
+            <pre className="my-1.5 overflow-x-auto rounded border border-border/30 bg-surface-raised p-2 text-xs">
               {children}
             </pre>
           ),
@@ -23,7 +23,7 @@ function MarkdownContent({ content }: MarkdownContentProps) {
               return <code className="text-xs">{children}</code>;
             }
             return (
-              <code className="rounded bg-muted/50 px-1 py-0.5 text-xs font-mono">
+              <code className="rounded bg-surface-raised px-1 py-0.5 text-xs font-mono">
                 {children}
               </code>
             );
@@ -46,7 +46,7 @@ function MarkdownContent({ content }: MarkdownContentProps) {
           a: ({ href, children }) => (
             <a
               href={href}
-              className="text-blue-400 underline decoration-blue-400/30 hover:decoration-blue-400"
+              className="text-foreground underline decoration-foreground/30 hover:decoration-foreground/60"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -65,7 +65,7 @@ function MarkdownContent({ content }: MarkdownContentProps) {
           ),
           // Blockquotes
           blockquote: ({ children }) => (
-            <blockquote className="my-1 border-l-2 border-muted-foreground/30 pl-3 text-muted-foreground">
+            <blockquote className="my-1 border-l-2 border-foreground/20 pl-3 text-muted-foreground">
               {children}
             </blockquote>
           ),

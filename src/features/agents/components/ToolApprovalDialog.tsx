@@ -138,7 +138,7 @@ function ApprovalItem({ approval }: ApprovalItemProps) {
               size="sm"
               onClick={handleApprove}
               disabled={responding}
-              className="h-6 rounded-r-none border-r border-emerald-600/50 bg-emerald-700 px-3 text-[11px] text-white hover:bg-emerald-600"
+              className="h-6 rounded-r-none border-r border-foreground/20 bg-foreground/90 px-3 text-[11px] text-background hover:bg-foreground/80"
             >
               {responding ? "Sending..." : "Approve"}
             </Button>
@@ -148,7 +148,7 @@ function ApprovalItem({ approval }: ApprovalItemProps) {
                   size="sm"
                   disabled={responding}
                   aria-label="More approval options"
-                  className="h-6 rounded-l-none bg-emerald-700 px-1.5 text-[11px] text-white hover:bg-emerald-600"
+                  className="h-6 rounded-l-none bg-foreground/90 px-1.5 text-[11px] text-background hover:bg-foreground/80"
                 >
                   <ChevronDown className="h-3 w-3" />
                 </Button>
@@ -165,7 +165,7 @@ function ApprovalItem({ approval }: ApprovalItemProps) {
             size="sm"
             onClick={handleApprove}
             disabled={responding}
-            className="h-6 bg-emerald-700 px-3 text-[11px] text-white hover:bg-emerald-600"
+            className="h-6 bg-foreground/90 px-3 text-[11px] text-background hover:bg-foreground/80"
           >
             {responding ? "Sending..." : "Approve"}
           </Button>

@@ -37,7 +37,7 @@ function RateLimitStatus() {
     <div className="flex items-center gap-1.5 px-3 py-1.5">
       <span
         className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-          isAllowed ? "bg-green-500/70" : "bg-orange-500/70"
+          isAllowed ? "bg-emerald-500/70" : "bg-orange-500/70"
         }`}
       />
       <span className="truncate text-[10px] text-muted-foreground/60">

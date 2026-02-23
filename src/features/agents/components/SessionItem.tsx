@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { MessageSquare, X } from "lucide-react";
+import { MessageSquare, TerminalSquare, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StatusBadge } from "./StatusBadge";
 import { useUIStore } from "../stores/uiStore";
@@ -42,6 +42,7 @@ function SessionItem({ session, isActive, onSelect, onDelete }: SessionItemProps
     (req) => req.sessionId === session.id,
   );
   const isUnread = session.status === "completed" && unreadSessions.has(session.id);
+  const isTerminal = session.sessionType === "terminal";
 
   const handleClick = useCallback(() => {
     onSelect(session.id);
@@ -62,6 +63,11 @@ function SessionItem({ session, isActive, onSelect, onDelete }: SessionItemProps
     [onDelete, session.id],
   );
 
+  const Icon = isTerminal ? TerminalSquare : MessageSquare;
+  const label = isTerminal
+    ? truncatePrompt(session.prompt, 30) === "Untitled session" ? "Terminal" : truncatePrompt(session.prompt, 30)
+    : truncatePrompt(session.prompt, 30);
+
   return (
     <div
       role="button"
@@ -71,12 +77,12 @@ function SessionItem({ session, isActive, onSelect, onDelete }: SessionItemProps
       className={cn(
         "group flex items-center gap-1.5 overflow-hidden rounded px-2 py-1 text-xs",
         "cursor-pointer hover:bg-accent/50",
-        isActive && "bg-accent text-foreground",
+        isActive && "border-l-2 border-l-foreground/40 bg-accent text-foreground",
       )}
     >
-      <MessageSquare className={cn("h-3 w-3 shrink-0", isActive ? "text-foreground/70" : "text-muted-foreground/60")} />
+      <Icon className={cn("h-3 w-3 shrink-0", isActive ? "text-foreground/70" : "text-muted-foreground/60")} />
       <span className={cn("min-w-0 flex-1 truncate", isActive ? "text-foreground/90" : "text-muted-foreground")}>
-        {truncatePrompt(session.prompt, 30)}
+        {label}
       </span>
       <span className="shrink-0 text-[9px] text-muted-foreground/40">
         {formatRelativeTime(session.createdAt)}

@@ -126,6 +126,8 @@ function PromptInput({
     [],
   );
 
+  const hasText = value.trim().length > 0;
+
   return (
     <div className="border-t border-border/50 px-4 py-3">
       <div className="flex items-end gap-2">
@@ -140,7 +142,7 @@ function PromptInput({
           className={cn(
             "flex-1 resize-none rounded-lg border border-border/60 bg-muted/40 px-3 py-2",
             "text-sm text-foreground/90 placeholder:text-muted-foreground/50",
-            "focus:border-border focus:outline-none",
+            "focus:border-foreground/25 focus:outline-none focus:ring-1 focus:ring-foreground/10",
             "disabled:cursor-not-allowed disabled:opacity-40",
             "max-h-[120px] min-h-[36px] select-text",
           )}
@@ -161,9 +163,14 @@ function PromptInput({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+            className={cn(
+              "h-8 w-8 shrink-0",
+              hasText
+                ? "text-foreground hover:bg-foreground/10"
+                : "text-muted-foreground hover:text-foreground",
+            )}
             onClick={handleSubmit}
-            disabled={disabled || value.trim().length === 0}
+            disabled={disabled || !hasText}
             title="Send message"
           >
             <Send className="h-3.5 w-3.5" />

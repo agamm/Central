@@ -41,10 +41,7 @@ function ProjectSidebar() {
   }, [addProject]);
 
   return (
-    <div
-      className="flex h-full flex-col"
-      style={{ backgroundColor: "hsl(0 0% 4%)" }}
-    >
+    <div className="flex h-full flex-col bg-sidebar">
       <div className="flex items-center justify-between px-3 py-2">
         <h2 className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground/70">
           Projects

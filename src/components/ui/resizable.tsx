@@ -33,12 +33,12 @@ function ResizableHandle({
   return (
     <Separator
       className={cn(
-        "relative flex w-px items-center justify-center bg-border/50",
-        "after:absolute after:inset-y-0 after:left-1/2 after:w-2 after:-translate-x-1/2",
-        "transition-colors duration-150 hover:bg-border",
+        "relative flex w-px items-center justify-center bg-border/30",
+        "after:absolute after:inset-y-0 after:left-1/2 after:w-3 after:-translate-x-1/2",
+        "transition-colors duration-150 hover:bg-foreground/15",
         "focus-visible:outline-none",
         "data-[orientation=vertical]:h-px data-[orientation=vertical]:w-full",
-        "data-[orientation=vertical]:after:left-0 data-[orientation=vertical]:after:h-2",
+        "data-[orientation=vertical]:after:left-0 data-[orientation=vertical]:after:h-3",
         "data-[orientation=vertical]:after:w-full data-[orientation=vertical]:after:-translate-y-1/2",
         "data-[orientation=vertical]:after:translate-x-0",
         "[&[data-orientation=vertical]>div]:rotate-90",

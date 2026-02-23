@@ -84,7 +84,7 @@ function FileTreeNode({
     <button
       type="button"
       className={`flex w-full items-center gap-1 py-px pr-2 text-left text-xs hover:bg-accent/40 ${
-        isSelected ? "bg-accent/60" : ""
+        isSelected ? "border-l-2 border-l-foreground/30 bg-accent/60" : ""
       }`}
       style={{ paddingLeft }}
       onClick={() => {

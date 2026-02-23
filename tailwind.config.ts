@@ -78,6 +78,9 @@ const config: Config = {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        "accent-primary": "hsl(var(--accent-primary))",
+        "accent-primary-muted": "hsl(var(--accent-primary-muted))",
+        "surface-raised": "hsl(var(--surface-raised))",
       },
       keyframes: {
         "accordion-down": {

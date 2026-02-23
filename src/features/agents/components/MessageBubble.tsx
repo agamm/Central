@@ -123,7 +123,11 @@ function MessageBubble({ message, elapsedMs }: MessageBubbleProps) {
       <div
         className={cn(
           "max-w-[85%] rounded-lg px-3 py-2",
-          isUser ? "bg-accent/50 text-foreground/90" : isSystem ? "text-muted-foreground italic text-xs" : "text-foreground/85",
+          isUser
+            ? "bg-accent-primary-muted/40 border border-border/40 text-foreground/90"
+            : isSystem
+              ? "text-muted-foreground italic text-xs"
+              : "text-foreground/85",
         )}
       >
         {!isUser && message.thinking && <ThinkingBlock thinking={message.thinking} isStreaming={isStreaming} />}

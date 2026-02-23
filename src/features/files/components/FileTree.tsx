@@ -149,7 +149,7 @@ function FileTreeHeader({
       <div className="flex items-center gap-2">
         <span className="text-xs font-medium text-foreground">Files</span>
         {changedCount > 0 ? (
-          <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-yellow-400">
+          <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-foreground/70">
             {changedCount}
           </span>
         ) : null}
@@ -186,9 +186,9 @@ function FileTreeSearch({
         ref={inputRef}
         type="text"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => { onChange(e.target.value); }}
         placeholder="Search files..."
-        className="h-6 w-full rounded bg-muted/50 pl-6 pr-6 text-xs text-foreground placeholder:text-muted-foreground/60 focus:bg-muted focus:outline-none focus:ring-1 focus:ring-ring/40"
+        className="h-6 w-full rounded bg-muted/50 pl-6 pr-6 text-xs text-foreground placeholder:text-muted-foreground/60 focus:bg-muted focus:outline-none focus:ring-1 focus:ring-foreground/15"
       />
       {value.length > 0 ? (
         <button

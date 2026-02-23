@@ -10,43 +10,48 @@
   }
 
   .dark {
-    /* Neutral, desaturated palette — no blue tint */
-    --background: 0 0% 5%;
-    --foreground: 0 0% 87%;
+    /* Cool gray monochrome palette */
+    --background: 220 5% 5%;
+    --foreground: 220 5% 88%;
 
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 87%;
+    --card: 220 5% 7%;
+    --card-foreground: 220 5% 88%;
 
-    --popover: 0 0% 8%;
-    --popover-foreground: 0 0% 87%;
+    --popover: 220 5% 8%;
+    --popover-foreground: 220 5% 88%;
 
-    --primary: 0 0% 87%;
-    --primary-foreground: 0 0% 5%;
+    --primary: 220 5% 88%;
+    --primary-foreground: 220 5% 5%;
 
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 0 0% 87%;
+    --secondary: 220 5% 10%;
+    --secondary-foreground: 220 5% 88%;
 
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 48%;
+    --muted: 220 5% 10%;
+    --muted-foreground: 220 5% 48%;
 
-    --accent: 0 0% 12%;
-    --accent-foreground: 0 0% 87%;
+    --accent: 220 5% 12%;
+    --accent-foreground: 220 5% 88%;
 
     --destructive: 0 50% 30%;
-    --destructive-foreground: 0 0% 87%;
+    --destructive-foreground: 220 5% 88%;
 
-    --border: 0 0% 13%;
-    --input: 0 0% 11%;
-    --ring: 0 0% 40%;
+    --border: 220 5% 13%;
+    --input: 220 5% 11%;
+    --ring: 220 5% 40%;
 
-    --sidebar-background: 0 0% 4%;
-    --sidebar-foreground: 0 0% 87%;
-    --sidebar-primary: 0 0% 87%;
-    --sidebar-primary-foreground: 0 0% 4%;
-    --sidebar-accent: 0 0% 10%;
-    --sidebar-accent-foreground: 0 0% 87%;
-    --sidebar-border: 0 0% 13%;
-    --sidebar-ring: 0 0% 40%;
+    --sidebar-background: 220 5% 4%;
+    --sidebar-foreground: 220 5% 88%;
+    --sidebar-primary: 220 5% 88%;
+    --sidebar-primary-foreground: 220 5% 4%;
+    --sidebar-accent: 220 5% 10%;
+    --sidebar-accent-foreground: 220 5% 88%;
+    --sidebar-border: 220 5% 13%;
+    --sidebar-ring: 220 5% 40%;
+
+    /* Semantic tokens — monochrome accent */
+    --accent-primary: 220 5% 80%;
+    --accent-primary-muted: 220 5% 15%;
+    --surface-raised: 220 5% 9%;
   }
 }
 
@@ -99,7 +104,7 @@
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: hsl(0 0% 18%) transparent;
+    scrollbar-color: hsl(220 5% 18%) transparent;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
@@ -112,12 +117,12 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: hsl(0 0% 20%);
+    background-color: hsl(220 5% 20%);
     border-radius: 3px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(0 0% 28%);
+    background-color: hsl(220 5% 28%);
   }
 }
 
@@ -132,10 +137,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: hsl(0 0% 18%);
+  background-color: hsl(220 5% 18%);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: hsl(0 0% 26%);
+  background-color: hsl(220 5% 26%);
 }

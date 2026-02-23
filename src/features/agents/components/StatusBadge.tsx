@@ -50,7 +50,7 @@ function StatusBadge({ status, hasApproval = false, isUnread = false, className 
     return (
       <Loader2
         className={cn(
-          "h-2.5 w-2.5 shrink-0 animate-spin text-blue-400/70",
+          "h-2.5 w-2.5 shrink-0 animate-spin text-foreground/50",
           className,
         )}
         aria-label={STATUS_LABELS[visual]}

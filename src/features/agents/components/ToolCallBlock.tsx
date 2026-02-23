@@ -56,7 +56,7 @@ function SingleToolCall({ tool }: { readonly tool: ToolCallInfo }) {
         )}
       </div>
       {expanded && (
-        <div className="ml-5 mt-1.5 select-text overflow-x-auto whitespace-pre-wrap rounded border border-border/40 bg-muted/30 px-3 py-2 font-mono text-xs text-muted-foreground/80">
+        <div className="ml-5 mt-1.5 select-text overflow-x-auto whitespace-pre-wrap rounded border border-border/30 bg-surface-raised px-3 py-2 font-mono text-xs text-muted-foreground/80">
           {JSON.stringify(tool.input, null, 2)}
         </div>
       )}
