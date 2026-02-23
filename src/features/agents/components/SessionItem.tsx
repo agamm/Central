@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { MessageSquare, TerminalSquare, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { StatusBadge } from "./StatusBadge";
 import { useUIStore } from "../stores/uiStore";
 import type { AgentSession } from "@/core/types";
@@ -41,7 +42,7 @@ function SessionItem({ session, isActive, onSelect, onDelete }: SessionItemProps
   const hasApproval = Array.from(pendingApprovals.values()).some(
     (req) => req.sessionId === session.id,
   );
-  const isUnread = session.status === "completed" && unreadSessions.has(session.id);
+  const isUnread = !isActive && unreadSessions.has(session.id);
   const isTerminal = session.sessionType === "terminal";
 
   const handleClick = useCallback(() => {
@@ -53,14 +54,6 @@ function SessionItem({ session, isActive, onSelect, onDelete }: SessionItemProps
       if (e.key === "Enter") onSelect(session.id);
     },
     [onSelect, session.id],
-  );
-
-  const handleDelete = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      onDelete?.(session.id);
-    },
-    [onDelete, session.id],
   );
 
   const Icon = isTerminal ? TerminalSquare : MessageSquare;
@@ -91,16 +84,28 @@ function SessionItem({ session, isActive, onSelect, onDelete }: SessionItemProps
         status={session.status}
         hasApproval={hasApproval}
         isUnread={isUnread}
+        isTerminal={isTerminal}
         className="shrink-0"
       />
       {onDelete && (
-        <button
-          onClick={handleDelete}
-          className="shrink-0 rounded p-0.5 opacity-0 hover:bg-destructive/20 group-hover:opacity-100"
-          aria-label="Delete session"
-        >
-          <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
-        </button>
+        <ConfirmDialog
+          trigger={
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              className="shrink-0 rounded p-0.5 opacity-0 hover:bg-destructive/20 group-hover:opacity-100"
+              aria-label="Delete session"
+            >
+              <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+            </button>
+          }
+          title="Delete session?"
+          description="This session and its messages will be permanently deleted."
+          onConfirm={() => {
+            onDelete(session.id);
+          }}
+        />
       )}
     </div>
   );

@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { cn } from "@/lib/utils";
 import type { Project } from "@/core/types";
 
@@ -169,15 +170,24 @@ function ProjectItem({
                 <Pencil className="h-3.5 w-3.5" />
                 Rename
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
+              <ConfirmDialog
+                trigger={
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                    }}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Delete
+                  </DropdownMenuItem>
+                }
+                title={`Delete "${project.name}"?`}
+                description="This will delete the project and all its sessions. This action cannot be undone."
+                onConfirm={() => {
                   onDelete(project.id);
                 }}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-                Delete
-              </DropdownMenuItem>
+              />
             </DropdownMenuContent>
           </DropdownMenu>
         )}

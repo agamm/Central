@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
-import { Plus, Loader2, Settings } from "lucide-react";
+import { FolderOpen, Loader2, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -55,7 +55,7 @@ function ProjectSidebar() {
               onClick={() => void handleOpenFolderPicker()}
               disabled={loading}
             >
-              <Plus className="h-3.5 w-3.5" />
+              <FolderOpen className="h-3.5 w-3.5" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right">Add Project</TooltipContent>
