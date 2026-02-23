@@ -6,6 +6,7 @@ import { useUIStore } from "../stores/uiStore";
 import { handleMessageEvent } from "./handlers/handleMessage";
 import { handleSessionCompleted, handleSessionFailed } from "./handlers/handleSessionLifecycle";
 import { debugLog } from "@/shared/debugLog";
+import { useUsageStore } from "@/features/usage/store";
 import type { AgentEventPayload, SidecarEvent, ToolApprovalRequest } from "../types";
 
 async function dispatchEvent(event: SidecarEvent): Promise<void> {
@@ -44,6 +45,13 @@ async function dispatchEvent(event: SidecarEvent): Promise<void> {
       break;
     case "session_failed":
       handleSessionFailed(event.sessionId, event.error);
+      break;
+    case "rate_limit_status":
+      useUsageStore.getState().setRateLimitStatus({
+        status: event.status,
+        resetsAt: event.resetsAt,
+        rateLimitType: event.rateLimitType,
+      });
       break;
     case "error":
       useSessionStore.getState().setError(event.message);

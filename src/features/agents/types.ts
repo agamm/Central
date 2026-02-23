@@ -52,7 +52,14 @@ type SidecarEvent =
       durationMs?: number;
     }
   | { type: "session_failed"; sessionId: string; error: string }
-  | { type: "error"; message: string };
+  | { type: "error"; message: string }
+  | {
+      type: "rate_limit_status";
+      sessionId: string;
+      status: string;
+      resetsAt: number;
+      rateLimitType: string;
+    };
 
 /** SDK permission-update suggestion returned with canUseTool */
 interface PermissionUpdateSuggestion {

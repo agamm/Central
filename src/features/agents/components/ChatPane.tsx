@@ -6,6 +6,7 @@ import { MessageQueue } from "./MessageQueue";
 import { PromptInput } from "./PromptInput";
 import { ChatEmptyState } from "./ChatEmptyState";
 import { ToolApprovalDialog } from "./ToolApprovalDialog";
+import { RateLimitStatus } from "@/features/usage/components/RateLimitStatus";
 
 function ChatPane() {
   const session = useChatSession();
@@ -55,6 +56,8 @@ function ChatPane() {
             : "Send a message to start an agent..."
         }
       />
+
+      <RateLimitStatus />
     </div>
   );
 }

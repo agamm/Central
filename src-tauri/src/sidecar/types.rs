@@ -123,6 +123,15 @@ pub enum SidecarEvent {
     Error {
         message: String,
     },
+    RateLimitStatus {
+        #[serde(rename = "sessionId")]
+        session_id: String,
+        status: String,
+        #[serde(rename = "resetsAt")]
+        resets_at: f64,
+        #[serde(rename = "rateLimitType")]
+        rate_limit_type: String,
+    },
 }
 
 /// Payload emitted to the frontend via Tauri events
@@ -448,6 +457,27 @@ mod tests {
                 assert!((elapsed_seconds - 5.2).abs() < 0.01);
             }
             _ => panic!("Expected ToolProgress event"),
+        }
+    }
+
+    #[test]
+    fn deserialize_rate_limit_status_event() {
+        let json = r#"{
+            "type":"rate_limit_status",
+            "sessionId":"s1",
+            "status":"allowed",
+            "resetsAt":1771822800,
+            "rateLimitType":"five_hour"
+        }"#;
+        let event: SidecarEvent = serde_json::from_str(json).unwrap();
+        match event {
+            SidecarEvent::RateLimitStatus { session_id, status, resets_at, rate_limit_type } => {
+                assert_eq!(session_id, "s1");
+                assert_eq!(status, "allowed");
+                assert!((resets_at - 1771822800.0).abs() < 0.01);
+                assert_eq!(rate_limit_type, "five_hour");
+            }
+            _ => panic!("Expected RateLimitStatus event"),
         }
     }
 

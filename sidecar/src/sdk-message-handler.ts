@@ -152,6 +152,28 @@ function handleStreamEvent(
   }
 }
 
+function handleRateLimitEvent(
+  sessionId: string,
+  msg: SDKMessage,
+  emit: (event: SidecarEvent) => void,
+  log: (msg: string) => void,
+): void {
+  const rlMsg = msg as unknown as {
+    rate_limit_info?: { status: string; resetsAt: number; rateLimitType: string };
+  };
+  const info = rlMsg.rate_limit_info;
+  if (!info) return;
+
+  emit({
+    type: "rate_limit_status",
+    sessionId,
+    status: info.status,
+    resetsAt: info.resetsAt,
+    rateLimitType: info.rateLimitType,
+  });
+  log(`Rate limit: status=${info.status} resets=${info.resetsAt} type=${info.rateLimitType}`);
+}
+
 const messageHandlers: Record<string, Handler> = {
   system: handleSystem,
   assistant: handleAssistant,
@@ -159,6 +181,7 @@ const messageHandlers: Record<string, Handler> = {
   result: handleResult,
   auth_status: handleAuthStatus,
   stream_event: handleStreamEvent,
+  rate_limit_event: handleRateLimitEvent,
 };
 
 export { processSDKMessage, getSdkSessionId };
