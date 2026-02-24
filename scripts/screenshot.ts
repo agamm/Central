@@ -160,6 +160,9 @@ async function main() {
         if (cmd === "mark_interrupted_sessions") return Promise.resolve();
         if (cmd === "send_native_notification") return Promise.resolve();
 
+        // Project discovery
+        if (cmd === "list_project_directories") return Promise.resolve([]);
+
         // Terminal PTY commands (no-op for screenshot)
         if (cmd === "start_terminal") return Promise.resolve();
         if (cmd === "resize_terminal") return Promise.resolve();

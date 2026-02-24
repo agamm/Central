@@ -91,6 +91,7 @@ pub fn run() {
             commands::files::status::get_file_content,
             commands::files::status::write_file,
             commands::files::diff::get_diff,
+            commands::files::discover::list_project_directories,
             commands::settings::get_setting,
             commands::settings::set_setting,
             commands::notifications::send_native_notification,

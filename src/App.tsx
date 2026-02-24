@@ -21,6 +21,7 @@ import { BootstrapLoading } from "@/components/BootstrapLoading";
 import { SettingsPane, useSettingsStore } from "@/features/settings";
 import { useAgentStore } from "@/features/agents/store";
 import { useProjectStore } from "@/features/projects/store";
+import { CommandPalette } from "@/components/CommandPalette";
 
 function CenterPane() {
   const viewingFileInCenter = useFilesStore((s) => s.viewingFileInCenter);
@@ -131,9 +132,11 @@ function App() {
   }
 
   return (
-    <TooltipProvider delayDuration={300}>
-      <MainLayout />
-    </TooltipProvider>
+    <CommandPalette>
+      <TooltipProvider delayDuration={300}>
+        <MainLayout />
+      </TooltipProvider>
+    </CommandPalette>
   );
 }
 
