@@ -34,7 +34,7 @@ interface ProjectItemProps {
 
 function ProjectItem({
   project,
-  isSelected: _isSelected,
+  isSelected,
   isExpanded,
   onSelect,
   onRename,
@@ -88,7 +88,9 @@ function ProjectItem({
         className={cn(
           "group flex items-center gap-1 rounded px-2 py-1 text-sm",
           "cursor-pointer",
-          isExpanded && "border-l-2 border-l-foreground/30",
+          isSelected
+            ? "bg-accent/50 border-l-2 border-l-foreground/70"
+            : "hover:bg-accent/20",
         )}
       >
         <ChevronRight
@@ -97,7 +99,7 @@ function ProjectItem({
             isExpanded && "rotate-90",
           )}
         />
-        <Folder className={cn("h-3.5 w-3.5 shrink-0", isExpanded ? "text-foreground/70" : "text-muted-foreground/70")} />
+        <Folder className={cn("h-3.5 w-3.5 shrink-0", isSelected ? "text-foreground" : "text-muted-foreground/70")} />
 
         {isEditing ? (
           <Input
@@ -114,7 +116,7 @@ function ProjectItem({
             }}
           />
         ) : (
-          <span className="flex-1 truncate text-foreground/85">
+          <span className={cn("flex-1 truncate", isSelected ? "text-foreground font-medium" : "text-foreground/85")}>
             {project.name}
           </span>
         )}
