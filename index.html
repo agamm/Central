@@ -5,9 +5,19 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Central</title>
+    <style>html,body{margin:0;padding:0;background:hsl(220 5% 5%)}</style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Inline loading shown instantly before JS/CSS bundles load. React replaces this on mount. -->
+      <div style="display:flex;align-items:center;justify-content:center;height:100vh;width:100vw;background:hsl(220 5% 5%);margin:0">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="hsl(220 5% 30%)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          <span style="font-family:-apple-system,system-ui,sans-serif;font-size:11px;color:hsl(220 5% 30%)">Loading...</span>
+        </div>
+      </div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

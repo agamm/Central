@@ -21,7 +21,7 @@ Open source so you can extend it to fit your workflow — add custom tools, twea
 
 ```
 pnpm install
-pnpm tauri dev
+pnpm dev
 ```
 
 ## Stack

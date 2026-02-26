@@ -44,6 +44,8 @@ function ProjectList({ onAddProject }: ProjectListProps) {
         });
       } else {
         selectProject(id);
+        switchSession(null);
+        closeFileViewer();
         // Ensure newly selected project is expanded
         setCollapsedProjects((prev) => {
           if (!prev.has(id)) return prev;
